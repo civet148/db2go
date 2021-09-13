@@ -1,0 +1,26 @@
+syntax = "proto3";
+package proto;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.gostring_all) = true;
+
+message ClassesDO {
+	int32 id = 1; //incr id
+	string class_no = 2; //class no
+	int32 user_id = 3; //student id
+}
+
+message UsersDO {
+	int32 id = 1; //auto inc id
+	string name = 2; //user name
+	string phone = 3; //phone number
+	int32 sex = 4; //user sex
+	string email = 5; //email
+	int32 disable = 6; //disabled(0=false 1=true)
+	double balance = 7; //balance of decimal
+}
+
