@@ -67,6 +67,9 @@ func (c *Commander) GoString() string {
 }
 
 func (c *Commander) ParseSpecTypes(strSpecType string) (sts []*SpecType) {
+	if strSpecType == "" {
+		return
+	}
 	ss := strings.Split(strSpecType, ",")
 	for _, v := range ss {
 		tt := strings.Split(v, "=")
@@ -323,7 +326,7 @@ func GetDatabaseName(strPath string) (strName string) {
 }
 
 //将数据库字段类型转为go语言对应的数据类型
-func GetGoColumnType(strTableName string, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
+func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
 
 	var bUnsigned bool
 	var strColName, strDataType, strColumnType string
@@ -366,7 +369,7 @@ func GetGoColumnType(strTableName string, col TableColumn, enableDecimal bool, t
 		}
 	}
 
-	return
+	return ReplaceColumnType(cmd, strTableName, col.Name, strGoColType), isDecimal
 }
 
 //将数据库字段类型转为protobuf对应的数据类型

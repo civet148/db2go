@@ -15,7 +15,7 @@ import (
 
 const (
 	SSH_SCHEME = "ssh://"
-	VERSION    = "v2.0.0"
+	VERSION    = "v2.1.0"
 )
 
 var argvUrl = flag.String("url", "", "mysql://root:123456@127.0.0.1:3306/test?charset=utf8")

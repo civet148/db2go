@@ -62,8 +62,8 @@ github.com/civet148/gotools v1.1.3 h1:59hYaDsGAIL2rD6BV/M1Nz67dAwKHxBUSYPbH8BCeM
 github.com/civet148/gotools v1.1.3/go.mod h1:CcRiAjJ24CEvefoVmd8wnXtEntneyQ7JBZbjEWxhKMM=
 github.com/civet148/log v1.1.0 h1:VRGFYD9ytkWzAIBpw2ALwJF/+ocYP32JNl9C6QSW614=
 github.com/civet148/log v1.1.0/go.mod h1:fR/TOocpVvjAKFXzx/tf+LUpntHmfVekz126r5wmgME=
-github.com/civet148/sqlca/v2 v2.0.2 h1:JgEafrFhOElCOTNs2HcjpbVaraCJYMKBxiw6mXf/MbI=
-github.com/civet148/sqlca/v2 v2.0.2/go.mod h1:VdV39nSc4d59RYaWKXBR4BdeaxjdZbfh3TooJTjOvCc=
+github.com/civet148/sqlca/v2 v2.0.5 h1:GsZ18w4V1/I+qVmCKCFmS5GoXxSM3Ly5nGcSPdvK7cM=
+github.com/civet148/sqlca/v2 v2.0.5/go.mod h1:M9Jma5pzNiuHhgR0cdl7nY5gq94zHPwpr8t5e1XShAQ=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cloudflare/cloudflare-go v0.10.2/go.mod h1:qhVI5MKwBGhdNU89ZRz2plgYutcJ5PCekLxXn56w6SY=
 github.com/containerd/cgroups v0.0.0-20190919134610-bf292b21730f/go.mod h1:OApqhQ4XNSNC13gXIwDjhOQxjWa/NxkwZXJ1EvqT0ko=
@@ -279,9 +279,8 @@ github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHX
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mattn/go-runewidth v0.0.2/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
+github.com/mattn/go-sqlite3 v1.9.0 h1:pDRiWfl+++eC2FEFRy6jXmQlvp4Yh3z1MJKg4UeYM/4=
 github.com/mattn/go-sqlite3 v1.9.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
-github.com/mattn/go-sqlite3 v1.10.0 h1:jbhqpg7tQe4SupckyijYiy0mJJ/pRyHvXf7JdWK860o=
-github.com/mattn/go-sqlite3 v1.10.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/mattn/go-tty v0.0.0-20180219170247-931426f7535a/go.mod h1:XPvLUNfbS4fJH25nqRHfWLMa1ONC8Amw+mIA639KxkE=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/mholt/certmagic v0.7.5/go.mod h1:91uJzK5K8IWtYQqTi5R2tsxV1pCde+wdGfaRaOZi6aQ=
