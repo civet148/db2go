@@ -29,7 +29,7 @@ var argvPackage = flag.String("package", "", "export package name")
 var argvWithout = flag.String("without", "", "exclude columns")
 var argvReadOnly = flag.String("readonly", "", "read only columns")
 var argvProtobuf = flag.Bool("proto", false, "output proto buffer file")
-var argvDisableDecimal = flag.Bool("disable-decimal", true, "compatible with legacy version [deprecated]")
+var argvSpecType = flag.String("spec-type", "", "specify column types")
 var argvEnableDecimal = flag.Bool("enable-decimal", false, "decimal as sqlca.Decimal type")
 var argvGogoOptions = flag.String("gogo-options", "", "gogo proto options")
 var argvOneFile = flag.Bool("one-file", false, "output go/proto file into one file which named by database name")
@@ -61,6 +61,7 @@ func main() {
 	cmd.OmitEmpty = *argvOmitEmpty
 	cmd.Struct = *argvStruct
 	cmd.SSH = *argvSSH
+	cmd.SpecTypes = strings.Split(*argvSpecType, ",")
 
 	if cmd.SSH != "" {
 		if !strings.Contains(cmd.SSH, SSH_SCHEME) {

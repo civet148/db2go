@@ -48,6 +48,7 @@ type Commander struct {
 	Engine         *sqlca.Engine `json:"-"`
 	JsonProperties string        `json:"-"`
 	SSH            string        `json:"ssh"`
+	SpecTypes      []string      `json:"spec_types"`
 }
 
 func (c *Commander) String() string {
