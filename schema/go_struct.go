@@ -246,7 +246,7 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 		var strColType, strColName string
 		strColName = CamelCaseConvert(v.Name)
 		strColType, _ = GetGoColumnType(table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
-
+		strColType = ReplaceColumnType(cmd, table.TableName, v.Name, strColType)
 		if IsInSlice(v.Name, cmd.ReadOnly) {
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", sqlca.TAG_NAME_SQLCA, sqlca.SQLCA_TAG_VALUE_READ_ONLY))
 		}

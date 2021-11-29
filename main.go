@@ -29,7 +29,7 @@ var argvPackage = flag.String("package", "", "export package name")
 var argvWithout = flag.String("without", "", "exclude columns")
 var argvReadOnly = flag.String("readonly", "", "read only columns")
 var argvProtobuf = flag.Bool("proto", false, "output proto buffer file")
-var argvSpecType = flag.String("spec-type", "", "specify column types")
+var argvSpecType = flag.String("spec-type", "", "specify column types [only string can replace], e.g 'user.detail=UserDetail, user.data=UserData' ")
 var argvEnableDecimal = flag.Bool("enable-decimal", false, "decimal as sqlca.Decimal type")
 var argvGogoOptions = flag.String("gogo-options", "", "gogo proto options")
 var argvOneFile = flag.Bool("one-file", false, "output go/proto file into one file which named by database name")
@@ -48,7 +48,7 @@ func init() {
 
 func main() {
 	//var err error
-	var cmd = schema.Commander{}
+	var cmd = &schema.Commander{}
 	cmd.Prefix = *argvPackage
 	cmd.Prefix = *argvPrefix
 	cmd.Suffix = *argvSuffix
@@ -61,7 +61,7 @@ func main() {
 	cmd.OmitEmpty = *argvOmitEmpty
 	cmd.Struct = *argvStruct
 	cmd.SSH = *argvSSH
-	cmd.SpecTypes = strings.Split(*argvSpecType, ",")
+	cmd.ParseSpecTypes(*argvSpecType)
 
 	if cmd.SSH != "" {
 		if !strings.Contains(cmd.SSH, SSH_SCHEME) {
@@ -74,7 +74,7 @@ func main() {
 		return
 	}
 	if cmd.Struct {
-		structs.ExportStruct(&cmd)
+		structs.ExportStruct(cmd)
 	} else {
 
 		if *argvUrl == "" {
@@ -141,7 +141,7 @@ func main() {
 			cmd.Engine = sqlca.NewEngine(cmd.ConnUrl)
 		}
 
-		export(&cmd, cmd.Engine)
+		export(cmd, cmd.Engine)
 	}
 }
 

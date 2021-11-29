@@ -21,6 +21,12 @@ const (
 	IMPORT_SQLCA      = `import "github.com/civet148/sqlca/v2"`
 )
 
+type SpecType struct {
+	Table  string `json:"table"`
+	Column string `json:"column"`
+	Type   string `json:"type"`
+}
+
 type Commander struct {
 	ConnUrl        string        `json:"ConnUrl,omitempty"`
 	Database       string        `json:"-"`
@@ -48,7 +54,7 @@ type Commander struct {
 	Engine         *sqlca.Engine `json:"-"`
 	JsonProperties string        `json:"-"`
 	SSH            string        `json:"ssh"`
-	SpecTypes      []string      `json:"spec_types"`
+	SpecTypes      []*SpecType   `json:"spec_types"`
 }
 
 func (c *Commander) String() string {
@@ -58,6 +64,29 @@ func (c *Commander) String() string {
 
 func (c *Commander) GoString() string {
 	return c.String()
+}
+
+func (c *Commander) ParseSpecTypes(strSpecType string) (sts []*SpecType) {
+	ss := strings.Split(strSpecType, ",")
+	for _, v := range ss {
+		tt := strings.Split(v, "=")
+		if len(tt) != 2 {
+			log.Errorf("spec type [%s] format illegal", v)
+			continue
+		}
+		tc := strings.Split(tt[0], ".")
+		if len(tc) != 2 {
+			log.Errorf("spec type [%s] format illegal", tt[0])
+			continue
+		}
+		sts = append(sts, &SpecType{
+			Table:  tc[0],
+			Column: tc[1],
+			Type:   tt[1],
+		})
+	}
+	c.SpecTypes = sts
+	return
 }
 
 func (c *Commander) GetJsonPropertiesSlice() (jsonProps []string) {
@@ -153,6 +182,16 @@ func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment st
 	}
 	return fmt.Sprintf("	%v %v `json:\"%v\" db:\"%v\" %v` //%v \n",
 		strColName, strColType, strJsonValue, strTagValue, strAppends, strComment)
+}
+
+func ReplaceColumnType(cmd *Commander, strTableName, strColName, strColType string) string {
+
+	for _, v := range cmd.SpecTypes {
+		if v.Table == strTableName && strColName == v.Column && strColType == "string" {
+			strColType = v.Type
+		}
+	}
+	return strColType
 }
 
 func MakeGetter(strStructName, strColName, strColType string) (strGetter string) {
