@@ -49,7 +49,6 @@ func init() {
 func main() {
 	//var err error
 	var cmd = &schema.Commander{}
-	cmd.Prefix = *argvPackage
 	cmd.Prefix = *argvPrefix
 	cmd.Suffix = *argvSuffix
 	cmd.OutDir = *argvOutput

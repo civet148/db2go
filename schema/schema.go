@@ -72,6 +72,7 @@ func (c *Commander) ParseSpecTypes(strSpecType string) (sts []*SpecType) {
 	}
 	ss := strings.Split(strSpecType, ",")
 	for _, v := range ss {
+		v = strings.TrimSpace(v)
 		tt := strings.Split(v, "=")
 		if len(tt) != 2 {
 			log.Errorf("spec type [%s] format illegal", v)
