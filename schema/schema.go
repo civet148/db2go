@@ -28,32 +28,33 @@ type SpecType struct {
 }
 
 type Commander struct {
-	ConnUrl        string        `json:"ConnUrl,omitempty"`
-	Database       string        `json:"-"`
-	Tables         []string      `json:"-"`
-	Without        []string      `json:"Without,omitempty"`
-	ReadOnly       []string      `json:"ReadOnly,omitempty"`
-	Tags           []string      `json:"Tags,omitempty"`
-	Scheme         string        `json:"-"`
-	Host           string        `json:"-"`
-	User           string        `json:"-"`
-	Password       string        `json:"-"`
-	Charset        string        `json:"-"`
-	OutDir         string        `json:"OutDir,omitempty"`
-	Prefix         string        `json:"Prefix,omitempty"`
-	Suffix         string        `json:"Suffix,omitempty"`
-	PackageName    string        `json:"PackageName,omitempty"`
-	Protobuf       bool          `json:"Protobuf,omitempty"`
-	EnableDecimal  bool          `json:"EnableDecimal,omitempty"`
-	OneFile        bool          `json:"OneFile,omitempty"`
-	GogoOptions    []string      `json:"GogoOptions,omitempty"`
-	Orm            bool          `json:"Orm,omitempty"`
-	OmitEmpty      bool          `json:"OmitEmpty,omitempty"`
-	TinyintAsBool  []string      `json:"TinyintAsBool,omitempty"`
-	Engine         *sqlca.Engine `json:"-"`
-	JsonProperties string        `json:"-"`
-	SSH            string        `json:"ssh"`
-	SpecTypes      []*SpecType   `json:"spec_types"`
+	ConnUrl        string
+	Database       string
+	Tables         []string
+	Without        []string
+	ReadOnly       []string
+	Tags           []string
+	Scheme         string
+	Host           string
+	User           string
+	Password       string
+	Charset        string
+	OutDir         string
+	Prefix         string
+	Suffix         string
+	PackageName    string
+	Protobuf       bool
+	EnableDecimal  bool
+	OneFile        bool
+	GogoOptions    []string
+	DAO            string
+	ImportModels   string
+	OmitEmpty      bool
+	TinyintAsBool  []string
+	Engine         *sqlca.Engine
+	JsonProperties string
+	SSH            string
+	SpecTypes      []*SpecType
 }
 
 func (c *Commander) String() string {
@@ -122,6 +123,7 @@ type TableSchema struct {
 	SchemeDir          string        `json:"schema_dir" db:"schema_dir"`       //output path
 	PkName             string        `json:"pk_name" db:"pk_name"`             //primary key column name
 	StructName         string        `json:"struct_name" db:"struct_name"`     //struct name
+	StructDAO          string        `json:"struct_dao" db:"struct_dao"`       //struct DAO name
 	OutDir             string        `json:"out_dir" db:"out_dir"`             //output directory
 	FileName           string        `json:"file_name" db:"file_name"`         //output directory
 	Columns            []TableColumn `json:"table_columns" db:"table_columns"` //columns with database and golang

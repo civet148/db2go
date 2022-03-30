@@ -5,15 +5,12 @@ import (
 	"github.com/civet148/log"
 	"github.com/civet148/sqlca/v2"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
-const (
-	METHOD_ARGS_NULL     = ""
-	METHOD_NAME_STRING   = "String"
-	METHOD_NAME_GOSTRING = "GoString"
-	METHOD_NAME_GET      = "Get"
-	METHOD_NAME_SET      = "Set"
+const(
+	TableNamePrefix = "TableName"
 )
 
 func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
@@ -80,7 +77,6 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 		log.Errorf("open file [%v] error (%v)", table.FileName, err.Error())
 		return
 	}
-	log.Infof("exporting table schema [%v] to file [%v]", table.TableName, table.FileName)
 
 	var strHead, strContent string
 
@@ -93,10 +89,10 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	//write table name in camel case naming
 	table.TableNameCamelCase = CamelCaseConvert(table.TableName)
 	table.TableComment = ReplaceCRLF(table.TableComment)
-	strContent += fmt.Sprintf("const TableName%v = \"%v\" //%v \n\n", table.TableNameCamelCase, table.TableName, table.TableComment)
+	strContent += fmt.Sprintf("const %s%v = \"%v\" //%v \n\n", TableNamePrefix, table.TableNameCamelCase, table.TableName, table.TableComment)
 
 	table.StructName = fmt.Sprintf("%s%s", table.TableNameCamelCase, strings.ToUpper(cmd.Suffix))
-
+	table.StructDAO = fmt.Sprintf("%sDAO", table.TableNameCamelCase)
 	for i, v := range table.Columns {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
@@ -106,11 +102,13 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 
 	strContent += makeColumnConsts(cmd, table)
 	strContent += makeTableStructure(cmd, table)
-	strContent += makeNewMethod(cmd, table)
 	strContent += makeObjectMethods(cmd, table)
-	strContent += makeOrmMethods(cmd, table)
 	strContent += makeTableCreateSQL(cmd, table)
-	_, _ = File.WriteString(strHead + strContent)
+	if _, err = File.WriteString(strHead + strContent); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	makeDAO(cmd, table)
 	return
 }
 
@@ -124,18 +122,86 @@ func haveDecimal(cmd *Commander, table *TableSchema, TableCols []TableColumn, en
 	return
 }
 
-func makeNewMethod(cmd *Commander, table *TableSchema) (strContent string) {
-	if cmd.Orm {
-		strContent += fmt.Sprintf(`
-func New%v(db *sqlca.Engine) *%v {
-	return &%v{
-		_db_: db,
+func makeDAO(cmd *Commander, table *TableSchema) {
+	var err error
+	var strContent string
+	if cmd.DAO == "" {
+		return
+	}
+	var strDir, strDAOFileName string
+
+	if strings.LastIndex(cmd.OutDir, fmt.Sprintf("%v", os.PathSeparator)) == -1 {
+		strDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.DAO)
+	} else {
+		strDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.DAO)
+	}
+	if _, err = os.Stat(strDir); err != nil {
+		if err = os.Mkdir(strDir, os.ModeDir); err != nil {
+			log.Errorf("mkdir %s error [%s]", strDir, err.Error())
+			return
+		}
+	}
+
+	var file *os.File
+	var fi os.FileInfo
+
+	strDAOFileName = filepath.Join(strDir, table.TableName+".go")
+	if fi, err = os.Stat(strDAOFileName); err != nil {
+		file, err = os.OpenFile(strDAOFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0)
+		if err != nil {
+			log.Errorf("open file [%v] error (%v)", strDAOFileName, err.Error())
+			return
+		}
+	} else {
+		if fi.IsDir() || fi.Name() != "" {
+			//log.Warnf("file %s already exist", strDAOFileName)
+			return
+		}
+	}
+
+	log.Infof("generate [%v]", strDAOFileName)
+	strContent += fmt.Sprintf("package %v\n\n", cmd.DAO)
+	strContent += fmt.Sprintf(`import (
+	"github.com/civet148/sqlca/v2"
+	"%s"
+)
+
+`, cmd.ImportModels)
+
+	strContent += makeNewMethod(cmd, table)
+	strContent += makeOrmMethods(cmd, table)
+	if _, err = file.WriteString(strContent); err != nil {
+		log.Errorf("export DAO for table [%v] to file [%v] error [%s]", table.TableName, strDAOFileName, err.Error())
+		return
 	}
 }
 
-`, table.StructName, table.StructName, table.StructName)
+//make new DAO method
+func makeNewMethod(cmd *Commander, table *TableSchema) (strContent string) {
+	strContent += fmt.Sprintf(`
+type %s struct {
+	db *sqlca.Engine
+}
+
+`, table.StructDAO)
+
+	strContent += fmt.Sprintf(`
+func New%v(db *sqlca.Engine) *%v {
+	return &%v{
+		db: db,
 	}
+}
+
+`, table.StructDAO, table.StructDAO, table.StructDAO)
 	return
+}
+
+func makeModelTableName(cmd *Commander, table *TableSchema) string {
+	return fmt.Sprintf("%s.%s%s", cmd.PackageName, TableNamePrefix, table.TableNameCamelCase)
+}
+
+func makeModelStructName(cmd *Commander, table *TableSchema) string {
+	return fmt.Sprintf("%s.%s", cmd.PackageName, table.StructName)
 }
 
 func makeObjectMethods(cmd *Commander, table *TableSchema) (strContent string) {
@@ -161,59 +227,53 @@ func makeTableCreateSQL(cmd *Commander, table *TableSchema) (strContent string) 
 }
 
 func makeOrmMethods(cmd *Commander, table *TableSchema) (strContent string) {
-	if cmd.Orm {
-		strContent += makeOrmInsertMethod(cmd, table)
-		strContent += makeOrmUpsertMethod(cmd, table)
-		strContent += makeOrmUpdateMethod(cmd, table)
-		strContent += makeOrmQueryMethod(cmd, table)
-		strContent += makeOrmQueryExcludeMethod(cmd, table)
-	}
+	strContent += makeOrmInsertMethod(cmd, table)
+	strContent += makeOrmUpsertMethod(cmd, table)
+	strContent += makeOrmUpdateMethod(cmd, table)
+	strContent += makeOrmQueryMethod(cmd, table)
 	return
 }
 
 func makeOrmInsertMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert into table by data model
-func (do *%v) Insert_() (lastInsertId int64, err error) {
-	return do._db_.Model(do).Table(%v).Insert()
+func (dao *%v) Insert(do *%s) (lastInsertId int64, err error) {
+	return dao.db.Model(do).Table(%s).Insert()
 }
-`, table.StructName, table.TableNameCamelCase)
+
+`, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
 func makeOrmUpsertMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert if not exist or update columns on duplicate key...
-func (do *%v) Upsert_() (lastInsertId int64, err error) {
-	return do._db_.Model(do).Table(%v).Select(columns...).Upsert()
+func (dao *%v) Upsert(do *%s, columns...string) (lastInsertId int64, err error) {
+	return dao.db.Model(do).Table(%s).Select(columns...).Upsert()
 }
-`, table.StructName, table.TableNameCamelCase)
+
+`, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
 func makeOrmUpdateMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //update table set columns where id=xxx
-func (do *%v) Update_(columns...string) (rows int64, err error) {
-	return do._db_.Model(do).Table(%v).Select(columns...).Update()
+func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
+	return dao.db.Model(do).Table(%s).Select(columns...).Update()
 }
-`, table.StructName, table.TableNameCamelCase)
+
+`, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
 func makeOrmQueryMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
-//select columns from table where id=xxx
-func (do *%v) Query_(columns...string) (rows int64, err error) {
-	return do._db_.Model(do).Table(%v).Select(columns...).Query()
-}
-`, table.StructName, table.TableNameCamelCase)
+func (dao *%v) QueryById(id interface{}, columns...string) (do *%s, err error) {
+	if _, err = dao.db.Model(do).Table(%s).Id(id).Select(columns...).Query(); err != nil {
+		return nil, err
+	}
+	return
 }
 
-func makeOrmQueryExcludeMethod(cmd *Commander, table *TableSchema) (strContent string) {
-	return fmt.Sprintf(`
-//select * from table where id=xxx exclude columns
-func (do *%v) Query_exclude(columns...string) (rows int64, err error) {
-	return do._db_.Model(do).Table(%v).Exclude(columns...).Query()
-}
-`, table.StructName, table.TableNameCamelCase)
+`, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
 func makeColumnConsts(cmd *Commander, table *TableSchema) (strContent string) {
@@ -229,13 +289,10 @@ func makeColumnConsts(cmd *Commander, table *TableSchema) (strContent string) {
 	strContent += fmt.Sprintf(")\n\n")
 	return
 }
+
 func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) {
 
 	strContent += fmt.Sprintf("type %v struct { \n", table.StructName)
-
-	if cmd.Orm {
-		strContent += "_db_      *sqlca.Engine \n"
-	}
 	for _, v := range table.Columns {
 
 		if IsInSlice(v.Name, cmd.Without) {

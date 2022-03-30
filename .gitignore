@@ -16,3 +16,4 @@
 .idea
 /db2go
 /models/
+/dao/

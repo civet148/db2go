@@ -26,10 +26,6 @@ var (
 )
 
 const (
-	CMD_NAME_RUN = "run"
-)
-
-const (
 	CmdFlag_Url            = "url"
 	CmdFlag_Output         = "out"
 	CmdFlag_Database       = "db"
@@ -45,11 +41,12 @@ const (
 	CmdFlag_EnableDecimal  = "enable-decimal"
 	CmdFlag_GogoOptions    = "gogo-options"
 	CmdFlag_OneFile        = "one-file"
-	CmdFlag_DAO            = "orm"
+	CmdFlag_DAO            = "dao"
 	CmdFlag_OmitEmpty      = "omitempty"
 	CmdFlag_JsonProperties = "json-properties"
 	CmdFlag_TinyintAsBool  = "tinyint-as-bool"
 	CmdFlag_SSH            = "ssh"
+	CmdFlag_ImportModels   = "import-models"
 )
 
 func init() {
@@ -91,9 +88,9 @@ func main() {
 				Required: true,
 			},
 			&cli.StringFlag{
-				Name:        CmdFlag_Output,
-				Usage:       "output path",
-				DefaultText: ".",
+				Name:  CmdFlag_Output,
+				Usage: "output path",
+				Value: ".",
 			},
 			&cli.StringFlag{
 				Name:  CmdFlag_Database,
@@ -127,7 +124,7 @@ func main() {
 				Name:  CmdFlag_ReadOnly,
 				Usage: "readonly columns split by colon",
 			},
-			&cli.StringFlag{
+			&cli.BoolFlag{
 				Name:  CmdFlag_Protobuf,
 				Usage: "export protobuf file",
 			},
@@ -150,7 +147,10 @@ func main() {
 			&cli.StringFlag{
 				Name:  CmdFlag_DAO,
 				Usage: "generate data access object file",
-				Value: "dao",
+			},
+			&cli.StringFlag{
+				Name:  CmdFlag_ImportModels,
+				Usage: "project name",
 			},
 			&cli.BoolFlag{
 				Name:  CmdFlag_OmitEmpty,
@@ -191,7 +191,8 @@ func doAction(ctx *cli.Context) error {
 	cmd.PackageName = ctx.String(CmdFlag_Package)
 	cmd.Protobuf = ctx.Bool(CmdFlag_Protobuf)
 	cmd.EnableDecimal = ctx.Bool(CmdFlag_EnableDecimal)
-	cmd.Orm = ctx.Bool(CmdFlag_DAO)
+	cmd.DAO = ctx.String(CmdFlag_DAO)
+	cmd.ImportModels = ctx.String(CmdFlag_ImportModels)
 	cmd.OmitEmpty = ctx.Bool(CmdFlag_OmitEmpty)
 	cmd.SSH = ctx.String(CmdFlag_SSH)
 	cmd.Database = ctx.String(CmdFlag_Database)
@@ -199,6 +200,10 @@ func doAction(ctx *cli.Context) error {
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
 
+	if cmd.DAO != "" && cmd.ImportModels == "" {
+		log.Errorf("models import required when generate DAO files, eg. github.com/your-repo/dal/models")
+		return nil
+	}
 	if cmd.SSH != "" {
 		if !strings.Contains(cmd.SSH, SSH_SCHEME) {
 			cmd.SSH = SSH_SCHEME + cmd.SSH
@@ -206,8 +211,6 @@ func doAction(ctx *cli.Context) error {
 	}
 
 	ui := sqlca.ParseUrl(cmd.ConnUrl)
-
-	log.Infof("%+v", cmd.String())
 
 	if cmd.Database == "" {
 		//use default database
@@ -247,6 +250,9 @@ func doAction(ctx *cli.Context) error {
 	cmd.Host = ui.Host
 	cmd.User = ui.User
 	cmd.Password = ui.Password
+
+	log.Infof("command options [%+v]", cmd)
+
 	if strings.TrimSpace(cmd.SSH) != "" {
 		cmd.Engine = sqlca.NewEngine(cmd.ConnUrl, tunnelOption(cmd.SSH))
 	} else {
@@ -271,7 +277,6 @@ func tunnelOption(strSSH string) *sqlca.Options {
 }
 
 func export(cmd *schema.Commander, e *sqlca.Engine) (err error) {
-	e.Debug(true)
 	exporter := schema.NewExporter(cmd, e)
 	if exporter == nil {
 		err = fmt.Errorf("new exporter error, nil object")
@@ -279,11 +284,13 @@ func export(cmd *schema.Commander, e *sqlca.Engine) (err error) {
 		return err
 	}
 	if cmd.Protobuf {
+		log.Infof("generate protobuf files...")
 		if err = exporter.ExportProto(); err != nil {
 			log.Errorf("export [%v] to protobuf file error [%v]", cmd.Scheme, err.Error())
 			return err
 		}
 	} else {
+		log.Infof("generate golang files...")
 		if err := exporter.ExportGo(); err != nil {
 			log.Errorf("export [%v] to go file error [%v]", cmd.Scheme, err.Error())
 			return err
