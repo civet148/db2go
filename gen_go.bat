@@ -2,12 +2,14 @@
 go build -ldflags "-s -w"
 
 set OUT_DIR=.
-set PACK_NAME=dataobject
+set PACK_NAME="models"
 set SUFFIX_NAME="do"
 set READ_ONLY="created_at, updated_at"
 set DB_NAME="test"
 set TABLE_NAME="users, classes"
 set WITH_OUT=""
+rem set DSN_URL="mssql://sa:123456@127.0.0.1:1433/test?instance=SQLEXPRESS&windows=false"
+rem set DSN_URL="postgres://postgres:123456@127.0.0.1:5432/test?sslmode=disable"
 set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 SET JSON_PROPERTIES="omitempty"
 

@@ -49,7 +49,6 @@ type Commander struct {
 	GogoOptions    []string      `json:"GogoOptions,omitempty"`
 	Orm            bool          `json:"Orm,omitempty"`
 	OmitEmpty      bool          `json:"OmitEmpty,omitempty"`
-	Struct         bool          `json:"Struct"`
 	TinyintAsBool  []string      `json:"TinyintAsBool,omitempty"`
 	Engine         *sqlca.Engine `json:"-"`
 	JsonProperties string        `json:"-"`
