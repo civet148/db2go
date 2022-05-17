@@ -18,7 +18,8 @@ const (
 
 const (
 	IMPORT_GOGO_PROTO = `import "github.com/gogo/protobuf/gogoproto/gogo.proto";`
-	IMPORT_SQLCA      = `import "github.com/civet148/sqlca/v2"`
+	IMPORT_SQLCA_V1   = `import "github.com/civet148/sqlca"`
+	IMPORT_SQLCA_V2   = `import "github.com/civet148/sqlca/v2"`
 )
 
 type SpecType struct {
@@ -55,6 +56,7 @@ type Commander struct {
 	JsonProperties string
 	SSH            string
 	SpecTypes      []*SpecType
+	ImportVer      string
 }
 
 func (c *Commander) String() string {

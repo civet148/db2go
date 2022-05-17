@@ -97,7 +97,7 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
 	if haveDecimal(cmd, table, table.Columns, cmd.EnableDecimal) {
-		strHead += IMPORT_SQLCA + "\n\n" //根据数据库中是否存在decimal类型决定是否导入sqlca包
+		strHead += cmd.ImportVer + "\n\n" //根据数据库中是否存在decimal类型决定是否导入sqlca包
 	}
 
 	strContent += makeColumnConsts(cmd, table)

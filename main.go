@@ -16,12 +16,12 @@ import (
 
 const (
 	SSH_SCHEME   = "ssh://"
-	Version      = "2.2.0"
+	Version      = "2.3.0"
 	ProgrameName = "db2go"
 )
 
 var (
-	BuildTime = "2022-03-30"
+	BuildTime = "2022-05-17"
 	GitCommit = "<N/A>"
 )
 
@@ -47,6 +47,8 @@ const (
 	CmdFlag_TinyintAsBool  = "tinyint-as-bool"
 	CmdFlag_SSH            = "ssh"
 	CmdFlag_ImportModels   = "import-models"
+	CmdFlag_V1             = "v1"
+	CmdFlag_V2             = "v2"
 )
 
 func init() {
@@ -168,6 +170,14 @@ func main() {
 				Name:  CmdFlag_SSH,
 				Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
 			},
+			&cli.BoolFlag{
+				Name:  CmdFlag_V1,
+				Usage: "v1 package imports",
+			},
+			//&cli.BoolFlag{
+			//	Name:  CmdFlag_V2,
+			//	Usage: "v2 package imports",
+			//},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -199,7 +209,11 @@ func doAction(ctx *cli.Context) error {
 	cmd.OneFile = ctx.Bool(CmdFlag_OneFile)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
-
+	if ctx.Bool(CmdFlag_V1) {
+		cmd.ImportVer = schema.IMPORT_SQLCA_V1
+	} else {
+		cmd.ImportVer = schema.IMPORT_SQLCA_V2
+	}
 	if cmd.DAO != "" && cmd.ImportModels == "" {
 		log.Errorf("models import required when generate DAO files, eg. github.com/your-repo/dal/models")
 		return nil
