@@ -278,7 +278,7 @@ func CreateOutputFile(cmd *Commander, table *TableSchema, strFileSuffix string, 
 		table.FileName = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.TableName, strNameSuffix, strFileSuffix)
 	}
 
-	file, err = os.OpenFile(table.FileName, flag, 0)
+	file, err = os.OpenFile(table.FileName, flag, os.ModePerm)
 	if err != nil {
 		log.Errorf("open file [%v] error (%v)", table.FileName, err.Error())
 		return

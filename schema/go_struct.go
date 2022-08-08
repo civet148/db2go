@@ -72,7 +72,7 @@ func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
 func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 
 	var File *os.File
-	File, err = os.OpenFile(table.FileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0)
+	File, err = os.OpenFile(table.FileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		log.Errorf("open file [%v] error (%v)", table.FileName, err.Error())
 		return
@@ -147,7 +147,7 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 
 	strDAOFileName = filepath.Join(strDir, table.TableName+".go")
 	if fi, err = os.Stat(strDAOFileName); err != nil {
-		file, err = os.OpenFile(strDAOFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0)
+		file, err = os.OpenFile(strDAOFileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 		if err != nil {
 			log.Errorf("open file [%v] error (%v)", strDAOFileName, err.Error())
 			return
