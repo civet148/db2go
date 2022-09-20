@@ -194,7 +194,7 @@ func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment st
 func ReplaceColumnType(cmd *Commander, strTableName, strColName, strColType string) string {
 
 	for _, v := range cmd.SpecTypes {
-		if v.Table == strTableName && strColName == v.Column && strColType == "string" {
+		if v.Table == strTableName && strColName == v.Column && (strColType == "string" || strColType == "struct{}") {
 			strColType = v.Type
 		}
 	}

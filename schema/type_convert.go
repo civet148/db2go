@@ -130,7 +130,7 @@ var db2goTypes = map[string]string{
 	DB_COLUMN_TYPE_LONGBLOB:   "string",
 	DB_COLUMN_TYPE_BINARY:     "string",
 	DB_COLUMN_TYPE_VARBINARY:  "string",
-	DB_COLUMN_TYPE_JSON:       "string",
+	DB_COLUMN_TYPE_JSON:       "struct{}",
 	DB_COLUMN_TYPE_JSONB:      "string",
 	DB_COLUMN_TYPE_POINT:      "string", //暂定
 	DB_COLUMN_TYPE_POLYGON:    "string", //暂定
@@ -172,7 +172,7 @@ var db2protoTypes = map[string]string{
 	DB_COLUMN_TYPE_LONGBLOB:   "string",
 	DB_COLUMN_TYPE_BINARY:     "string",
 	DB_COLUMN_TYPE_VARBINARY:  "string",
-	DB_COLUMN_TYPE_JSON:       "string",
+	DB_COLUMN_TYPE_JSON:       "struct{}",
 	DB_COLUMN_TYPE_JSONB:      "string",
 	DB_COLUMN_TYPE_POINT:      "string", //暂定
 	DB_COLUMN_TYPE_POLYGON:    "string", //暂定
