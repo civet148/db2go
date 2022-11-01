@@ -342,7 +342,7 @@ func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enabl
 	//tinyint type column redeclare as bool
 	if len(tinyintAsBool) > 0 && strDataType == DB_COLUMN_TYPE_TINYINT {
 		if IsInSlice(strColName, tinyintAsBool) {
-			log.Warnf("table [%s] column [%s] %s redeclare as bool type", strTableName, strColName, strDataType)
+			//log.Warnf("table [%s] column [%s] %s redeclare as bool type", strTableName, strColName, strDataType)
 			return DB_COLUMN_TYPE_BOOL, false
 		}
 	}
@@ -354,7 +354,7 @@ func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enabl
 	var ok bool
 	if strGoColType, ok = db2goTypes[strDataType]; !ok {
 		strGoColType = "string"
-		log.Warnf("table [%v] column [%v] data type [%v] not support yet, set as string type", strTableName, strColName, strDataType)
+		//log.Warnf("table [%v] column [%v] data type [%v] not support yet, set as string type", strTableName, strColName, strDataType)
 		return
 	}
 	if bUnsigned {
