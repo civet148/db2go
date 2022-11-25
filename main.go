@@ -15,13 +15,13 @@ import (
 )
 
 const (
-	SSH_SCHEME   = "ssh://"
-	Version      = "2.4.0"
+	SshScheme = "ssh://"
+	Version   = "2.4.1"
 	ProgrameName = "db2go"
 )
 
 var (
-	BuildTime = "2022-09-20"
+	BuildTime = "2022-11-25"
 	GitCommit = "<N/A>"
 )
 
@@ -219,8 +219,8 @@ func doAction(ctx *cli.Context) error {
 		return nil
 	}
 	if cmd.SSH != "" {
-		if !strings.Contains(cmd.SSH, SSH_SCHEME) {
-			cmd.SSH = SSH_SCHEME + cmd.SSH
+		if !strings.Contains(cmd.SSH, SshScheme) {
+			cmd.SSH = SshScheme + cmd.SSH
 		}
 	}
 
