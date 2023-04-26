@@ -14,6 +14,7 @@ const (
 	SCHEME_POSTGRES          = "postgres"
 	SCHEME_MSSQL             = "mssql"
 	JSON_PROPERTY_OMIT_EMTPY = "omitempty"
+	DAO_SUFFIX               = "dao"
 )
 
 const (
@@ -228,7 +229,7 @@ func CreateOutputFile(cmd *Commander, table *TableSchema, strFileSuffix string, 
 	if errStat != nil && os.IsNotExist(errStat) {
 
 		log.Info("mkdir [%v]", strOutDir)
-		if err = os.Mkdir(strOutDir, os.ModeDir); err != nil {
+		if err = os.MkdirAll(strOutDir, os.ModeDir); err != nil {
 			log.Error("mkdir [%v] error (%v)", strOutDir, err.Error())
 			return
 		}
@@ -253,7 +254,7 @@ func CreateOutputFile(cmd *Commander, table *TableSchema, strFileSuffix string, 
 	if errStat != nil && os.IsNotExist(errStat) {
 
 		log.Info("mkdir [%v]", table.SchemeDir)
-		if err = os.Mkdir(table.SchemeDir, os.ModeDir); err != nil {
+		if err = os.MkdirAll(table.SchemeDir, os.ModeDir); err != nil {
 			log.Errorf("mkdir path name [%v] error (%v)", table.SchemeDir, err.Error())
 			return
 		}

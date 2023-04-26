@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const(
+const (
 	TableNamePrefix = "TableName"
 )
 
@@ -21,7 +21,7 @@ func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
 		if errStat != nil && os.IsNotExist(errStat) {
 
 			log.Info("mkdir [%v]", cmd.OutDir)
-			if err = os.Mkdir(cmd.OutDir, os.ModeDir); err != nil {
+			if err = os.MkdirAll(cmd.OutDir, os.ModeDir); err != nil {
 				log.Error("mkdir [%v] error (%v)", cmd.OutDir, err.Error())
 				return
 			}
@@ -46,7 +46,7 @@ func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
 		if errStat != nil && os.IsNotExist(errStat) {
 
 			log.Info("mkdir [%v]", v.SchemeDir)
-			if err = os.Mkdir(v.SchemeDir, os.ModeDir); err != nil {
+			if err = os.MkdirAll(v.SchemeDir, os.ModeDir); err != nil {
 				log.Errorf("mkdir path name [%v] error (%v)", v.SchemeDir, err.Error())
 				return
 			}
@@ -136,7 +136,7 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 		strDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.DAO)
 	}
 	if _, err = os.Stat(strDir); err != nil {
-		if err = os.Mkdir(strDir, os.ModeDir); err != nil {
+		if err = os.MkdirAll(strDir, os.ModeDir); err != nil {
 			log.Errorf("mkdir %s error [%s]", strDir, err.Error())
 			return
 		}
@@ -152,9 +152,10 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 			log.Errorf("open file [%v] error (%v)", strDAOFileName, err.Error())
 			return
 		}
+		log.Infof("data access object file %s create successful", strDAOFileName)
 	} else {
 		if fi.IsDir() || fi.Name() != "" {
-			//log.Warnf("file %s already exist", strDAOFileName)
+			log.Warnf("data access object file %s already exist (ignored)", strDAOFileName)
 			return
 		}
 	}

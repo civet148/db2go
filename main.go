@@ -15,13 +15,13 @@ import (
 )
 
 const (
-	SshScheme = "ssh://"
-	Version   = "2.4.1"
+	SshScheme    = "ssh://"
+	Version      = "2.5.0"
 	ProgrameName = "db2go"
 )
 
 var (
-	BuildTime = "2022-11-25"
+	BuildTime = "2023-04-26"
 	GitCommit = "<N/A>"
 )
 
@@ -29,6 +29,7 @@ const (
 	CmdFlag_Url            = "url"
 	CmdFlag_Output         = "out"
 	CmdFlag_Database       = "db"
+	CmdFlag_DAO            = "dao"
 	CmdFlag_Tables         = "table"
 	CmdFlag_Tags           = "tag"
 	CmdFlag_Prefix         = "prefix"
@@ -41,14 +42,12 @@ const (
 	CmdFlag_EnableDecimal  = "enable-decimal"
 	CmdFlag_GogoOptions    = "gogo-options"
 	CmdFlag_OneFile        = "one-file"
-	CmdFlag_DAO            = "dao"
 	CmdFlag_OmitEmpty      = "omitempty"
 	CmdFlag_JsonProperties = "json-properties"
 	CmdFlag_TinyintAsBool  = "tinyint-as-bool"
 	CmdFlag_SSH            = "ssh"
 	CmdFlag_ImportModels   = "import-models"
 	CmdFlag_V1             = "v1"
-	CmdFlag_V2             = "v2"
 )
 
 func init() {
@@ -215,8 +214,7 @@ func doAction(ctx *cli.Context) error {
 		cmd.ImportVer = schema.IMPORT_SQLCA_V2
 	}
 	if cmd.DAO != "" && cmd.ImportModels == "" {
-		log.Errorf("models import required when generate DAO files, eg. github.com/your-repo/dal/models")
-		return nil
+		return log.Errorf("models path required eg. github.com/xxx/your-repo/models")
 	}
 	if cmd.SSH != "" {
 		if !strings.Contains(cmd.SSH, SshScheme) {
@@ -229,6 +227,7 @@ func doAction(ctx *cli.Context) error {
 	if cmd.Database == "" {
 		//use default database
 		cmd.Database = schema.GetDatabaseName(ui.Path)
+		log.Infof("using default database %s", cmd.Database)
 	}
 
 	if ctx.String(CmdFlag_Tables) != "" {
@@ -267,15 +266,19 @@ func doAction(ctx *cli.Context) error {
 
 	log.Infof("command options [%+v]", cmd)
 
+	var err error
 	if strings.TrimSpace(cmd.SSH) != "" {
-		cmd.Engine = sqlca.NewEngine(cmd.ConnUrl, tunnelOption(cmd.SSH))
+		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl, Option(cmd.SSH))
 	} else {
-		cmd.Engine = sqlca.NewEngine(cmd.ConnUrl)
+		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl)
+	}
+	if err != nil {
+		return log.Errorf("connect database [%s] error [%s]", cmd.ConnUrl, err.Error())
 	}
 	return export(cmd, cmd.Engine)
 }
 
-func tunnelOption(strSSH string) *sqlca.Options {
+func Option(strSSH string) *sqlca.Options {
 	if strSSH == "" {
 		return nil
 	}
