@@ -14,7 +14,7 @@ set SPEC_TYPES="users.extra_data=struct{}"
 set IMPORT_MODELS="github.com/civet148/db2go/models"
 
 If "%errorlevel%" == "0" (
-db2go --url %DSN_URL% --out %OUT_DIR% --table %TABLE_NAME% --json-properties %JSON_PROPERTIES% --enable-decimal  --spec-type %SPEC_TYPES% ^
+.\db2go.exe --url %DSN_URL% --out %OUT_DIR% --table %TABLE_NAME% --json-properties %JSON_PROPERTIES% --enable-decimal  --spec-type %SPEC_TYPES% ^
 --suffix %SUFFIX_NAME% --package %PACK_NAME% --readonly %READ_ONLY% --without %WITH_OUT% --dao dao --tinyint-as-bool %TINYINT_TO_BOOL% ^
 --import-models %IMPORT_MODELS%
 
