@@ -308,7 +308,11 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", sqlca.TAG_NAME_SQLCA, sqlca.SQLCA_TAG_VALUE_READ_ONLY))
 		}
 		for _, t := range cmd.Tags {
-			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, v.Name))
+			tv := v.Name
+			if t == "bson" && tv == "id" {
+				tv = "_id"
+			}
+			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
 		}
 		//添加成员和标签
 		strContent += MakeTags(cmd, strColName, strColType, v.Name, v.Comment, strings.Join(tagValues, " "))
