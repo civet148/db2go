@@ -3,7 +3,6 @@ package schema
 import (
 	"fmt"
 	"github.com/civet148/log"
-	"github.com/civet148/sqlca/v2"
 	"os"
 	"path/filepath"
 	"strings"
@@ -177,7 +176,7 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 	}
 }
 
-//make new DAO method
+// make new DAO method
 func makeNewMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	strContent += fmt.Sprintf(`
 type %s struct {
@@ -305,8 +304,11 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 		strColName = CamelCaseConvert(v.Name)
 		strColType, _ = GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		if IsInSlice(v.Name, cmd.ReadOnly) {
-			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", sqlca.TAG_NAME_SQLCA, sqlca.SQLCA_TAG_VALUE_READ_ONLY))
+			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_READ_ONLY))
+		} else if v.IsNullable == "YES" {
+			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_IS_NULL))
 		}
+
 		for _, t := range cmd.Tags {
 			tv := v.Name
 			if t == "bson" && tv == "id" {

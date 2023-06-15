@@ -16,12 +16,12 @@ import (
 
 const (
 	SshScheme    = "ssh://"
-	Version      = "2.5.0"
+	Version      = "2.6.0"
 	ProgrameName = "db2go"
 )
 
 var (
-	BuildTime = "2023-04-26"
+	BuildTime = "2023-06-15"
 	GitCommit = "<N/A>"
 )
 
@@ -48,6 +48,7 @@ const (
 	CmdFlag_SSH            = "ssh"
 	CmdFlag_ImportModels   = "import-models"
 	CmdFlag_V1             = "v1"
+	CmdFlag_Debug          = "debug"
 )
 
 func init() {
@@ -173,10 +174,10 @@ func main() {
 				Name:  CmdFlag_V1,
 				Usage: "v1 package imports",
 			},
-			//&cli.BoolFlag{
-			//	Name:  CmdFlag_V2,
-			//	Usage: "v2 package imports",
-			//},
+			&cli.BoolFlag{
+				Name:  CmdFlag_Debug,
+				Usage: "open debug mode",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -193,6 +194,7 @@ func main() {
 func doAction(ctx *cli.Context) error {
 	//var err error
 	var cmd = &schema.Commander{}
+	cmd.Debug = ctx.Bool(CmdFlag_Debug)
 	cmd.Prefix = ctx.String(CmdFlag_Prefix)
 	cmd.Suffix = ctx.String(CmdFlag_Suffix)
 	cmd.OutDir = ctx.String(CmdFlag_Output)
@@ -222,6 +224,10 @@ func doAction(ctx *cli.Context) error {
 		}
 	}
 
+	if cmd.Debug {
+		log.SetLevel("debug")
+	}
+
 	ui := sqlca.ParseUrl(cmd.ConnUrl)
 
 	if cmd.Database == "" {
@@ -231,7 +237,10 @@ func doAction(ctx *cli.Context) error {
 	}
 
 	if ctx.String(CmdFlag_Tables) != "" {
-		cmd.Tables = schema.TrimSpaceSlice(strings.Split(ctx.String(CmdFlag_Tables), ","))
+		strFlagValue := ctx.String(CmdFlag_Tables)
+		log.Infof("tables %+v", strFlagValue)
+		tables := strings.Split(strFlagValue, ",")
+		cmd.Tables = schema.TrimSpaceSlice(tables)
 	}
 
 	if ctx.String(CmdFlag_Without) != "" {

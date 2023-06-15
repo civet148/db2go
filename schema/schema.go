@@ -58,6 +58,7 @@ type Commander struct {
 	SSH            string
 	SpecTypes      []*SpecType
 	ImportVer      string
+	Debug          bool
 }
 
 func (c *Commander) String() string {
@@ -141,11 +142,12 @@ type TableColumn struct {
 	Key          string `json:"column_key" db:"column_key"`
 	Extra        string `json:"extra" db:"extra"`
 	Comment      string `json:"column_comment" db:"column_comment"`
+	IsNullable   string `json:"is_nullable" db:"is_nullable"`
 	IsPrimaryKey bool   // is primary key
 	IsDecimal    bool   // is decimal type
 	IsReadOnly   bool   // is read only
-	GoName       string //column name in golang
-	GoType       string //column type in golang
+	GoName       string // column name in golang
+	GoType       string // column type in golang
 }
 
 type Exporter interface {
@@ -330,7 +332,7 @@ func GetDatabaseName(strPath string) (strName string) {
 	return strPath[idx+1:]
 }
 
-//将数据库字段类型转为go语言对应的数据类型
+// 将数据库字段类型转为go语言对应的数据类型
 func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
 
 	var bUnsigned bool
@@ -377,7 +379,7 @@ func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enabl
 	return ReplaceColumnType(cmd, strTableName, col.Name, strGoColType), isDecimal
 }
 
-//将数据库字段类型转为protobuf对应的数据类型
+// 将数据库字段类型转为protobuf对应的数据类型
 func GetProtoColumnType(strTableName, strColName, strDataType string) (strColType string) {
 
 	var ok bool

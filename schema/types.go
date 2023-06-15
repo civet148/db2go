@@ -6,6 +6,12 @@ import (
 )
 
 const (
+	TAG_NAME_SQLCA      = "sqlca"
+	TAG_VALUE_IS_NULL   = "isnull"
+	TAG_VALUE_READ_ONLY = "readonly"
+)
+
+const (
 	POSTGRES_COLUMN_INTEGER           = "integer"
 	POSTGRES_COLUMN_BIT               = "bit"
 	POSTGRES_COLUMN_BOOLEAN           = "boolean"
@@ -93,7 +99,7 @@ var db2goTypesUnsigned = map[string]string{
 	DB_COLUMN_TYPE_TINYINT:   "uint8",
 }
 
-//数据库字段类型与go语言类型对照表
+// 数据库字段类型与go语言类型对照表
 var db2goTypes = map[string]string{
 
 	DB_COLUMN_TYPE_BIGINT:     "int64",
@@ -136,7 +142,7 @@ var db2goTypes = map[string]string{
 	DB_COLUMN_TYPE_POLYGON:    "string", //暂定
 }
 
-//数据库字段类型与protobuf类型对照表
+// 数据库字段类型与protobuf类型对照表
 var db2protoTypes = map[string]string{
 
 	DB_COLUMN_TYPE_BIGINT:     "int64",
