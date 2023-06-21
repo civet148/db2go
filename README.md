@@ -1,40 +1,39 @@
 # db2go is a command to export database table structure to go or proto file 
 
 ## Usage
+```shell
+USAGE:
+   db2go [global options] command [command options] [arguments...]
+   
+GLOBAL OPTIONS:
+--url value              data source name of database
+--out value              output path (default: ".")
+--db value               database name to export
+--table value            database tables to export
+--tag value              export tags for golang
+--prefix value           filename prefix
+--suffix value           filename suffix
+--package value          package name
+--without value          exclude columns split by colon
+--readonly value         readonly columns split by colon
+--proto                  export protobuf file (default: false)
+--spec-type value        specify column as customized types, e.g 'user.extra_data=UserData'
+--enable-decimal         decimal as sqlca.Decimal type (default: false)
+--gogo-options value     gogo proto options (only protobuf)
+--one-file               export to one file (default: false)
+--dao value              generate data access object file
+--import-models value    project name
+--omitempty              json omitempty (default: false)
+--json-properties value  customized properties for json tag
+--tinyint-as-bool value  convert tinyint columns redeclare as bool type
+--ssh value              ssh tunnel e.g ssh://root:123456@192.168.1.23:22
+--v1                     v1 package imports (default: false)
+--debug                  open debug mode (default: false)
+--json-style value       json style: smallcamel or bigcamel (default: "default")
+--help, -h               show help (default: false)
+--version, -v            print the version (default: false)
+```
 
---url       connection url of database [required]
-
---db        databases to export, eg. "test" [required]
-
---table     tables to export, eg. "users, devices" [optional]
-
---out       output directory, default . [optional]
-
---package   export to a directory which used to be a package name in golang [optional]
-
---prefix    prefix of go file name [optional]
-
---suffix    suffix of go file name [optional]
-
---tag       customer golang struct member tag [optional] 
-
---without   ignore columns [optional]
-
---readonly  specify columns only for select [optional]
-
---proto     generate .proto file [optional]
-
---gogo-options specify gogo proto generate options [optional]
-
---one-file  all table schema integrate into one file named by database [optional]
-
---enable-decimal decimal as sqlca.Decimal type when exporting [optional]
-
---orm generate ORM code inner data object [optional]
-
---omitempty omit empty for json tag [optional]
-
---json-properties custom properties for json [optional]
 
 ## 1. 数据库表导出到go文件
 
@@ -42,23 +41,168 @@
 
 ```batch
 @echo off
-set OUT_DIR=.
-set PACK_NAME=dataobject
-set SUFFIX_NAME=do
-set READ_ONLY="created_at, updated_at"
-set DB_NAME="test"
-set TABLE_NAME="users, classes"
-set WITH_OUT=""
-set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
+go build -ldflags "-s -w"
 
-db2go.exe --url %DSN_URL%  ^
---out %OUT_DIR% --db %DB_NAME% --table %TABLE_NAME% --suffix %SUFFIX_NAME% --package %PACK_NAME% --readonly %READ_ONLY% --without %WITH_OUT%
+set OUT_DIR=.
+set PACK_NAME="models"
+set SUFFIX_NAME="do"
+set READ_ONLY="created_at, updated_at"
+set TABLE_NAME="users,classes"
+set WITH_OUT=""
+set TAGS="bson"
+set TINYINT_TO_BOOL="deleted,is_admin,disable"
+set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
+set JSON_PROPERTIES="omitempty"
+set SPEC_TYPES="users.extra_data=struct{}"
+set IMPORT_MODELS="github.com/civet148/db2go/models"
+
+If "%errorlevel%" == "0" (
+.\db2go.exe --url %DSN_URL% --out %OUT_DIR% --table %TABLE_NAME% --json-properties %JSON_PROPERTIES% --enable-decimal  --spec-type %SPEC_TYPES% ^
+--suffix %SUFFIX_NAME% --package %PACK_NAME% --readonly %READ_ONLY% --without %WITH_OUT% --dao dao --tinyint-as-bool %TINYINT_TO_BOOL% ^
+--tag %TAGS% --import-models %IMPORT_MODELS%
 
 echo generate go file ok, formatting...
 gofmt -w %OUT_DIR%/%PACK_NAME%
+)
 pause
 ```
+- Linux/Unix shell脚本
 
+```shell
+#!/bin/sh
+
+# 数据对象文件输出目录
+OUT_DIR=.
+# 数据对象文件golang包名
+PACK_NAME="models"
+# 文件后缀名
+SUFFIX_NAME="do"
+# 指定只读字段(当created_at和updated_at字段由数据库自动生成时使用)
+READ_ONLY="created_at, updated_at"
+# 数据库表名(可为空)
+TABLE_NAME="users, classes"
+# 排除某些字段
+WITH_OUT=""
+# 字段自定义标签
+TAGS="bson"
+# 指定字段自动生成为bool类型
+TINYINT_TO_BOOL="deleted,is_admin,disable"
+# 数据源连接URL
+DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
+# 增加json标签属性
+JSON_PROPERTIES="omitempty"
+# 指定字段为自定义类型(如果是结构体则需要自行创建一个文件进行声明)
+SPEC_TYPES="users.extra_data=struct{}"
+# 自动生成数据库操作对象文件时需指定数据对象文件导入路径
+IMPORT_MODELS="github.com/civet148/db2go/models"
+
+go build -ldflags "-s -w"
+
+if [ $? -eq 0 ]; then
+./db2go --debug --url $DSN_URL --out $OUT_DIR --table "$TABLE_NAME" --json-properties $JSON_PROPERTIES --enable-decimal  --spec-type "$SPEC_TYPES" \
+--suffix $SUFFIX_NAME --package $PACK_NAME --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
+--tag "$TAGS" --import-models $IMPORT_MODELS
+
+echo "generate go file ok, formatting..."
+gofmt -w $OUT_DIR/$PACK_NAME
+
+else
+  echo "error: db2go build failed"
+fi
+```
+
+- data object
+
+```go
+// Code generated by db2go. DO NOT EDIT.
+// https://github.com/civet148/sqlca
+
+package models
+
+import "github.com/civet148/sqlca/v2"
+
+const TableNameUsers = "users" //
+
+const (
+	USERS_COLUMN_ID         = "id"
+	USERS_COLUMN_NAME       = "name"
+	USERS_COLUMN_PHONE      = "phone"
+	USERS_COLUMN_SEX        = "sex"
+	USERS_COLUMN_EMAIL      = "email"
+	USERS_COLUMN_DISABLE    = "disable"
+	USERS_COLUMN_BALANCE    = "balance"
+	USERS_COLUMN_SEX_NAME   = "sex_name"
+	USERS_COLUMN_DATA_SIZE  = "data_size"
+	USERS_COLUMN_EXTRA_DATA = "extra_data"
+	USERS_COLUMN_CREATED_AT = "created_at"
+	USERS_COLUMN_UPDATED_AT = "updated_at"
+	USERS_COLUMN_DELETED_AT = "deleted_at"
+)
+
+type UsersDO struct {
+	Id        uint32        `json:"id,omitempty" db:"id" bson:"_id"`                                         //auto inc id
+	Name      string        `json:"name,omitempty" db:"name" bson:"name"`                                    //user name
+	Phone     string        `json:"phone,omitempty" db:"phone" bson:"phone"`                                 //phone number
+	Sex       uint8         `json:"sex,omitempty" db:"sex" bson:"sex"`                                       //user sex
+	Email     string        `json:"email,omitempty" db:"email" bson:"email"`                                 //email
+	Disable   bool          `json:"disable,omitempty" db:"disable" bson:"disable"`                           //disabled(0=false 1=true)
+	Balance   sqlca.Decimal `json:"balance,omitempty" db:"balance" bson:"balance"`                           //balance of decimal
+	SexName   string        `json:"sex_name,omitempty" db:"sex_name" bson:"sex_name"`                        //sex name
+	DataSize  int64         `json:"data_size,omitempty" db:"data_size" bson:"data_size"`                     //data size
+	ExtraData struct{}      `json:"extra_data,omitempty" db:"extra_data" sqlca:"isnull" bson:"extra_data"`   //extra data
+	CreatedAt string        `json:"created_at,omitempty" db:"created_at" sqlca:"readonly" bson:"created_at"` //create time
+	UpdatedAt string        `json:"updated_at,omitempty" db:"updated_at" sqlca:"readonly" bson:"updated_at"` //update time
+	DeletedAt string        `json:"deleted_at,omitempty" db:"deleted_at" sqlca:"isnull" bson:"deleted_at"`   //delete time
+}
+
+func (do *UsersDO) GetId() uint32              { return do.Id }
+func (do *UsersDO) SetId(v uint32)             { do.Id = v }
+func (do *UsersDO) GetName() string            { return do.Name }
+func (do *UsersDO) SetName(v string)           { do.Name = v }
+func (do *UsersDO) GetPhone() string           { return do.Phone }
+func (do *UsersDO) SetPhone(v string)          { do.Phone = v }
+func (do *UsersDO) GetSex() uint8              { return do.Sex }
+func (do *UsersDO) SetSex(v uint8)             { do.Sex = v }
+func (do *UsersDO) GetEmail() string           { return do.Email }
+func (do *UsersDO) SetEmail(v string)          { do.Email = v }
+func (do *UsersDO) GetDisable() bool           { return do.Disable }
+func (do *UsersDO) SetDisable(v bool)          { do.Disable = v }
+func (do *UsersDO) GetBalance() sqlca.Decimal  { return do.Balance }
+func (do *UsersDO) SetBalance(v sqlca.Decimal) { do.Balance = v }
+func (do *UsersDO) GetSexName() string         { return do.SexName }
+func (do *UsersDO) SetSexName(v string)        { do.SexName = v }
+func (do *UsersDO) GetDataSize() int64         { return do.DataSize }
+func (do *UsersDO) SetDataSize(v int64)        { do.DataSize = v }
+func (do *UsersDO) GetExtraData() struct{}     { return do.ExtraData }
+func (do *UsersDO) SetExtraData(v struct{})    { do.ExtraData = v }
+func (do *UsersDO) GetCreatedAt() string       { return do.CreatedAt }
+func (do *UsersDO) SetCreatedAt(v string)      { do.CreatedAt = v }
+func (do *UsersDO) GetUpdatedAt() string       { return do.UpdatedAt }
+func (do *UsersDO) SetUpdatedAt(v string)      { do.UpdatedAt = v }
+func (do *UsersDO) GetDeletedAt() string       { return do.DeletedAt }
+func (do *UsersDO) SetDeletedAt(v string)      { do.DeletedAt = v }
+
+/*
+CREATE TABLE `users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'auto inc id',
+  `name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'user name',
+  `phone` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'phone number',
+  `sex` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'user sex',
+  `email` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'email',
+  `disable` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'disabled(0=false 1=true)',
+  `balance` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'balance of decimal',
+  `sex_name` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'sex name',
+  `data_size` bigint NOT NULL DEFAULT '0' COMMENT 'data size',
+  `extra_data` json DEFAULT NULL COMMENT 'extra data',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
+  `deleted_at` datetime DEFAULT NULL COMMENT 'delete time',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `phone` (`phone`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
+*/
+
+```
 
 ## 2. 数据库表导出到proto文件
 
