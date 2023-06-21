@@ -23,6 +23,12 @@ const (
 	IMPORT_SQLCA_V2   = `import "github.com/civet148/sqlca/v2"`
 )
 
+const (
+	JSON_STYLE_UNDERLINE       = "underline"
+	JSON_STYLE_SMALL_CAMELCASE = "smallcamel"
+	JSON_STYLE_BIG_CAMELCASE   = "bigcamel"
+)
+
 type SpecType struct {
 	Table  string `json:"table"`
 	Column string `json:"column"`
@@ -55,6 +61,7 @@ type Commander struct {
 	TinyintAsBool  []string
 	Engine         *sqlca.Engine
 	JsonProperties string
+	JsonStyle      string
 	SSH            string
 	SpecTypes      []*SpecType
 	ImportVer      string
@@ -187,6 +194,11 @@ func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment st
 	var strJsonValue string
 	var strJsonProperties = cmd.GetJsonPropertiesSlice()
 	strJsonValue = strTagValue
+	if cmd.JsonStyle == JSON_STYLE_SMALL_CAMELCASE {
+		strJsonValue = SmallCamelCase(strTagValue)
+	} else if cmd.JsonStyle == JSON_STYLE_BIG_CAMELCASE {
+		strJsonValue = BigCamelCase(strTagValue)
+	}
 	if len(strJsonProperties) > 0 {
 		strJsonValue += fmt.Sprintf(",%s", strings.Join(strJsonProperties, ","))
 	}
@@ -290,22 +302,17 @@ func CreateOutputFile(cmd *Commander, table *TableSchema, strFileSuffix string, 
 	return
 }
 
-func CamelCaseConvert(strIn string) (strOut string) {
-
+func BigCamelCase(strIn string) (strOut string) {
 	var idxUnderLine = int(-1)
 	for i, v := range strIn {
 		strChr := string(v)
-
 		if i == 0 {
-
 			strOut += strings.ToUpper(strChr)
 		} else {
 			if v == '_' {
 				idxUnderLine = i //ignore
 			} else {
-
 				if i == idxUnderLine+1 {
-
 					strOut += strings.ToUpper(strChr)
 				} else {
 					strOut += strChr
@@ -314,6 +321,27 @@ func CamelCaseConvert(strIn string) (strOut string) {
 		}
 	}
 
+	return
+}
+
+func SmallCamelCase(strIn string) (strOut string) {
+	var idxUnderLine = int(-1)
+	for i, v := range strIn {
+		strChr := string(v)
+		if i == 0 {
+			strOut += strings.ToLower(strChr)
+		} else {
+			if v == '_' {
+				idxUnderLine = i //ignore
+			} else {
+				if i == idxUnderLine+1 {
+					strOut += strings.ToUpper(strChr)
+				} else {
+					strOut += strChr
+				}
+			}
+		}
+	}
 	return
 }
 

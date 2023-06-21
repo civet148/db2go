@@ -23,7 +23,7 @@ func MakeProtoHead(cmd *Commander) (strContent string) {
 
 func MakeProtoBody(cmd *Commander, table *TableSchema) (strContent string) {
 
-	strTableName := CamelCaseConvert(table.TableName)
+	strTableName := BigCamelCase(table.TableName)
 	strContent += fmt.Sprintf("message %vDO {\n", strTableName)
 	for i, v := range table.Columns {
 

@@ -16,12 +16,12 @@ import (
 
 const (
 	SshScheme    = "ssh://"
-	Version      = "2.6.0"
+	Version      = "2.7.0"
 	ProgrameName = "db2go"
 )
 
 var (
-	BuildTime = "2023-06-15"
+	BuildTime = "2023-06-21"
 	GitCommit = "<N/A>"
 )
 
@@ -49,6 +49,7 @@ const (
 	CmdFlag_ImportModels   = "import-models"
 	CmdFlag_V1             = "v1"
 	CmdFlag_Debug          = "debug"
+	CmdFlag_JsonStyle      = "json-style"
 )
 
 func init() {
@@ -178,6 +179,11 @@ func main() {
 				Name:  CmdFlag_Debug,
 				Usage: "open debug mode",
 			},
+			&cli.StringFlag{
+				Name:  CmdFlag_JsonStyle,
+				Usage: "json style: [underline or smallcamel/bigcamel] default underline",
+				Value: schema.JSON_STYLE_UNDERLINE,
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -210,6 +216,8 @@ func doAction(ctx *cli.Context) error {
 	cmd.OneFile = ctx.Bool(CmdFlag_OneFile)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
+	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
+
 	if ctx.Bool(CmdFlag_V1) {
 		cmd.ImportVer = schema.IMPORT_SQLCA_V1
 	} else {

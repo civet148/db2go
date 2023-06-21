@@ -86,7 +86,7 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	strHead += fmt.Sprintf("package %v\n\n", cmd.PackageName)
 
 	//write table name in camel case naming
-	table.TableNameCamelCase = CamelCaseConvert(table.TableName)
+	table.TableNameCamelCase = BigCamelCase(table.TableName)
 	table.TableComment = ReplaceCRLF(table.TableComment)
 	strContent += fmt.Sprintf("const %s%v = \"%v\" //%v \n\n", TableNamePrefix, table.TableNameCamelCase, table.TableName, table.TableComment)
 
@@ -211,7 +211,7 @@ func makeObjectMethods(cmd *Commander, table *TableSchema) (strContent string) {
 		if IsInSlice(v.Name, cmd.Without) {
 			continue
 		}
-		strColName := CamelCaseConvert(v.Name)
+		strColName := BigCamelCase(v.Name)
 		strColType, _ := GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		strContent += MakeGetter(table.StructName, strColName, strColType)
 		strContent += MakeSetter(table.StructName, strColName, strColType)
@@ -301,7 +301,7 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 
 		var tagValues []string
 		var strColType, strColName string
-		strColName = CamelCaseConvert(v.Name)
+		strColName = BigCamelCase(v.Name)
 		strColType, _ = GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		if IsInSlice(v.Name, cmd.ReadOnly) {
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_READ_ONLY))
