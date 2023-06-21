@@ -41,7 +41,6 @@ GLOBAL OPTIONS:
 
 ```batch
 @echo off
-go build -ldflags "-s -w"
 
 set OUT_DIR=.
 set PACK_NAME="models"
@@ -95,8 +94,6 @@ JSON_PROPERTIES="omitempty"
 SPEC_TYPES="users.extra_data=struct{}"
 # 自动生成数据库操作对象文件时需指定数据对象文件导入路径
 IMPORT_MODELS="github.com/civet148/db2go/models"
-
-go build -ldflags "-s -w"
 
 if [ $? -eq 0 ]; then
 ./db2go --debug --url $DSN_URL --out $OUT_DIR --table "$TABLE_NAME" --json-properties $JSON_PROPERTIES --enable-decimal  --spec-type "$SPEC_TYPES" \
