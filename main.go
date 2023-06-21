@@ -16,7 +16,7 @@ import (
 
 const (
 	SshScheme    = "ssh://"
-	Version      = "2.7.0"
+	Version      = "2.7.1"
 	ProgrameName = "db2go"
 )
 
@@ -181,8 +181,8 @@ func main() {
 			},
 			&cli.StringFlag{
 				Name:  CmdFlag_JsonStyle,
-				Usage: "json style: [underline or smallcamel/bigcamel] default underline",
-				Value: schema.JSON_STYLE_UNDERLINE,
+				Usage: "json style: smallcamel or bigcamel",
+				Value: schema.JSON_STYLE_DEFAULT,
 			},
 		},
 		Action: func(ctx *cli.Context) error {

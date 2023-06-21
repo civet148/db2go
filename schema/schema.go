@@ -24,7 +24,7 @@ const (
 )
 
 const (
-	JSON_STYLE_UNDERLINE       = "underline"
+	JSON_STYLE_DEFAULT         = "default"
 	JSON_STYLE_SMALL_CAMELCASE = "smallcamel"
 	JSON_STYLE_BIG_CAMELCASE   = "bigcamel"
 )
