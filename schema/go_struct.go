@@ -238,7 +238,7 @@ func makeOrmInsertMethod(cmd *Commander, table *TableSchema) (strContent string)
 	return fmt.Sprintf(`
 //insert into table by data model
 func (dao *%v) Insert(do *%s) (lastInsertId int64, err error) {
-	return dao.db.Model(do).Table(%s).Insert()
+	return dao.db.Model(&do).Table(%s).Insert()
 }
 
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
@@ -248,7 +248,7 @@ func makeOrmUpsertMethod(cmd *Commander, table *TableSchema) (strContent string)
 	return fmt.Sprintf(`
 //insert if not exist or update columns on duplicate key...
 func (dao *%v) Upsert(do *%s, columns...string) (lastInsertId int64, err error) {
-	return dao.db.Model(do).Table(%s).Select(columns...).Upsert()
+	return dao.db.Model(&do).Table(%s).Select(columns...).Upsert()
 }
 
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
@@ -258,7 +258,7 @@ func makeOrmUpdateMethod(cmd *Commander, table *TableSchema) (strContent string)
 	return fmt.Sprintf(`
 //update table set columns where id=xxx
 func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
-	return dao.db.Model(do).Table(%s).Select(columns...).Update()
+	return dao.db.Model(&do).Table(%s).Select(columns...).Update()
 }
 
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
@@ -267,7 +267,7 @@ func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
 func makeOrmQueryMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 func (dao *%v) QueryById(id interface{}, columns...string) (do *%s, err error) {
-	if _, err = dao.db.Model(do).Table(%s).Id(id).Select(columns...).Query(); err != nil {
+	if _, err = dao.db.Model(&do).Table(%s).Id(id).Select(columns...).Query(); err != nil {
 		return nil, err
 	}
 	return
