@@ -162,6 +162,7 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 	log.Infof("generate [%v]", strDAOFileName)
 	strContent += fmt.Sprintf("package %v\n\n", cmd.DAO)
 	strContent += fmt.Sprintf(`import (
+    "fmt"
 	"github.com/civet148/sqlca/v2"
 	"%s"
 )
@@ -230,7 +231,8 @@ func makeOrmMethods(cmd *Commander, table *TableSchema) (strContent string) {
 	strContent += makeOrmInsertMethod(cmd, table)
 	strContent += makeOrmUpsertMethod(cmd, table)
 	strContent += makeOrmUpdateMethod(cmd, table)
-	strContent += makeOrmQueryMethod(cmd, table)
+	strContent += makeOrmQueryByIdMethod(cmd, table)
+	strContent += makeOrmQueryByConditionMethod(cmd, table)
 	return
 }
 
@@ -264,10 +266,31 @@ func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
-func makeOrmQueryMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmQueryByIdMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
+//query records by id
 func (dao *%v) QueryById(id interface{}, columns...string) (do *%s, err error) {
 	if _, err = dao.db.Model(&do).Table(%s).Id(id).Select(columns...).Query(); err != nil {
+		return nil, err
+	}
+	return
+}
+
+`, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
+}
+
+func makeOrmQueryByConditionMethod(cmd *Commander, table *TableSchema) (strContent string) {
+	return fmt.Sprintf(`
+//query records by conditions
+func (dao *%v) QueryByCondition(conditions map[string]interface{}, columns...string) (dos []*%s, err error) {
+    if len(conditions) == 0 {
+        return nil, fmt.Errorf("condition must not be empty")
+    }
+    e := dao.db.Model(&dos).Table(%s).Select(columns...)
+    for k, v := range conditions {
+        e.Eq(k, v)
+    }
+	if _, err = e.Query(); err != nil {
 		return nil, err
 	}
 	return
