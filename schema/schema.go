@@ -30,9 +30,10 @@ const (
 )
 
 type SpecType struct {
-	Table  string `json:"table"`
-	Column string `json:"column"`
-	Type   string `json:"type"`
+	Table   string            `json:"table"`
+	Column  string            `json:"column"`
+	Type    string            `json:"type"`
+	Package map[string]string `json:"package"`
 }
 
 type Commander struct {
@@ -68,6 +69,10 @@ type Commander struct {
 	Debug          bool
 }
 
+func NewCommander() *Commander {
+	return &Commander{}
+}
+
 func (c *Commander) String() string {
 	data, _ := json.Marshal(c)
 	return string(data)
@@ -77,7 +82,8 @@ func (c *Commander) GoString() string {
 	return c.String()
 }
 
-func (c *Commander) ParseSpecTypes(strSpecType string) (sts []*SpecType) {
+func (c *Commander) ParseSpecTypes(strSpecType string) {
+	var sts []*SpecType
 	if strSpecType == "" {
 		return
 	}
@@ -94,10 +100,24 @@ func (c *Commander) ParseSpecTypes(strSpecType string) (sts []*SpecType) {
 			log.Errorf("spec type [%s] format illegal", tt[0])
 			continue
 		}
+		var strSpectType = tt[1]
+		idx := strings.LastIndex(strSpectType, ".")
+		var pack = make(map[string]string)
+		var strPackage, strAliase string
+		if idx > 0 {
+			strPackage = strSpectType[:idx]
+			strSpectType = strSpectType[idx+1:]
+			strAliase = strings.ReplaceAll(strPackage, "/", "_")
+			strAliase = strings.ReplaceAll(strAliase, "-", "_")
+			strAliase = strings.ReplaceAll(strAliase, ".", "_")
+			pack[strAliase] = strPackage
+		}
+
 		sts = append(sts, &SpecType{
-			Table:  tc[0],
-			Column: tc[1],
-			Type:   tt[1],
+			Table:   tc[0],
+			Column:  tc[1],
+			Type:    strSpectType,
+			Package: pack,
 		})
 	}
 	c.SpecTypes = sts
@@ -208,9 +228,15 @@ func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment st
 
 func ReplaceColumnType(cmd *Commander, strTableName, strColName, strColType string) string {
 
-	for _, v := range cmd.SpecTypes {
-		if v.Table == strTableName && strColName == v.Column {
-			strColType = v.Type
+	for _, st := range cmd.SpecTypes {
+		if st.Table == strTableName && strColName == st.Column {
+			if len(st.Package) != 0 {
+				for k, _ := range st.Package {
+					strColType = fmt.Sprintf("%s.%s", k, st.Type)
+				}
+			} else {
+				strColType = st.Type
+			}
 		}
 	}
 	return strColType

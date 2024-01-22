@@ -15,13 +15,13 @@ import (
 )
 
 const (
-	SshScheme    = "ssh://"
-	Version      = "2.9.0"
-	ProgrameName = "db2go"
+	SshScheme   = "ssh://"
+	Version     = "2.10.0"
+	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2023-12-27"
+	BuildTime = "2024-01-22"
 	GitCommit = "<N/A>"
 )
 
@@ -81,7 +81,7 @@ func main() {
 	grace()
 
 	app := &cli.App{
-		Name:    ProgrameName,
+		Name:    ProgramName,
 		Usage:   "db2go [options] --url <DSN>",
 		Version: fmt.Sprintf("v%s %s commit %s", Version, BuildTime, GitCommit),
 		Flags: []cli.Flag{
@@ -199,7 +199,7 @@ func main() {
 
 func doAction(ctx *cli.Context) error {
 	//var err error
-	var cmd = &schema.Commander{}
+	var cmd = schema.NewCommander()
 	cmd.Debug = ctx.Bool(CmdFlag_Debug)
 	cmd.Prefix = ctx.String(CmdFlag_Prefix)
 	cmd.Suffix = ctx.String(CmdFlag_Suffix)

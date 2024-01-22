@@ -95,6 +95,12 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	for i, v := range table.Columns {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
+	for _, st := range cmd.SpecTypes {
+		for k, v := range st.Package {
+			strHead += fmt.Sprintf(`import %s "%s"`, k, v)
+			strHead += "\n"
+		}
+	}
 	if haveDecimal(cmd, table, table.Columns, cmd.EnableDecimal) {
 		strHead += cmd.ImportVer + "\n\n" //根据数据库中是否存在decimal类型决定是否导入sqlca包
 	}
