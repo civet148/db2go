@@ -256,6 +256,9 @@ func makeOrmUpsertMethod(cmd *Commander, table *TableSchema) (strContent string)
 	return fmt.Sprintf(`
 //insert if not exist or update columns on duplicate key...
 func (dao *%v) Upsert(do *%s, columns...string) (lastInsertId int64, err error) {
+    if len(columns) == 0 {
+        return 0, fmt.Errorf("no columns to update")
+    }
 	return dao.db.Model(&do).Table(%s).Select(columns...).Upsert()
 }
 
@@ -266,6 +269,9 @@ func makeOrmUpdateMethod(cmd *Commander, table *TableSchema) (strContent string)
 	return fmt.Sprintf(`
 //update table set columns where id=xxx
 func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
+    if len(columns) == 0 {
+        return 0, fmt.Errorf("no columns to update")
+    }
 	return dao.db.Model(&do).Table(%s).Select(columns...).Update()
 }
 
