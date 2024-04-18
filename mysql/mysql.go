@@ -156,7 +156,7 @@ func (m *ExporterMysql) queryTableColumns(table *schema.TableSchema) (err error)
 }
 
 func (m *ExporterMysql) queryTableCreateStructure(table *schema.TableSchema) (err error) {
-	if _, err = m.Engine.Model(&table.TableName, &table.TableCreateSQL).QueryRaw("SHOW CREATE TABLE %s", table.TableName); err != nil {
+	if _, err = m.Engine.Model(&table.TableName, &table.TableCreateSQL).QueryRaw("SHOW CREATE TABLE `%s`", table.TableName); err != nil {
 		log.Error(err.Error())
 		return
 	}
