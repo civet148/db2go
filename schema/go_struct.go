@@ -96,6 +96,9 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
 	for _, st := range cmd.SpecTypes {
+		if table.TableName != st.Table {
+			continue
+		}
 		for k, v := range st.Package {
 			strHead += fmt.Sprintf(`import %s "%s"`, k, v)
 			strHead += "\n"
