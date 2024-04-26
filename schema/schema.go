@@ -346,8 +346,7 @@ func BigCamelCase(strIn string) (strOut string) {
 			}
 		}
 	}
-
-	return
+	return strOut
 }
 
 func SmallCamelCase(strIn string) (strOut string) {
