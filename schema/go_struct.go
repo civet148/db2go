@@ -45,7 +45,7 @@ func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
 		if errStat != nil && os.IsNotExist(errStat) {
 
 			log.Info("mkdir [%v]", v.SchemeDir)
-			if err = os.MkdirAll(v.SchemeDir, os.ModeDir); err != nil {
+			if err = os.MkdirAll(v.SchemeDir, os.ModePerm); err != nil {
 				log.Errorf("mkdir path name [%v] error (%v)", v.SchemeDir, err.Error())
 				return
 			}

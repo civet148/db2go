@@ -122,11 +122,11 @@ func (m *ExporterPostgres) ExportProto() (err error) {
 	return
 }
 
-//查询当前库下所有表名
+// 查询当前库下所有表名
 func (m *ExporterPostgres) queryTableNames() (rows int64, err error) {
 	var e = m.Engine
 	var cmd = m.Cmd
-	strQuery := fmt.Sprintf(`SELECT relname AS table_name FROM pg_class C WHERE relkind = 'r' AND relname NOT LIKE'pg_%%' AND relname NOT LIKE'sql_%%' ORDER BY relname`)
+	strQuery := `SELECT relname AS table_name FROM pg_class C WHERE relkind = 'r' AND relname NOT LIKE 'pg_%%' AND relname NOT LIKE 'sql_%%' ORDER BY relname`
 	if rows, err = e.Model(&cmd.Tables).QueryRaw(strQuery); err != nil {
 		log.Errorf(err.Error())
 		return
@@ -134,7 +134,7 @@ func (m *ExporterPostgres) queryTableNames() (rows int64, err error) {
 	return
 }
 
-//查询表和注释、引擎等等基本信息
+// 查询表和注释、引擎等等基本信息
 func (m *ExporterPostgres) queryTableSchemas() (schemas []*schema.TableSchema, err error) {
 
 	var cmd = m.Cmd
@@ -182,7 +182,8 @@ func (m *ExporterPostgres) queryTableColumns(table *schema.TableSchema) (err err
 
 	var e = m.Engine
 	_, err = e.Model(&table.Columns).QueryRaw(`SELECT C.relname as table_name, A.attname AS column_name, format_type(A.atttypid,A.atttypmod) AS data_type,
-	col_description ( A.attrelid, A.attnum ) AS column_comment FROM pg_class AS C, pg_attribute AS A WHERE	C.relname = '%v' AND A.attrelid = C.oid	AND A.attnum > 0
+	col_description ( A.attrelid, A.attnum ) AS column_comment FROM pg_class AS C, pg_attribute AS A WHERE	C.relname = '%v' AND A.attrelid = C.oid	AND A.attnum > 0 
+    AND format_type(A.atttypid,A.atttypmod) != '-'
     ORDER BY C.relname,A.attnum`, table.TableName)
 
 	if err != nil {
