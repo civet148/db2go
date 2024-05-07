@@ -12,6 +12,33 @@ const (
 	TableNamePrefix = "TableName"
 )
 
+func ExportToSqlFile(cmd *Commander, tables []*TableSchema) (err error) {
+	if len(tables) == 0 {
+		return nil //no table found
+	}
+	var strDatabase = cmd.Database
+	if strings.Index(strDatabase, "`") == -1 {
+		strDatabase = fmt.Sprintf("`%s`", cmd.Database)
+	}
+	var strTemplate = fmt.Sprintf(`USE %s;`, strDatabase)
+	strTemplate += "\n\n"
+	for _, t := range tables {
+		strTemplate += "\n"
+		strTemplate += t.TableCreateSQL
+		strTemplate += ";\n"
+	}
+	var fi *os.File
+	fi, err = os.OpenFile(cmd.ExportTo, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return log.Errorf("open file [%v] error (%v)", cmd.ExportTo, err.Error())
+	}
+	_, err = fi.WriteString(strTemplate)
+	if err != nil {
+		return log.Errorf(err.Error())
+	}
+	return nil
+}
+
 func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
 
 	for _, v := range tables {
@@ -168,7 +195,6 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 		log.Infof("data access object file %s create successful", strDAOFileName)
 	} else {
 		if fi.IsDir() || fi.Name() != "" {
-			log.Warnf("data access object file %s already exist (ignored)", strDAOFileName)
 			return
 		}
 	}

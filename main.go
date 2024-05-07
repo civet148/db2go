@@ -16,7 +16,7 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "2.10.4"
+	Version     = "2.11.0"
 	ProgramName = "db2go"
 )
 
@@ -50,6 +50,7 @@ const (
 	CmdFlag_V1             = "v1"
 	CmdFlag_Debug          = "debug"
 	CmdFlag_JsonStyle      = "json-style"
+	CmdFlag_Export         = "export"
 )
 
 func init() {
@@ -175,6 +176,10 @@ func main() {
 				Name:  CmdFlag_V1,
 				Usage: "v1 package imports",
 			},
+			&cli.StringFlag{
+				Name:  CmdFlag_Export,
+				Usage: "export database DDL to file",
+			},
 			&cli.BoolFlag{
 				Name:  CmdFlag_Debug,
 				Usage: "open debug mode",
@@ -217,6 +222,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
+	cmd.ExportTo = ctx.String(CmdFlag_Export)
 
 	if ctx.Bool(CmdFlag_V1) {
 		cmd.ImportVer = schema.IMPORT_SQLCA_V1

@@ -68,6 +68,7 @@ type Commander struct {
 	SpecTypes      []*SpecType
 	ImportVer      string
 	Debug          bool
+	ExportTo       string
 }
 
 func NewCommander() *Commander {
