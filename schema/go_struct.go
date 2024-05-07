@@ -95,13 +95,18 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	for i, v := range table.Columns {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
+	var packages = make(map[string]bool)
 	for _, st := range cmd.SpecTypes {
-		if table.TableName != st.Table {
+		if table.TableName != st.Table && st.Table != TABLE_ALL {
 			continue
 		}
 		for k, v := range st.Package {
+			if ok := packages[v]; ok {
+				continue //package already exist
+			}
 			strHead += fmt.Sprintf(`import %s "%s"`, k, v)
 			strHead += "\n"
+			packages[v] = true
 		}
 	}
 	if haveDecimal(cmd, table, table.Columns, cmd.EnableDecimal) {

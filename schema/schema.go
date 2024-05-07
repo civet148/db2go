@@ -15,6 +15,7 @@ const (
 	SCHEME_MSSQL             = "mssql"
 	JSON_PROPERTY_OMIT_EMTPY = "omitempty"
 	DAO_SUFFIX               = "dao"
+	TABLE_ALL                = "__all_tables__"
 )
 
 const (
@@ -95,10 +96,17 @@ func (c *Commander) ParseSpecTypes(strSpecType string) {
 			log.Errorf("spec type [%s] format illegal", v)
 			continue
 		}
-		tc := strings.Split(tt[0], ".")
-		if len(tc) != 2 {
-			log.Errorf("spec type [%s] format illegal", tt[0])
+		var strTableName, strColumnName string
+		tcs := strings.Split(tt[0], ".")
+		if len(tcs) == 0 {
 			continue
+		}
+		if len(tcs) == 1 {
+			strTableName = TABLE_ALL
+			strColumnName = tcs[0]
+		} else {
+			strTableName = tcs[0]
+			strColumnName = tcs[1]
 		}
 		var strSpectType = tt[1]
 		idx := strings.LastIndex(strSpectType, ".")
@@ -114,8 +122,8 @@ func (c *Commander) ParseSpecTypes(strSpecType string) {
 		}
 
 		sts = append(sts, &SpecType{
-			Table:   tc[0],
-			Column:  tc[1],
+			Table:   strTableName,
+			Column:  strColumnName,
 			Type:    strSpectType,
 			Package: pack,
 		})
@@ -229,7 +237,7 @@ func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment st
 func ReplaceColumnType(cmd *Commander, strTableName, strColName, strColType string) string {
 
 	for _, st := range cmd.SpecTypes {
-		if st.Table == strTableName && strColName == st.Column {
+		if (st.Table == strTableName || st.Table == TABLE_ALL) && strColName == st.Column {
 			if len(st.Package) != 0 {
 				for k, _ := range st.Package {
 					strColType = fmt.Sprintf("%s.%s", k, st.Type)
