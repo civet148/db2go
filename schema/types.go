@@ -215,3 +215,8 @@ func getFamiliarType(strDataType string) (strType string) {
 	}
 	return DB_COLUMN_TYPE_TEXT
 }
+
+type CreateDatabaseDDL struct {
+	Database  string `db:"Database"`
+	CreateSQL string `db:"Create Database"`
+}

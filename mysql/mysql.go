@@ -40,7 +40,11 @@ func (m *ExporterMysql) ExportGo() (err error) {
 	}
 	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
 	log.Infof("ready to export tables [%v]", cmd.Tables)
-
+	var ddl *schema.CreateDatabaseDDL
+	ddl, err = m.queryCreateDatabaseDDL(cmd, e)
+	if err != nil {
+		return err
+	}
 	if schemas, err = m.queryTableSchemas(cmd, e); err != nil {
 		log.Errorf("query tables error [%s]", err.Error())
 		return
@@ -57,7 +61,7 @@ func (m *ExporterMysql) ExportGo() (err error) {
 	}
 
 	if cmd.ExportTo != "" {
-		err = schema.ExportToSqlFile(cmd, schemas)
+		err = schema.ExportToSqlFile(cmd, ddl, schemas)
 		if err != nil {
 			log.Errorf("export to file [%s] error [%s]", cmd.ExportTo, err.Error())
 		}
@@ -103,6 +107,14 @@ func (m *ExporterMysql) ExportProto() (err error) {
 	}
 	file.Close()
 	return
+}
+
+func (m *ExporterMysql) queryCreateDatabaseDDL(cmd *schema.Commander, e *sqlca.Engine) (ddl *schema.CreateDatabaseDDL, err error) {
+	_, err = e.Model(&ddl).QueryRaw("SHOW CREATE DATABASE `%s`", cmd.Database)
+	if err != nil {
+		return nil, log.Error(err.Error())
+	}
+	return ddl, nil
 }
 
 func (m *ExporterMysql) queryTableSchemas(cmd *schema.Commander, e *sqlca.Engine) (schemas []*schema.TableSchema, err error) {

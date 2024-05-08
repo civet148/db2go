@@ -12,15 +12,15 @@ const (
 	TableNamePrefix = "TableName"
 )
 
-func ExportToSqlFile(cmd *Commander, tables []*TableSchema) (err error) {
+func ExportToSqlFile(cmd *Commander, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
 	if len(tables) == 0 {
 		return nil //no table found
 	}
-	var strDatabase = cmd.Database
-	if strings.Index(strDatabase, "`") == -1 {
-		strDatabase = fmt.Sprintf("`%s`", cmd.Database)
-	}
-	var strTemplate = fmt.Sprintf(`USE %s;`, strDatabase)
+	var strDatabase = fmt.Sprintf("`%s`", cmd.Database)
+	var strTemplate string
+
+	strTemplate += ddl.CreateSQL + "\n"
+	strTemplate += fmt.Sprintf(`USE %s;`, strDatabase)
 	strTemplate += "\n\n"
 	for _, t := range tables {
 		strTemplate += "\n"
