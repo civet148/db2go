@@ -37,6 +37,13 @@ type SpecType struct {
 	Package map[string]string `json:"package"`
 }
 
+type CommTagType struct {
+	Table    string `json:"table"`
+	Column   string `json:"column"`
+	TagName  string `json:"tag_name"`
+	TagValue string `json:"tag_value"`
+}
+
 type Commander struct {
 	ConnUrl        string
 	Database       string
@@ -69,6 +76,7 @@ type Commander struct {
 	ImportVer      string
 	Debug          bool
 	ExportTo       string
+	TagTypes       []*CommTagType
 }
 
 func NewCommander() *Commander {
@@ -82,6 +90,49 @@ func (c *Commander) String() string {
 
 func (c *Commander) GoString() string {
 	return c.String()
+}
+
+func (c *Commander) ParseCommonTags(strCommTags string) {
+	var tts []*CommTagType
+	if strCommTags == "" || strCommTags == "\"\"" {
+		return
+	}
+	ss := strings.Split(strCommTags, " ")
+	for _, v := range ss {
+		v = strings.TrimSpace(v)
+		tt := strings.Split(v, "=")
+		if len(tt) != 2 {
+			log.Errorf("spec type [%s] format illegal", v)
+			continue
+		}
+		var strTableName, strColumnName string
+		tcs := strings.Split(tt[0], ".")
+		if len(tcs) == 0 {
+			continue
+		}
+		if len(tcs) == 1 {
+			strTableName = TABLE_ALL
+			strColumnName = tcs[0]
+		} else {
+			strTableName = tcs[0]
+			strColumnName = tcs[1]
+		}
+		var strTagType = tt[1]
+		var strTagName, strTagValue string
+		idx := strings.Index(strTagType, ":")
+		if idx > 0 {
+			strTagName = strTagType[:idx]
+			strTagValue = strTagType[idx+1:]
+		}
+
+		tts = append(tts, &CommTagType{
+			Table:    strTableName,
+			Column:   strColumnName,
+			TagName:  strTagName,
+			TagValue: strTagValue,
+		})
+	}
+	c.TagTypes = tts
 }
 
 func (c *Commander) ParseSpecTypes(strSpecType string) {

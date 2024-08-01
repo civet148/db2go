@@ -122,11 +122,15 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	for i, v := range table.Columns {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
+	//检查此表是否存在需要导入第三方包类型的字段
+	spectTypes := getImportSpecTypes(cmd, table)
+
 	var packages = make(map[string]bool)
-	for _, st := range cmd.SpecTypes {
+	for _, st := range spectTypes {
 		if table.TableName != st.Table && st.Table != TABLE_ALL {
 			continue
 		}
+
 		for k, v := range st.Package {
 			if ok := packages[v]; ok {
 				continue //package already exist
@@ -149,6 +153,17 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 		return err
 	}
 	makeDAO(cmd, table)
+	return
+}
+
+func getImportSpecTypes(cmd *Commander, table *TableSchema) (specTypes []*SpecType) {
+	for _, col := range table.Columns {
+		for _, st := range cmd.SpecTypes {
+			if col.Name == st.Column {
+				specTypes = append(specTypes, st)
+			}
+		}
+	}
 	return
 }
 
@@ -385,6 +400,18 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 			}
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
 		}
+		for _, t := range cmd.TagTypes {
+			if t.Column != v.Name {
+				continue
+			}
+			if t.Table == table.TableName || t.Table == TABLE_ALL {
+				tv := t.TagValue
+				if strings.Contains(tv, "\"") {
+					tv = strings.ReplaceAll(tv, "\"", "")
+				}
+				tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t.TagName, tv))
+			}
+		}
 		//添加成员和标签
 		strContent += MakeTags(cmd, strColName, strColType, v.Name, v.Comment, strings.Join(tagValues, " "))
 
@@ -407,3 +434,4 @@ func GenerateMethodDeclare(strShortName, strStructName, strMethodName, strArgs, 
 	strFunc += fmt.Sprintf("}\n\n")
 	return
 }
+

@@ -103,7 +103,7 @@ func (m *ExporterMssql) ExportProto() (err error) {
 	return
 }
 
-//查询当前库下所有表名
+// 查询当前库下所有表名
 func (m *ExporterMssql) queryTableNames() (rows int64, err error) {
 	var e = m.Engine
 	var cmd = m.Cmd
@@ -115,7 +115,7 @@ func (m *ExporterMssql) queryTableNames() (rows int64, err error) {
 	return
 }
 
-//查询表和注释、引擎等等基本信息
+// 查询表和注释、引擎等等基本信息
 func (m *ExporterMssql) queryTableSchemas() (schemas []*schema.TableSchema, err error) {
 
 	var cmd = m.Cmd

@@ -16,12 +16,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "2.11.1"
+	Version     = "2.12.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2024-05-08"
+	BuildTime = "2024-07-31"
 	GitCommit = "<N/A>"
 )
 
@@ -51,6 +51,7 @@ const (
 	CmdFlag_Debug          = "debug"
 	CmdFlag_JsonStyle      = "json-style"
 	CmdFlag_Export         = "export"
+	CmdFlag_CommTags       = "common-tags"
 )
 
 func init() {
@@ -189,6 +190,10 @@ func main() {
 				Usage: "json style: smallcamel or bigcamel",
 				Value: schema.JSON_STYLE_DEFAULT,
 			},
+			&cli.StringFlag{
+				Name:  CmdFlag_CommTags,
+				Usage: "set common tag values, e.g gorm",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -221,6 +226,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.OneFile = ctx.Bool(CmdFlag_OneFile)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
+	cmd.ParseCommonTags(ctx.String(CmdFlag_CommTags))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportTo = ctx.String(CmdFlag_Export)
 

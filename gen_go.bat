@@ -13,6 +13,8 @@ set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 set JSON_PROPERTIES="omitempty"
 set SPEC_TYPES="users.extra_data=struct{}"
 set IMPORT_MODELS="github.com/civet148/db2go/models"
+rem 指定其他orm的标签和值(以空格分隔)
+set COMMON_TAGS="id=gorm:\"primarykey\" created_at=gorm:\"autoCreateTime;type:timestamp\" updated_at=gorm:\"autoUpdateTime;type:timestamp\""
 
 If "%errorlevel%" == "0" (
 .\db2go.exe --url %DSN_URL% --out %OUT_DIR% --table %TABLE_NAME% --json-properties %JSON_PROPERTIES% --enable-decimal  --spec-type %SPEC_TYPES% ^
