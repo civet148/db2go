@@ -77,10 +77,13 @@ type Commander struct {
 	Debug          bool
 	ExportTo       string
 	TagTypes       []*CommTagType
+	ProtoOptions   map[string]string
 }
 
 func NewCommander() *Commander {
-	return &Commander{}
+	return &Commander{
+		ProtoOptions: make(map[string]string),
+	}
 }
 
 func (c *Commander) String() string {
@@ -511,3 +514,4 @@ func HandleCommentCRLF(table *TableSchema) {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
 }
+

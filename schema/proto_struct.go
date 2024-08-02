@@ -2,6 +2,7 @@ package schema
 
 import (
 	"fmt"
+	"strings"
 )
 
 func MakeProtoHead(cmd *Commander) (strContent string) {
@@ -17,6 +18,13 @@ func MakeProtoHead(cmd *Commander) (strContent string) {
 	for _, v := range cmd.GogoOptions {
 		strContent += fmt.Sprintf("option %v;\n", v)
 	}
+	for k, v := range cmd.ProtoOptions {
+		if strings.Contains(v, "\"") {
+			strContent += fmt.Sprintf("option %v=%v;\n", k, v)
+		} else {
+			strContent += fmt.Sprintf("option %v=\"%v\";\n", k, v)
+		}
+	}
 	strContent += "\n"
 	return
 }
@@ -24,7 +32,7 @@ func MakeProtoHead(cmd *Commander) (strContent string) {
 func MakeProtoBody(cmd *Commander, table *TableSchema) (strContent string) {
 
 	strTableName := BigCamelCase(table.TableName)
-	strContent += fmt.Sprintf("message %vDO {\n", strTableName)
+	strContent += fmt.Sprintf("message %v {\n", strTableName)
 	for i, v := range table.Columns {
 
 		if IsInSlice(v.Name, cmd.Without) {
@@ -38,3 +46,4 @@ func MakeProtoBody(cmd *Commander, table *TableSchema) (strContent string) {
 	strContent += "}\n\n"
 	return
 }
+

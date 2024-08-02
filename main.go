@@ -16,7 +16,7 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "2.12.0"
+	Version     = "2.13.0"
 	ProgramName = "db2go"
 )
 
@@ -41,7 +41,8 @@ const (
 	CmdFlag_SpecType       = "spec-type"
 	CmdFlag_EnableDecimal  = "enable-decimal"
 	CmdFlag_GogoOptions    = "gogo-options"
-	CmdFlag_OneFile        = "one-file"
+	CmdFlag_ProtoOptions   = "proto-options"
+	CmdFlag_Merge          = "merge"
 	CmdFlag_OmitEmpty      = "omitempty"
 	CmdFlag_JsonProperties = "json-properties"
 	CmdFlag_TinyintAsBool  = "tinyint-as-bool"
@@ -146,7 +147,7 @@ func main() {
 				Usage: "gogo proto options",
 			},
 			&cli.BoolFlag{
-				Name:  CmdFlag_OneFile,
+				Name:  CmdFlag_Merge,
 				Usage: "export to one file",
 			},
 			&cli.StringFlag{
@@ -194,6 +195,10 @@ func main() {
 				Name:  CmdFlag_CommTags,
 				Usage: "set common tag values, e.g gorm",
 			},
+			&cli.StringFlag{
+				Name:  CmdFlag_ProtoOptions,
+				Usage: "set protobuf options, multiple options seperated by ';'",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -223,7 +228,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.OmitEmpty = ctx.Bool(CmdFlag_OmitEmpty)
 	cmd.SSH = ctx.String(CmdFlag_SSH)
 	cmd.Database = ctx.String(CmdFlag_Database)
-	cmd.OneFile = ctx.Bool(CmdFlag_OneFile)
+	cmd.OneFile = ctx.Bool(CmdFlag_Merge)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
 	cmd.ParseCommonTags(ctx.String(CmdFlag_CommTags))
@@ -243,7 +248,20 @@ func doAction(ctx *cli.Context) error {
 			cmd.SSH = SshScheme + cmd.SSH
 		}
 	}
-
+	if cmd.Protobuf {
+		var strProtoOptions string
+		strProtoOptions = ctx.String(CmdFlag_ProtoOptions)
+		if strProtoOptions != "" {
+			opts := strings.Split(strProtoOptions, ";")
+			for _, opt := range opts {
+				ss := strings.Split(opt, "=")
+				if len(ss) != 2 {
+					return log.Errorf("invalid protobuf option %s", opt)
+				}
+				cmd.ProtoOptions[ss[0]] = ss[1]
+			}
+		}
+	}
 	if cmd.Debug {
 		log.SetLevel("debug")
 	}
@@ -344,3 +362,4 @@ func export(cmd *schema.Commander, e *sqlca.Engine) (err error) {
 	}
 	return nil
 }
+
