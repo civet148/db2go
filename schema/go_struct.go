@@ -147,7 +147,7 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	strContent += makeColumnConsts(cmd, table)
 	strContent += makeTableStructure(cmd, table)
 	strContent += makeObjectMethods(cmd, table)
-	strContent += makeTableCreateSQL(cmd, table)
+	//strContent += makeTableCreateSQL(cmd, table)
 	if _, err = File.WriteString(strHead + strContent); err != nil {
 		log.Errorf(err.Error())
 		return err
