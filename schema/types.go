@@ -145,13 +145,13 @@ var db2goTypes = map[string]string{
 // 数据库字段类型与protobuf类型对照表
 var db2protoTypes = map[string]string{
 
-	DB_COLUMN_TYPE_BIGINT:     "int64",
-	DB_COLUMN_TYPE_INT:        "int32",
-	DB_COLUMN_TYPE_INTEGER:    "int32",
-	DB_COLUMN_TYPE_MEDIUMINT:  "int32",
-	DB_COLUMN_TYPE_SMALLINT:   "int32",
-	DB_COLUMN_TYPE_TINYINT:    "int32",
-	DB_COLUMN_TYPE_BIT:        "int32",
+	DB_COLUMN_TYPE_BIGINT:     "sint64",
+	DB_COLUMN_TYPE_INT:        "sint32",
+	DB_COLUMN_TYPE_INTEGER:    "sint32",
+	DB_COLUMN_TYPE_MEDIUMINT:  "sint32",
+	DB_COLUMN_TYPE_SMALLINT:   "sint32",
+	DB_COLUMN_TYPE_TINYINT:    "sint32",
+	DB_COLUMN_TYPE_BIT:        "sint32",
 	DB_COLUMN_TYPE_BOOL:       "bool",
 	DB_COLUMN_TYPE_BOOLEAN:    "bool",
 	DB_COLUMN_TYPE_DECIMAL:    "double",
@@ -182,6 +182,16 @@ var db2protoTypes = map[string]string{
 	DB_COLUMN_TYPE_JSONB:      "string",
 	DB_COLUMN_TYPE_POINT:      "string", //暂定
 	DB_COLUMN_TYPE_POLYGON:    "string", //暂定
+}
+
+// 数据库字段类型与protobuf类型对照表(无符号)
+var db2protoTypesUnsigned = map[string]string{
+	DB_COLUMN_TYPE_BIGINT:    "uint64",
+	DB_COLUMN_TYPE_INT:       "uint32",
+	DB_COLUMN_TYPE_INTEGER:   "uint32",
+	DB_COLUMN_TYPE_MEDIUMINT: "uint32",
+	DB_COLUMN_TYPE_SMALLINT:  "uint32",
+	DB_COLUMN_TYPE_TINYINT:   "uint32",
 }
 
 func ConvertPostgresColumnType(table *TableSchema) (err error) {
@@ -220,3 +230,4 @@ type CreateDatabaseDDL struct {
 	Database  string `db:"Database"`
 	CreateSQL string `db:"Create Database"`
 }
+

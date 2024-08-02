@@ -496,15 +496,29 @@ func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enabl
 }
 
 // 将数据库字段类型转为protobuf对应的数据类型
-func GetProtoColumnType(strTableName, strColName, strDataType string) (strColType string) {
-
+func GetProtoColumnType(strTableName string, col TableColumn) (strColType string) {
 	var ok bool
-	if strColType, ok = db2protoTypes[strDataType]; !ok {
-		strColType = "string"
-		log.Warnf("table [%v] column [%v] data type [%v] not support yet, set as string type", strTableName, strColName, strDataType)
-		return
+	var unsigned bool
+	var strColName, strDataType, strColumnType string
+	strColName = col.Name
+	strDataType = col.DataType
+	strColumnType = col.ColumnType
+	if strings.Contains(strColumnType, "unsigned") { //判断字段是否为无符号类型
+		unsigned = true
 	}
-	return
+	if !unsigned {
+		if strColType, ok = db2protoTypes[strDataType]; !ok {
+			strColType = "string"
+			log.Warnf("table [%v] column [%v] data type [%v] not support yet, set as string type", strTableName, strColName, strDataType)
+			return
+		}
+	} else {
+		if strColType, ok = db2protoTypesUnsigned[strDataType]; !ok {
+			strColType = "string"
+			log.Warnf("table [%v] column [%v] data type [%v] not support yet, set as string type", strTableName, strColName, strDataType)
+		}
+	}
+	return strColType
 }
 
 func HandleCommentCRLF(table *TableSchema) {
