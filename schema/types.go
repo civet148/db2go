@@ -192,6 +192,11 @@ var db2protoTypesUnsigned = map[string]string{
 	DB_COLUMN_TYPE_MEDIUMINT: "uint32",
 	DB_COLUMN_TYPE_SMALLINT:  "uint32",
 	DB_COLUMN_TYPE_TINYINT:   "uint32",
+	DB_COLUMN_TYPE_DECIMAL:   "double",
+	DB_COLUMN_TYPE_REAL:      "float",
+	DB_COLUMN_TYPE_DOUBLE:    "double",
+	DB_COLUMN_TYPE_FLOAT:     "float",
+	DB_COLUMN_TYPE_NUMERIC:   "double",
 }
 
 func ConvertPostgresColumnType(table *TableSchema) (err error) {
