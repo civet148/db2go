@@ -97,6 +97,12 @@ var db2goTypesUnsigned = map[string]string{
 	DB_COLUMN_TYPE_MEDIUMINT: "uint32",
 	DB_COLUMN_TYPE_SMALLINT:  "uint16",
 	DB_COLUMN_TYPE_TINYINT:   "uint8",
+	DB_COLUMN_TYPE_BIT:       "uint8",
+	DB_COLUMN_TYPE_DECIMAL:   "float64",
+	DB_COLUMN_TYPE_REAL:      "float32",
+	DB_COLUMN_TYPE_DOUBLE:    "float64",
+	DB_COLUMN_TYPE_FLOAT:     "float32",
+	DB_COLUMN_TYPE_NUMERIC:   "float64",
 }
 
 // 数据库字段类型与go语言类型对照表
@@ -109,13 +115,13 @@ var db2goTypes = map[string]string{
 	DB_COLUMN_TYPE_SMALLINT:   "int16",
 	DB_COLUMN_TYPE_TINYINT:    "int8",
 	DB_COLUMN_TYPE_BIT:        "int8",
-	DB_COLUMN_TYPE_BOOL:       "bool",
-	DB_COLUMN_TYPE_BOOLEAN:    "bool",
 	DB_COLUMN_TYPE_DECIMAL:    "float64",
 	DB_COLUMN_TYPE_REAL:       "float64",
 	DB_COLUMN_TYPE_DOUBLE:     "float64",
 	DB_COLUMN_TYPE_FLOAT:      "float64",
 	DB_COLUMN_TYPE_NUMERIC:    "float64",
+	DB_COLUMN_TYPE_BOOL:       "bool",
+	DB_COLUMN_TYPE_BOOLEAN:    "bool",
 	DB_COLUMN_TYPE_DATETIME:   "string",
 	DB_COLUMN_TYPE_YEAR:       "string",
 	DB_COLUMN_TYPE_DATE:       "string",
