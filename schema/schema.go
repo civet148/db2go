@@ -387,7 +387,7 @@ func CreateOutputFile(cmd *Commander, table *TableSchema, strFileSuffix string, 
 		log.Errorf("open file [%v] error (%v)", table.FileName, err.Error())
 		return
 	}
-	log.Infof("open file [%v] ok", table.FileName)
+	log.Infof("generate table [%s] protobuf schema to file [%v] successfully", table.TableName, table.FileName)
 	return
 }
 
