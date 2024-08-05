@@ -387,11 +387,6 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 		var strColType, strColName string
 		strColName = BigCamelCase(v.Name)
 		strColType, _ = GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
-		if IsInSlice(v.Name, cmd.ReadOnly) {
-			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_READ_ONLY))
-		} else if v.IsNullable == "YES" {
-			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_IS_NULL))
-		}
 
 		for _, t := range cmd.Tags {
 			tv := v.Name
@@ -411,6 +406,11 @@ func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) 
 				}
 				tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t.TagName, tv))
 			}
+		}
+		if IsInSlice(v.Name, cmd.ReadOnly) {
+			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_READ_ONLY))
+		} else if v.IsNullable == "YES" {
+			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_IS_NULL))
 		}
 		//添加成员和标签
 		strContent += MakeTags(cmd, strColName, strColType, v.Name, v.Comment, strings.Join(tagValues, " "))
