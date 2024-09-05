@@ -85,7 +85,7 @@ set DAO_OUT=dao
 rem 数据库操作对象导入数据库表模型数据路径(指定--dao选项时必填)
 set IMPORT_MODELS="test/sqler/models"
 rem 导出全部建表SQL到指定文件
-set DEPLOY_SQL="deploy/custom_jewel.sql"
+set DEPLOY_SQL="deploy/test.sql"
 
 rem 判断本地系统是否已安装db2go工具，没有则进行安装
 where db2go.exe
