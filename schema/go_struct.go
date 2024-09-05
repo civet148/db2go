@@ -19,7 +19,7 @@ func ExportToSqlFile(cmd *Commander, ddl *CreateDatabaseDDL, tables []*TableSche
 	var strDatabase = fmt.Sprintf("`%s`", cmd.Database)
 	var strTemplate string
 
-	strTemplate += ddl.CreateSQL + "\n"
+	strTemplate += ddl.CreateSQL + ";\n"
 	strTemplate += fmt.Sprintf(`USE %s;`, strDatabase)
 	strTemplate += "\n\n"
 	for _, t := range tables {
