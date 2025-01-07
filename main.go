@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/civet148/db2go/mssql"
 	_ "github.com/civet148/db2go/mysql"
+	_ "github.com/civet148/db2go/opengauss"
 	_ "github.com/civet148/db2go/postgres"
 	"github.com/civet148/db2go/schema"
 	"github.com/civet148/log"
@@ -16,12 +17,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "2.13.4"
+	Version     = "2.14.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2024-10-09"
+	BuildTime = "2025-01-07"
 	GitCommit = "<N/A>"
 )
 

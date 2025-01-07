@@ -13,6 +13,7 @@ const (
 	SCHEME_MYSQL             = "mysql"
 	SCHEME_POSTGRES          = "postgres"
 	SCHEME_MSSQL             = "mssql"
+	SCHEME_OPEN_GAUSS        = "opengauss"
 	JSON_PROPERTY_OMIT_EMTPY = "omitempty"
 	DAO_SUFFIX               = "dao"
 	TABLE_ALL                = "__all_tables__"
