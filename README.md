@@ -48,8 +48,17 @@ GLOBAL OPTIONS:
 
 ```
 
+## 1. 编译安装
 
-## 1. 数据库表导出到go文件
+- Ubuntu 20.04 or later
+
+```shell
+$ sudo apt update && sudo apt install -y make gcc 
+$ go env -w CGO_ENABLED=1
+$ make
+```
+
+## 2. 数据库表导出到go文件
 
 * Windows batch 脚本
 
