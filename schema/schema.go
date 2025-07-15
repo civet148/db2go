@@ -21,7 +21,9 @@ const (
 
 const (
 	IMPORT_GOGO_PROTO = `import "github.com/gogo/protobuf/gogoproto/gogo.proto";`
-	IMPORT_SQLCA_V1   = `import "github.com/civet148/sqlca"`
+	SQLCA_V2_PKG      = `github.com/civet148/sqlca/v2`
+	SQLCA_V3_PKG      = `github.com/civet148/sqlca/v3`
+	IMPORT_SQLCA_V3   = `import "github.com/civet148/sqlca/v3"`
 	IMPORT_SQLCA_V2   = `import "github.com/civet148/sqlca/v2"`
 )
 
@@ -75,6 +77,7 @@ type Commander struct {
 	SSH            string
 	SpecTypes      []*SpecType
 	ImportVer      string
+	SqlcaPkg       string
 	Debug          bool
 	ExportTo       string
 	TagTypes       []*CommTagType
@@ -529,4 +532,3 @@ func HandleCommentCRLF(table *TableSchema) {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
 }
-

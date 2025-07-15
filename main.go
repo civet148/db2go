@@ -17,12 +17,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "2.14.0"
+	Version     = "2.15.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2025-01-07"
+	BuildTime = "2025-07-15"
 	GitCommit = "<N/A>"
 )
 
@@ -49,7 +49,7 @@ const (
 	CmdFlag_TinyintAsBool  = "tinyint-as-bool"
 	CmdFlag_SSH            = "ssh"
 	CmdFlag_ImportModels   = "import-models"
-	CmdFlag_V1             = "v1"
+	CmdFlag_V2             = "v2"
 	CmdFlag_Debug          = "debug"
 	CmdFlag_JsonStyle      = "json-style"
 	CmdFlag_Export         = "export"
@@ -176,8 +176,8 @@ func main() {
 				Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
 			},
 			&cli.BoolFlag{
-				Name:  CmdFlag_V1,
-				Usage: "v1 package imports",
+				Name:  CmdFlag_V2,
+				Usage: "sqlca v2 package imports",
 			},
 			&cli.StringFlag{
 				Name:  CmdFlag_Export,
@@ -236,10 +236,12 @@ func doAction(ctx *cli.Context) error {
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportTo = ctx.String(CmdFlag_Export)
 
-	if ctx.Bool(CmdFlag_V1) {
-		cmd.ImportVer = schema.IMPORT_SQLCA_V1
-	} else {
+	if ctx.Bool(CmdFlag_V2) {
+		cmd.SqlcaPkg = schema.SQLCA_V2_PKG
 		cmd.ImportVer = schema.IMPORT_SQLCA_V2
+	} else {
+		cmd.SqlcaPkg = schema.SQLCA_V3_PKG
+		cmd.ImportVer = schema.IMPORT_SQLCA_V3
 	}
 	if cmd.DAO != "" && cmd.ImportModels == "" {
 		return log.Errorf("models path required eg. github.com/xxx/your-repo/models")
@@ -363,4 +365,3 @@ func export(cmd *schema.Commander, e *sqlca.Engine) (err error) {
 	}
 	return nil
 }
-

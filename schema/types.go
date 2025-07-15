@@ -144,8 +144,8 @@ var db2goTypes = map[string]string{
 	DB_COLUMN_TYPE_VARBINARY:  "string",
 	DB_COLUMN_TYPE_JSON:       "struct{}",
 	DB_COLUMN_TYPE_JSONB:      "string",
-	DB_COLUMN_TYPE_POINT:      "string", //暂定
-	DB_COLUMN_TYPE_POLYGON:    "string", //暂定
+	DB_COLUMN_TYPE_POINT:      "sqlca.Point", //暂定
+	DB_COLUMN_TYPE_POLYGON:    "string",      //暂定
 }
 
 // 数据库字段类型与protobuf类型对照表
@@ -241,4 +241,3 @@ type CreateDatabaseDDL struct {
 	Database  string `db:"Database"`
 	CreateSQL string `db:"Create Database"`
 }
-

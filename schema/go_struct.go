@@ -218,11 +218,11 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 	strContent += fmt.Sprintf("package %v\n\n", cmd.DAO)
 	strContent += fmt.Sprintf(`import (
     "fmt"
-	"github.com/civet148/sqlca/v2"
+	"%s"
 	"%s"
 )
 
-`, cmd.ImportModels)
+`, cmd.SqlcaPkg, cmd.ImportModels)
 
 	strContent += makeNewMethod(cmd, table)
 	strContent += makeOrmMethods(cmd, table)
@@ -294,7 +294,7 @@ func makeOrmMethods(cmd *Commander, table *TableSchema) (strContent string) {
 func makeOrmInsertMethod(cmd *Commander, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert into table by data model
-func (dao *%v) Insert(do *%s) (lastInsertId int64, err error) {
+func (dao *%v) Insert(do *%s) (lastInsertId, rowsAffected int64, err error) {
 	return dao.db.Model(&do).Table(%s).Insert()
 }
 
@@ -434,4 +434,3 @@ func GenerateMethodDeclare(strShortName, strStructName, strMethodName, strArgs, 
 	strFunc += fmt.Sprintf("}\n\n")
 	return
 }
-
