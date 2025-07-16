@@ -66,7 +66,7 @@ $ make
 @echo off
 
 rem 数据源连接串
-set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true&loc=Local"
+set DSN_URL="mysql://root:12345678@127.0.0.1:3306/test?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true&loc=Local"
 rem 数据模型(models)和数据库操作对象(dao)文件输出基础目录
 set OUT_DIR=.
 rem 数据模型包名(数据模型文件目录名)
@@ -131,30 +131,22 @@ pause
 ```shell
 #!/bin/sh
 
-# 数据对象文件输出目录
 OUT_DIR=.
-# 数据对象文件golang包名
 PACK_NAME="models"
-# 文件后缀名(一般不需要加)
-SUFFIX_NAME=""
-# 指定只读字段(当created_at和updated_at字段由数据库自动生成时使用)
+SUFFIX_NAME="do"
 READ_ONLY="created_at, updated_at"
-# 数据库表名(可为空)
-TABLE_NAME="users, classes"
-# 排除某些字段
+TABLE_NAME=""
 WITH_OUT=""
-# 字段自定义标签
 TAGS="bson"
-# 指定字段自动生成为bool类型
 TINYINT_TO_BOOL="deleted,is_admin,disable"
-# 数据源连接URL
-DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
-# 增加json标签属性
+DSN_URL="mysql://root:12345678@127.0.0.1:3306/test?charset=utf8"
 JSON_PROPERTIES="omitempty"
-# 指定字段为自定义类型(如果是结构体则需要自行创建一个文件进行声明)
-SPEC_TYPES="users.extra_data=struct{}"
-# 自动生成数据库操作对象文件时需指定数据对象文件导入路径
+# 指定表和字段为特定类型，支持第三方路径(多个表字段以英文逗号分隔)
+SPEC_TYPES="users.extra_data=struct{}, users.money=github.com/shopspring/decimal.Decimal"
+# 当指定--dao自动生成数据访问对象时需要指定models导入路径
 IMPORT_MODELS="github.com/civet148/db2go/models"
+#指定其他orm的标签和值(以空格分隔)
+COMMON_TAGS="id=gorm:\"primarykey\" created_at=gorm:\"autoCreateTime;type:timestamp\" updated_at=gorm:\"autoUpdateTime;type:timestamp\""
 
 if [ $? -eq 0 ]; then
 db2go --debug --url $DSN_URL --out $OUT_DIR --table "$TABLE_NAME" --json-properties $JSON_PROPERTIES --enable-decimal  --spec-type "$SPEC_TYPES" \
