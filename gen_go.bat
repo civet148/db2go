@@ -3,7 +3,7 @@ go build -ldflags "-s -w"
 
 set OUT_DIR=.
 set PACK_NAME="models"
-set SUFFIX_NAME="do"
+set SUFFIX_NAME=""
 set READ_ONLY="created_at, updated_at"
 set TABLE_NAME=""
 set WITH_OUT=""
