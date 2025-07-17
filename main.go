@@ -279,34 +279,29 @@ func doAction(ctx *cli.Context) error {
 
 	if ctx.String(CmdFlag_Tables) != "" {
 		strFlagValue := ctx.String(CmdFlag_Tables)
-		log.Infof("tables %+v", strFlagValue)
-		tables := strings.Split(strFlagValue, ",")
-		cmd.Tables = schema.TrimSpaceSlice(tables)
+		cmd.Tables = schema.TrimSpaceSlice(schema.Split(strFlagValue))
 	}
 
 	if ctx.String(CmdFlag_Without) != "" {
-		cmd.Without = schema.TrimSpaceSlice(strings.Split(ctx.String(CmdFlag_Without), ","))
+		cmd.Without = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_Without)))
 	}
 
 	if ctx.String(CmdFlag_TinyintAsBool) != "" {
-		cmd.TinyintAsBool = schema.TrimSpaceSlice(strings.Split(ctx.String(CmdFlag_TinyintAsBool), ","))
+		cmd.TinyintAsBool = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_TinyintAsBool)))
 	}
 
 	if cmd.Protobuf {
 		gogoOpt := ctx.String(CmdFlag_GogoOptions)
 		if gogoOpt != "" {
-			cmd.GogoOptions = schema.TrimSpaceSlice(strings.Split(gogoOpt, ","))
-			if len(cmd.GogoOptions) == 0 {
-				cmd.GogoOptions = schema.TrimSpaceSlice(strings.Split(gogoOpt, ";"))
-			}
+			cmd.GogoOptions = schema.TrimSpaceSlice(schema.Split(gogoOpt))
 		}
 	}
 
 	if ctx.String(CmdFlag_Tags) != "" {
-		cmd.Tags = schema.TrimSpaceSlice(strings.Split(ctx.String(CmdFlag_Tags), ","))
+		cmd.Tags = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_Tags)))
 	}
 	if ctx.String(CmdFlag_ReadOnly) != "" {
-		cmd.ReadOnly = schema.TrimSpaceSlice(strings.Split(ctx.String(CmdFlag_ReadOnly), ","))
+		cmd.ReadOnly = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_ReadOnly)))
 	}
 
 	cmd.Scheme = ui.Scheme

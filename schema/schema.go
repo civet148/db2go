@@ -437,6 +437,15 @@ func SmallCamelCase(strIn string) (strOut string) {
 	return
 }
 
+func Split(s string) (ss []string) {
+	if strings.Contains(s, ";") {
+		ss = strings.Split(s, ";")
+	} else {
+		ss = strings.Split(s, ",")
+	}
+	return ss
+}
+
 func TrimSpaceSlice(s []string) (ts []string) {
 	for _, v := range s {
 		ts = append(ts, strings.TrimSpace(v))
