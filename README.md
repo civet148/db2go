@@ -88,7 +88,7 @@ set JSON_PROPERTIES=""
 rem 指定某表的某字段为指定类型,多个表字段以英文逗号分隔（例如：user.is_deleted=bool表示指定user表is_deleted字段为bool类型; 如果不指定表名则所有表的is_deleted字段均为bool类型；支持第三方包类型，例如：user.weight=github.com/shopspring/decimal.Decimal）
 set SPEC_TYPES="users.extra_data=struct{}"
 rem 指定其他orm的标签和值(以空格分隔)
-set COMMON_TAGS="id=gorm:primarykey created_at=gorm:\"autoCreateTime;type:timestamp\" updated_at=gorm:\"autoUpdateTime;type:timestamp\""
+set COMMON_TAGS="id=gorm:primarykey create_time=gorm:\"autoCreateTime;type:timestamp\" update_time=gorm:\"autoUpdateTime;type:timestamp\""
 rem 数据库操作对象生成目录名
 set DAO_OUT=dao
 rem 数据库操作对象导入数据库表模型数据路径(指定--dao选项时必填)
