@@ -134,7 +134,7 @@ pause
 OUT_DIR=.
 PACK_NAME="models"
 SUFFIX_NAME=""
-READ_ONLY="created_at, updated_at"
+READ_ONLY="create_time, update_time"
 TABLE_NAME=""
 WITH_OUT=""
 TAGS="bson"
