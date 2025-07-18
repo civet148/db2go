@@ -438,10 +438,10 @@ func SmallCamelCase(strIn string) (strOut string) {
 }
 
 func Split(s string) (ss []string) {
-	if strings.Contains(s, ";") {
-		ss = strings.Split(s, ";")
-	} else {
+	if strings.Contains(s, ",") {
 		ss = strings.Split(s, ",")
+	} else {
+		ss = strings.Split(s, ";")
 	}
 	return ss
 }
