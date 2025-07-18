@@ -309,7 +309,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.User = ui.User
 	cmd.Password = ui.Password
 
-	log.Infof("command options [%+v]", cmd)
+	log.Json("command options", cmd)
 
 	var err error
 	if strings.TrimSpace(cmd.SSH) != "" {

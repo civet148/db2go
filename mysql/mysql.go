@@ -39,7 +39,7 @@ func (m *ExporterMysql) ExportGo() (err error) {
 		return
 	}
 	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
-	log.Infof("ready to export tables [%v]", cmd.Tables)
+	log.Infof("ready to export tables %v", cmd.Tables)
 	var ddl *schema.CreateDatabaseDDL
 	ddl, err = m.queryCreateDatabaseDDL(cmd, e)
 	if err != nil {
@@ -129,7 +129,7 @@ func (m *ExporterMysql) queryTableSchemas(cmd *schema.Commander, e *sqlca.Engine
 	}
 	var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
 
-	log.Infof("ready to export tables [%v]", cmd.Tables)
+	log.Infof("ready to export tables %v", cmd.Tables)
 	for _, v := range cmd.Tables {
 		tables = append(tables, fmt.Sprintf("'%v'", v))
 	}

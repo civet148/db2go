@@ -49,7 +49,7 @@ func (m *ExporterMssql) ExportGo() (err error) {
 		return
 	}
 	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
-	log.Infof("ready to export tables [%v]", cmd.Tables)
+	log.Infof("ready to export tables %v", cmd.Tables)
 
 	if schemas, err = m.queryTableSchemas(); err != nil {
 		log.Errorf("query tables error [%s]", err.Error())

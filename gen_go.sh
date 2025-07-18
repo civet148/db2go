@@ -10,7 +10,7 @@ TAGS="bson"
 TINYINT_TO_BOOL="deleted,is_admin,disable"
 DSN_URL="mysql://root:12345678@127.0.0.1:3306/test?charset=utf8"
 JSON_PROPERTIES="omitempty"
-SPEC_TYPES="users.extra_data=struct{}"
+SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 IMPORT_MODELS="github.com/civet148/db2go/models"
 #指定其他orm的标签和值(以空格分隔)
 COMMON_TAGS="id=gorm:\"primarykey\" create_time=gorm:\"autoCreateTime;type:timestamp\" update_time=gorm:\"autoUpdateTime;type:timestamp\""

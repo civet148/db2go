@@ -1,4 +1,4 @@
-package opengauss 
+package opengauss
 
 import (
 	"fmt"
@@ -68,7 +68,7 @@ func (m *ExporterOpenGauss) ExportGo() (err error) {
 		return
 	}
 	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
-	log.Infof("ready to export tables [%v]", cmd.Tables)
+	log.Infof("ready to export tables %v", cmd.Tables)
 
 	if schemas, err = m.queryTableSchemas(); err != nil {
 		log.Errorf("query tables error [%s]", err.Error())
@@ -193,4 +193,3 @@ func (m *ExporterOpenGauss) queryTableColumns(table *schema.TableSchema) (err er
 	schema.HandleCommentCRLF(table)
 	return schema.ConvertPostgresColumnType(table) //转换postgres数据库字段类型为MYSQL映射的类型
 }
-
