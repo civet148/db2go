@@ -115,10 +115,9 @@ IF "%errorlevel%" == "0" (
 
 rem 判断db2go是否安装成功
 If "%errorlevel%" == "0" (
-db2go --url %DSN_URL% --out %OUT_DIR% --table %TABLE_NAME% --json-properties %JSON_PROPERTIES% --enable-decimal  --spec-type %SPEC_TYPES% ^
---suffix %SUFFIX_NAME% --package %PACK_NAME% --readonly %READ_ONLY% --without %WITH_OUT% --tinyint-as-bool %TINYINT_TO_BOOL% ^
---tag %TAGS% --common-tags %COMMON_TAGS% --dao %DAO_OUT% --import-models %IMPORT_MODELS% ^
-rem --export %DEPLOY_SQL%
+db2go --debug --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
+--suffix "%SUFFIX_NAME%" --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tinyint-as-bool "%TINYINT_TO_BOOL%" ^
+--tag "%TAGS%" --common-tags "%COMMON_TAGS%" --dao "%DAO_OUT%" --import-models "%IMPORT_MODELS%" --export "%DEPLOY_SQL%"
 
 echo generate go file ok, formatting...
 gofmt -w %OUT_DIR%/%PACK_NAME%
@@ -145,11 +144,26 @@ SPEC_TYPES="users.extra_data=struct{}"
 IMPORT_MODELS="github.com/civet148/db2go/models"
 #指定其他orm的标签和值(以空格分隔)
 COMMON_TAGS="id=gorm:\"primarykey\" create_time=gorm:\"autoCreateTime;type:timestamp\" update_time=gorm:\"autoUpdateTime;type:timestamp\""
+DEPLOY_SQL="deploy/test.sql"
+
+# 检查 db2go 是否已安装
+if ! which db2go >/dev/null 2>&1; then
+    # 安装最新版 db2go
+    go install github.com/civet148/db2go@latest
+
+    # 检查是否安装成功
+    if which db2go >/dev/null 2>&1; then
+        echo "✅ db2go install success, $(which db2go)"
+    else
+        echo "❌ db2go install failed, please check go env and gcc tool-chain"
+        exit 1
+    fi
+fi
 
 if [ $? -eq 0 ]; then
 db2go --debug --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
 --suffix "$SUFFIX_NAME" --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
---tag "$TAGS" --import-models $IMPORT_MODELS --common-tags "$COMMON_TAGS"
+--tag "$TAGS" --import-models "$IMPORT_MODELS" --common-tags "$COMMON_TAGS"  --export "$DEPLOY_SQL"
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME
