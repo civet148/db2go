@@ -191,7 +191,7 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 		strDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.DAO)
 	}
 	if _, err = os.Stat(strDir); err != nil {
-		if err = os.MkdirAll(strDir, os.ModeDir); err != nil {
+		if err = os.MkdirAll(strDir, os.ModePerm); err != nil {
 			log.Errorf("mkdir %s error [%s]", strDir, err.Error())
 			return
 		}
