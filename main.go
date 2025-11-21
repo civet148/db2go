@@ -17,12 +17,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.0.1"
+	Version     = "3.1.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2025-08-15"
+	BuildTime = "2025-11-21"
 	GitCommit = "<N/A>"
 )
 
@@ -54,6 +54,7 @@ const (
 	CmdFlag_JsonStyle      = "json-style"
 	CmdFlag_Export         = "export"
 	CmdFlag_CommTags       = "common-tags"
+	CmdFlag_FieldStyle     = "field-style"
 )
 
 func init() {
@@ -200,6 +201,10 @@ func main() {
 				Name:  CmdFlag_ProtoOptions,
 				Usage: "set protobuf options, multiple options seperated by ';'",
 			},
+			&cli.StringFlag{
+				Name:  CmdFlag_FieldStyle,
+				Usage: "protobuf message field camel style (small or big)",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -235,6 +240,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.ParseCommonTags(ctx.String(CmdFlag_CommTags))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportTo = ctx.String(CmdFlag_Export)
+	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
 
 	if ctx.Bool(CmdFlag_V2) {
 		cmd.SqlcaPkg = schema.SQLCA_V2_PKG

@@ -39,11 +39,10 @@ func MakeProtoBody(cmd *Commander, table *TableSchema) (strContent string) {
 			continue
 		}
 		no := i + 1
-		strColName := v.Name
+		strColName := ConvertFieldStyle(v.Name, cmd.FieldStyle)
 		strColType := GetProtoColumnType(table.TableName, v)
 		strContent += fmt.Sprintf("	%-10s %-22s = %-2d; //%v\n", strColType, strColName, no, v.Comment)
 	}
 	strContent += "}\n\n"
 	return
 }
-

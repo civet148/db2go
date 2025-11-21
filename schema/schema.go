@@ -82,6 +82,7 @@ type Commander struct {
 	ExportTo       string
 	TagTypes       []*CommTagType
 	ProtoOptions   map[string]string
+	FieldStyle     FieldStyle
 }
 
 func NewCommander() *Commander {
