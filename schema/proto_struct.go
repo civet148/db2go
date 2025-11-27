@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func MakeProtoHead(cmd *Commander) (strContent string) {
+func MakeProtoHead(cmd *CmdFlags) (strContent string) {
 
 	strContent += "syntax = \"proto3\";\n"
 	strContent += fmt.Sprintf("package %v;\n\n", cmd.PackageName)
@@ -29,7 +29,7 @@ func MakeProtoHead(cmd *Commander) (strContent string) {
 	return
 }
 
-func MakeProtoBody(cmd *Commander, table *TableSchema) (strContent string) {
+func MakeProtoBody(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
 	strTableName := BigCamelCase(table.TableName)
 	strContent += fmt.Sprintf("message %v {\n", strTableName)

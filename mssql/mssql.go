@@ -21,7 +21,7 @@ LEFT JOIN sys.extended_properties C ON C.major_id = A.object_id  and minor_id=0 
 */
 
 type ExporterMssql struct {
-	Cmd     *schema.Commander
+	Cmd     *schema.CmdFlags
 	Engine  *sqlca.Engine
 	Schemas []*schema.TableSchema
 }
@@ -30,7 +30,7 @@ func init() {
 	schema.Register(schema.SCHEME_MSSQL, NewExporterMssql)
 }
 
-func NewExporterMssql(cmd *schema.Commander, e *sqlca.Engine) schema.Exporter {
+func NewExporterMssql(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
 
 	return &ExporterMssql{
 		Cmd:    cmd,

@@ -47,7 +47,7 @@ type CommTagType struct {
 	TagValue string `json:"tag_value"`
 }
 
-type Commander struct {
+type CmdFlags struct {
 	ConnUrl        string
 	Database       string
 	Tables         []string
@@ -85,22 +85,22 @@ type Commander struct {
 	FieldStyle     FieldStyle
 }
 
-func NewCommander() *Commander {
-	return &Commander{
+func NewCommander() *CmdFlags {
+	return &CmdFlags{
 		ProtoOptions: make(map[string]string),
 	}
 }
 
-func (c *Commander) String() string {
+func (c *CmdFlags) String() string {
 	data, _ := json.Marshal(c)
 	return string(data)
 }
 
-func (c *Commander) GoString() string {
+func (c *CmdFlags) GoString() string {
 	return c.String()
 }
 
-func (c *Commander) ParseCommonTags(strCommTags string) {
+func (c *CmdFlags) ParseCommonTags(strCommTags string) {
 	var tts []*CommTagType
 	if strCommTags == "" || strCommTags == "\"\"" {
 		return
@@ -143,7 +143,7 @@ func (c *Commander) ParseCommonTags(strCommTags string) {
 	c.TagTypes = tts
 }
 
-func (c *Commander) ParseSpecTypes(strSpecType string) {
+func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
 	var sts []*SpecType
 	if strSpecType == "" {
 		return
@@ -192,7 +192,7 @@ func (c *Commander) ParseSpecTypes(strSpecType string) {
 	return
 }
 
-func (c *Commander) GetJsonPropertiesSlice() (jsonProps []string) {
+func (c *CmdFlags) GetJsonPropertiesSlice() (jsonProps []string) {
 	var dup bool
 
 	if c.JsonProperties != "" {
@@ -250,7 +250,7 @@ type Exporter interface {
 	ExportProto() (err error)
 }
 
-type Instance func(cmd *Commander, e *sqlca.Engine) Exporter
+type Instance func(cmd *CmdFlags, e *sqlca.Engine) Exporter
 
 var instances = make(map[string]Instance, 1)
 
@@ -258,7 +258,7 @@ func Register(strScheme string, inst Instance) {
 	instances[strScheme] = inst
 }
 
-func NewExporter(cmd *Commander, e *sqlca.Engine) Exporter {
+func NewExporter(cmd *CmdFlags, e *sqlca.Engine) Exporter {
 	var ok bool
 	var inst Instance
 	if inst, ok = instances[cmd.Scheme]; !ok {
@@ -277,7 +277,7 @@ func IsInSlice(in string, s []string) bool {
 	return false
 }
 
-func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment string, strAppends string) string {
+func MakeTags(cmd *CmdFlags, strColName, strColType, strTagValue, strComment string, strAppends string) string {
 	strComment = ReplaceCRLF(strComment)
 	var strJsonValue string
 	var strJsonProperties = cmd.GetJsonPropertiesSlice()
@@ -294,7 +294,7 @@ func MakeTags(cmd *Commander, strColName, strColType, strTagValue, strComment st
 		strColName, strColType, strJsonValue, strTagValue, strAppends, strComment)
 }
 
-func ReplaceColumnType(cmd *Commander, strTableName, strColName, strColType string) string {
+func ReplaceColumnType(cmd *CmdFlags, strTableName, strColName, strColType string) string {
 
 	for _, st := range cmd.SpecTypes {
 		if (st.Table == strTableName || st.Table == TABLE_ALL) && strColName == st.Column {
@@ -326,7 +326,7 @@ func ReplaceCRLF(strIn string) (strOut string) {
 	return
 }
 
-func CreateOutputFile(cmd *Commander, table *TableSchema, strFileSuffix string, append bool) (file *os.File, err error) {
+func CreateOutputFile(cmd *CmdFlags, table *TableSchema, strFileSuffix string, append bool) (file *os.File, err error) {
 
 	var strOutDir = cmd.OutDir
 	var strPackageName = cmd.PackageName
@@ -463,7 +463,7 @@ func GetDatabaseName(strPath string) (strName string) {
 }
 
 // 将数据库字段类型转为go语言对应的数据类型
-func GetGoColumnType(cmd *Commander, strTableName string, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
+func GetGoColumnType(cmd *CmdFlags, strTableName string, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
 
 	var bUnsigned bool
 	var strColName, strDataType, strColumnType string

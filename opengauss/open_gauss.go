@@ -40,7 +40,7 @@ ORDER BY C.relname,A.attnum
 */
 
 type ExporterOpenGauss struct {
-	Cmd     *schema.Commander
+	Cmd     *schema.CmdFlags
 	Engine  *sqlca.Engine
 	Schemas []*schema.TableSchema
 }
@@ -49,7 +49,7 @@ func init() {
 	schema.Register(schema.SCHEME_OPEN_GAUSS, NewExporterOpenGauss)
 }
 
-func NewExporterOpenGauss(cmd *schema.Commander, e *sqlca.Engine) schema.Exporter {
+func NewExporterOpenGauss(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
 
 	return &ExporterOpenGauss{
 		Cmd:    cmd,

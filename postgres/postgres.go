@@ -40,7 +40,7 @@ ORDER BY C.relname,A.attnum
 */
 
 type ExporterPostgres struct {
-	Cmd     *schema.Commander
+	Cmd     *schema.CmdFlags
 	Engine  *sqlca.Engine
 	Schemas []*schema.TableSchema
 }
@@ -49,7 +49,7 @@ func init() {
 	schema.Register(schema.SCHEME_POSTGRES, NewExporterPostgres)
 }
 
-func NewExporterPostgres(cmd *schema.Commander, e *sqlca.Engine) schema.Exporter {
+func NewExporterPostgres(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
 
 	return &ExporterPostgres{
 		Cmd:    cmd,

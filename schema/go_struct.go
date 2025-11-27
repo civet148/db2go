@@ -12,7 +12,7 @@ const (
 	TableNamePrefix = "TableName"
 )
 
-func ExportToSqlFile(cmd *Commander, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
+func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
 	if len(tables) == 0 {
 		return nil //no table found
 	}
@@ -39,7 +39,7 @@ func ExportToSqlFile(cmd *Commander, ddl *CreateDatabaseDDL, tables []*TableSche
 	return nil
 }
 
-func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
+func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 
 	for _, v := range tables {
 
@@ -95,7 +95,7 @@ func ExportTableSchema(cmd *Commander, tables []*TableSchema) (err error) {
 	return
 }
 
-func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
+func ExportTableColumns(cmd *CmdFlags, table *TableSchema) (err error) {
 
 	var File *os.File
 	File, err = os.OpenFile(table.FileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
@@ -156,7 +156,7 @@ func ExportTableColumns(cmd *Commander, table *TableSchema) (err error) {
 	return
 }
 
-func getImportSpecTypes(cmd *Commander, table *TableSchema) (specTypes []*SpecType) {
+func getImportSpecTypes(cmd *CmdFlags, table *TableSchema) (specTypes []*SpecType) {
 	for _, col := range table.Columns {
 		for _, st := range cmd.SpecTypes {
 			if col.Name == st.Column {
@@ -167,7 +167,7 @@ func getImportSpecTypes(cmd *Commander, table *TableSchema) (specTypes []*SpecTy
 	return
 }
 
-func haveDecimal(cmd *Commander, table *TableSchema, TableCols []TableColumn, enableDecimal bool) (ok bool) {
+func haveDecimal(cmd *CmdFlags, table *TableSchema, TableCols []TableColumn, enableDecimal bool) (ok bool) {
 	for _, v := range TableCols {
 		_, ok = GetGoColumnType(cmd, table.TableName, v, enableDecimal, nil)
 		if ok {
@@ -177,7 +177,7 @@ func haveDecimal(cmd *Commander, table *TableSchema, TableCols []TableColumn, en
 	return
 }
 
-func makeDAO(cmd *Commander, table *TableSchema) {
+func makeDAO(cmd *CmdFlags, table *TableSchema) {
 	var err error
 	var strContent string
 	if cmd.DAO == "" {
@@ -233,7 +233,7 @@ func makeDAO(cmd *Commander, table *TableSchema) {
 }
 
 // make new DAO method
-func makeNewMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeNewMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	strContent += fmt.Sprintf(`
 type %s struct {
 	db *sqlca.Engine
@@ -252,15 +252,15 @@ func New%v(db *sqlca.Engine) *%v {
 	return
 }
 
-func makeModelTableName(cmd *Commander, table *TableSchema) string {
+func makeModelTableName(cmd *CmdFlags, table *TableSchema) string {
 	return fmt.Sprintf("%s.%s%s", cmd.PackageName, TableNamePrefix, table.TableNameCamelCase)
 }
 
-func makeModelStructName(cmd *Commander, table *TableSchema) string {
+func makeModelStructName(cmd *CmdFlags, table *TableSchema) string {
 	return fmt.Sprintf("%s.%s", cmd.PackageName, table.StructName)
 }
 
-func makeObjectMethods(cmd *Commander, table *TableSchema) (strContent string) {
+func makeObjectMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
 	for _, v := range table.Columns { //添加结构体成员Get/Set方法
 
@@ -275,14 +275,14 @@ func makeObjectMethods(cmd *Commander, table *TableSchema) (strContent string) {
 	return
 }
 
-func makeTableCreateSQL(cmd *Commander, table *TableSchema) (strContent string) {
+func makeTableCreateSQL(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	strContent += "/*\n"
 	strContent += table.TableCreateSQL + ";\n"
 	strContent += "*/\n"
 	return
 }
 
-func makeOrmMethods(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	strContent += makeOrmInsertMethod(cmd, table)
 	strContent += makeOrmUpsertMethod(cmd, table)
 	strContent += makeOrmUpdateMethod(cmd, table)
@@ -291,7 +291,7 @@ func makeOrmMethods(cmd *Commander, table *TableSchema) (strContent string) {
 	return
 }
 
-func makeOrmInsertMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmInsertMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert into table by data model
 func (dao *%v) Insert(do *%s) (lastInsertId, rowsAffected int64, err error) {
@@ -301,7 +301,7 @@ func (dao *%v) Insert(do *%s) (lastInsertId, rowsAffected int64, err error) {
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
-func makeOrmUpsertMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmUpsertMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert if not exist or update columns on duplicate key...
 func (dao *%v) Upsert(do *%s, columns...string) (lastInsertId int64, err error) {
@@ -314,7 +314,7 @@ func (dao *%v) Upsert(do *%s, columns...string) (lastInsertId int64, err error) 
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
-func makeOrmUpdateMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmUpdateMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //update table set columns where id=xxx
 func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
@@ -327,7 +327,7 @@ func (dao *%v) Update(do *%s, columns...string) (rows int64, err error) {
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
-func makeOrmQueryByIdMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmQueryByIdMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //query records by id
 func (dao *%v) QueryById(id interface{}, columns...string) (do *%s, err error) {
@@ -340,7 +340,7 @@ func (dao *%v) QueryById(id interface{}, columns...string) (do *%s, err error) {
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
-func makeOrmQueryByConditionMethod(cmd *Commander, table *TableSchema) (strContent string) {
+func makeOrmQueryByConditionMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //query records by conditions
 func (dao *%v) QueryByCondition(conditions map[string]interface{}, columns...string) (dos []*%s, err error) {
@@ -360,7 +360,7 @@ func (dao *%v) QueryByCondition(conditions map[string]interface{}, columns...str
 `, table.StructDAO, makeModelStructName(cmd, table), makeModelTableName(cmd, table))
 }
 
-func makeColumnConsts(cmd *Commander, table *TableSchema) (strContent string) {
+func makeColumnConsts(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	var strUpperTableName string
 	var strUpperColumnName string
 	strUpperTableName = strings.ToUpper(table.TableName)
@@ -374,7 +374,7 @@ func makeColumnConsts(cmd *Commander, table *TableSchema) (strContent string) {
 	return
 }
 
-func makeTableStructure(cmd *Commander, table *TableSchema) (strContent string) {
+func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
 	strContent += fmt.Sprintf("type %v struct { \n", table.StructName)
 	for _, v := range table.Columns {

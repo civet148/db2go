@@ -17,12 +17,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.1.0"
+	Version     = "3.1.1"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2025-11-21"
+	BuildTime = "2025-11-27"
 	GitCommit = "<N/A>"
 )
 
@@ -344,7 +344,7 @@ func Option(strSSH string) *sqlca.Options {
 	}
 }
 
-func export(cmd *schema.Commander, e *sqlca.Engine) (err error) {
+func export(cmd *schema.CmdFlags, e *sqlca.Engine) (err error) {
 	exporter := schema.NewExporter(cmd, e)
 	if exporter == nil {
 		err = fmt.Errorf("new exporter error, nil object")

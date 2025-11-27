@@ -10,7 +10,7 @@ import (
 )
 
 type ExporterMysql struct {
-	Cmd     *schema.Commander
+	Cmd     *schema.CmdFlags
 	Engine  *sqlca.Engine
 	Schemas []*schema.TableSchema
 }
@@ -19,7 +19,7 @@ func init() {
 	schema.Register(schema.SCHEME_MYSQL, NewExporterMysql)
 }
 
-func NewExporterMysql(cmd *schema.Commander, e *sqlca.Engine) schema.Exporter {
+func NewExporterMysql(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
 
 	return &ExporterMysql{
 		Cmd:    cmd,
@@ -109,7 +109,7 @@ func (m *ExporterMysql) ExportProto() (err error) {
 	return
 }
 
-func (m *ExporterMysql) queryCreateDatabaseDDL(cmd *schema.Commander, e *sqlca.Engine) (ddl *schema.CreateDatabaseDDL, err error) {
+func (m *ExporterMysql) queryCreateDatabaseDDL(cmd *schema.CmdFlags, e *sqlca.Engine) (ddl *schema.CreateDatabaseDDL, err error) {
 	_, err = e.Model(&ddl).QueryRaw("SHOW CREATE DATABASE `%s`", cmd.Database)
 	if err != nil {
 		return nil, log.Error(err.Error())
@@ -117,7 +117,7 @@ func (m *ExporterMysql) queryCreateDatabaseDDL(cmd *schema.Commander, e *sqlca.E
 	return ddl, nil
 }
 
-func (m *ExporterMysql) queryTableSchemas(cmd *schema.Commander, e *sqlca.Engine) (schemas []*schema.TableSchema, err error) {
+func (m *ExporterMysql) queryTableSchemas(cmd *schema.CmdFlags, e *sqlca.Engine) (schemas []*schema.TableSchema, err error) {
 
 	var strQuery string
 	var tables []string
