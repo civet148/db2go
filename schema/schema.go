@@ -85,7 +85,7 @@ type CmdFlags struct {
 	FieldStyle     FieldStyle
 }
 
-func NewCommander() *CmdFlags {
+func NewCmdFlags() *CmdFlags {
 	return &CmdFlags{
 		ProtoOptions: make(map[string]string),
 	}

@@ -220,7 +220,7 @@ func main() {
 
 func doAction(ctx *cli.Context) error {
 	//var err error
-	var cmd = schema.NewCommander()
+	var cmd = schema.NewCmdFlags()
 	cmd.Debug = ctx.Bool(CmdFlag_Debug)
 	cmd.Prefix = ctx.String(CmdFlag_Prefix)
 	cmd.Suffix = ctx.String(CmdFlag_Suffix)
