@@ -1,7 +1,13 @@
 package schema
 
 import (
+	"fmt"
+	"github.com/civet148/log"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -12,6 +18,69 @@ const (
 	FieldStyle_SmallCamel                   // 小驼峰
 	FieldStyle_BigCamel                     // 大驼峰
 )
+
+// hasGit 检查系统是否安装Git
+func hasGit() bool {
+	_, err := exec.LookPath("git")
+	return err == nil
+}
+
+func writeToFile(strOutputPath, strBody string) (err error) {
+	var file *os.File
+	strBody += fmt.Sprintf("\n\n%s\n\n", CustomizeCodeTip)
+	defer func() {
+		defer file.Close()
+		_ = exec.Command("gofmt", "-w", strOutputPath).Run() //格式化本地文件
+	}()
+
+	if !hasGit() || !isFileExist(strOutputPath) {
+		// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
+		file, err = os.OpenFile(strOutputPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+		if err != nil {
+			return log.Errorf(err)
+		}
+		_, err = file.WriteString(strBody)
+		return log.Errorf(err)
+	}
+	var dir = filepath.Dir(strOutputPath)
+	var name = filepath.Base(strOutputPath)
+	var datetime = time.Now().Format("20060102150405")
+
+	baseFile := filepath.Join(dir, fmt.Sprintf(".%s-%s", datetime, name))
+	blankFile := filepath.Join(dir, fmt.Sprintf(".%s-blank.go", datetime))
+	bf, err := os.Create(blankFile)
+	if err != nil {
+		return log.Errorf(err)
+	}
+	defer func() {
+		_ = bf.Close()
+		_ = os.Remove(blankFile)
+	}()
+
+	file, err = os.OpenFile(baseFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return log.Errorf(err)
+	}
+	_, err = file.WriteString(strBody)
+	if err != nil {
+		return log.Errorf(err)
+	}
+
+	defer os.Remove(baseFile)
+
+	_ = exec.Command("gofmt", "-w", baseFile).Run() //格式化新的数据模型副本
+
+	cmd := exec.Command("git", "merge-file", "-q", strOutputPath, blankFile, baseFile)
+	if err = cmd.Run(); err != nil {
+		log.Errorf("file %s merge conflict occurred", strOutputPath)
+	}
+	return nil
+}
+
+func isFileExist(strFilePath string) bool {
+	_, err := os.Stat(strFilePath)
+	return err == nil
+}
 
 func FieldStyleFromString(s string) FieldStyle {
 	switch strings.ToLower(s) {

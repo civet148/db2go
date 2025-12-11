@@ -224,7 +224,7 @@ type TableSchema struct {
 	StructName         string        `json:"struct_name" db:"struct_name"`     //struct name
 	StructDAO          string        `json:"struct_dao" db:"struct_dao"`       //struct DAO name
 	OutDir             string        `json:"out_dir" db:"out_dir"`             //output directory
-	FileName           string        `json:"file_name" db:"file_name"`         //output directory
+	OutFilePath        string        `json:"file_name" db:"file_name"`         //output file path
 	Columns            []TableColumn `json:"table_columns" db:"table_columns"` //columns with database and golang
 	TableNameCamelCase string        `json:"-"`                                //table name in camel case
 	TableCreateSQL     string        `json:"-"`                                //table create SQL
@@ -382,17 +382,17 @@ func CreateOutputFile(cmd *CmdFlags, table *TableSchema, strFileSuffix string, a
 	}
 
 	if cmd.OneFile { //数据库名称作为文件名
-		table.FileName = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.SchemeName, strNameSuffix, strFileSuffix)
+		table.OutFilePath = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.SchemeName, strNameSuffix, strFileSuffix)
 	} else { //数据表名作为文件名
-		table.FileName = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.TableName, strNameSuffix, strFileSuffix)
+		table.OutFilePath = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.TableName, strNameSuffix, strFileSuffix)
 	}
 
-	file, err = os.OpenFile(table.FileName, flag, os.ModePerm)
+	file, err = os.OpenFile(table.OutFilePath, flag, os.ModePerm)
 	if err != nil {
-		log.Errorf("open file [%v] error (%v)", table.FileName, err.Error())
+		log.Errorf("open file [%v] error (%v)", table.OutFilePath, err.Error())
 		return
 	}
-	log.Infof("generate table [%s] protobuf schema to file [%v] successfully", table.TableName, table.FileName)
+	log.Infof("generate table [%s] protobuf schema to file [%v] successfully", table.TableName, table.OutFilePath)
 	return
 }
 
