@@ -73,10 +73,27 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	cmd := exec.Command("git", "merge-file", "-q", strOutputPath, blankFile, baseFile)
 	if err = cmd.Run(); err != nil {
 		log.Errorf("file %s merge conflict occurred", strOutputPath)
+		//err = gitMergeFile(strOutputPath)
+		//if err != nil {
+		//	log.Errorf("file %s merge conflict error: %s", strOutputPath, err.Error())
+		//}
 	}
 	return nil
 }
 
+//	func gitMergeFile(strOutputPath string) (err error) {
+//		/*
+//			git config merge.tool vimdiff
+//			git config mergetool.keepBackup false
+//			git mergetool --no-prompt --tool=vimdiff output.go
+//		*/
+//		if hasGit() {
+//			//_ = exec.Command("git", "config", "merge.tool", "vimdiff").Run()
+//			//_ = exec.Command("git", "config", "mergetool.keepBackup", "false").Run()
+//			_ = exec.Command("git", "mergetool", "--no-prompt", "--tool=vimdiff", strOutputPath).Run()
+//		}
+//		return nil
+//	}
 func isFileExist(strFilePath string) bool {
 	_, err := os.Stat(strFilePath)
 	return err == nil

@@ -140,7 +140,7 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	strContent += makeColumnConsts(cmd, table)
 	strContent += makeTableStructure(cmd, table)
 	strContent += makeObjectMethods(cmd, table)
-	strContent += makeTableCreateSQL(cmd, table)
+	//strContent += makeTableCreateSQL(cmd, table)
 
 	return writeToFile(table.OutFilePath, strHead+strContent)
 }
