@@ -53,7 +53,7 @@ type CmdFlags struct {
 	Tables         []string
 	Without        []string
 	ReadOnly       []string
-	Tags           []string
+	ExtraTags      []string
 	Scheme         string
 	Host           string
 	User           string
@@ -98,49 +98,6 @@ func (c *CmdFlags) String() string {
 
 func (c *CmdFlags) GoString() string {
 	return c.String()
-}
-
-func (c *CmdFlags) ParseCommonTags(strCommTags string) {
-	var tts []*CommTagType
-	if strCommTags == "" || strCommTags == "\"\"" {
-		return
-	}
-	ss := strings.Split(strCommTags, " ")
-	for _, v := range ss {
-		v = strings.TrimSpace(v)
-		tt := strings.Split(v, "=")
-		if len(tt) != 2 {
-			log.Errorf("spec type [%s] format illegal", v)
-			continue
-		}
-		var strTableName, strColumnName string
-		tcs := strings.Split(tt[0], ".")
-		if len(tcs) == 0 {
-			continue
-		}
-		if len(tcs) == 1 {
-			strTableName = TABLE_ALL
-			strColumnName = tcs[0]
-		} else {
-			strTableName = tcs[0]
-			strColumnName = tcs[1]
-		}
-		var strTagType = tt[1]
-		var strTagName, strTagValue string
-		idx := strings.Index(strTagType, ":")
-		if idx > 0 {
-			strTagName = strTagType[:idx]
-			strTagValue = strTagType[idx+1:]
-		}
-
-		tts = append(tts, &CommTagType{
-			Table:    strTableName,
-			Column:   strColumnName,
-			TagName:  strTagName,
-			TagValue: strTagValue,
-		})
-	}
-	c.TagTypes = tts
 }
 
 func (c *CmdFlags) ParseSpecTypes(strSpecType string) {

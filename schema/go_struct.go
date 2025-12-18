@@ -369,10 +369,20 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		strColName = BigCamelCase(v.Name)
 		strColType, _ = GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 
-		for _, t := range cmd.Tags {
+		for _, t := range cmd.ExtraTags {
 			tv := v.Name
 			if t == "bson" && tv == "id" {
 				tv = "_id"
+			} else if t == "gorm" {
+				if isPrimartyKey(tv) {
+					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement", tv)
+				} else if isCreateTime(tv) {
+					tv = fmt.Sprintf("column:%s;default:CURRENT_TIMESTAMP;autoCreateTime", tv)
+				} else if isUpdateTime(tv) {
+					tv = fmt.Sprintf("column:%s;default:CURRENT_TIMESTAMP;autoUpdateTime", tv)
+				} else {
+					tv = fmt.Sprintf("column:%s", tv)
+				}
 			}
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
 		}
@@ -403,6 +413,22 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	strContent += "}\n\n"
 
 	return
+}
+
+func isPrimartyKey(tv string) bool {
+	return tv == "id" || tv == "uid"
+}
+
+func isCreateTime(tv string) bool {
+	return tv == "create_time" || tv == "create_at" || tv == "created_time" || tv == "created_at"
+}
+
+func isUpdateTime(tv string) bool {
+	return tv == "update_time" || tv == "update_at" || tv == "updated_time" || tv == "updated_at"
+}
+
+func isDeleteTime(tv string) bool {
+	return tv == "delete_time" || tv == "delete_at" || tv == "deleted_time" || tv == "deleted_at"
 }
 
 func GenerateMethodDeclare(strShortName, strStructName, strMethodName, strArgs, strReturn, strLogic string) (strFunc string) {

@@ -17,12 +17,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.2.1"
+	Version     = "3.3.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2025-12-11"
+	BuildTime = "2025-12-18"
 	GitCommit = "<N/A>"
 )
 
@@ -53,7 +53,6 @@ const (
 	CmdFlag_Debug          = "debug"
 	CmdFlag_JsonStyle      = "json-style"
 	CmdFlag_Export         = "export"
-	CmdFlag_CommTags       = "common-tags"
 	CmdFlag_FieldStyle     = "field-style"
 )
 
@@ -194,10 +193,6 @@ func main() {
 				Value: schema.JSON_STYLE_DEFAULT,
 			},
 			&cli.StringFlag{
-				Name:  CmdFlag_CommTags,
-				Usage: "set common tag values, e.g gorm",
-			},
-			&cli.StringFlag{
 				Name:  CmdFlag_ProtoOptions,
 				Usage: "set protobuf options, multiple options seperated by ';'",
 			},
@@ -237,7 +232,6 @@ func doAction(ctx *cli.Context) error {
 	cmd.OneFile = ctx.Bool(CmdFlag_Merge)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
-	cmd.ParseCommonTags(ctx.String(CmdFlag_CommTags))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportTo = ctx.String(CmdFlag_Export)
 	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
@@ -283,17 +277,16 @@ func doAction(ctx *cli.Context) error {
 		log.Infof("using default database %s", cmd.Database)
 	}
 
-	if ctx.String(CmdFlag_Tables) != "" {
-		strFlagValue := ctx.String(CmdFlag_Tables)
-		cmd.Tables = schema.TrimSpaceSlice(schema.Split(strFlagValue))
+	if v := ctx.String(CmdFlag_Tables); v != "" {
+		cmd.Tables = schema.TrimSpaceSlice(schema.Split(v))
 	}
 
-	if ctx.String(CmdFlag_Without) != "" {
-		cmd.Without = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_Without)))
+	if v := ctx.String(CmdFlag_Without); v != "" {
+		cmd.Without = schema.TrimSpaceSlice(schema.Split(v))
 	}
 
-	if ctx.String(CmdFlag_TinyintAsBool) != "" {
-		cmd.TinyintAsBool = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_TinyintAsBool)))
+	if v := ctx.String(CmdFlag_TinyintAsBool); v != "" {
+		cmd.TinyintAsBool = schema.TrimSpaceSlice(schema.Split(v))
 	}
 
 	if cmd.Protobuf {
@@ -303,11 +296,11 @@ func doAction(ctx *cli.Context) error {
 		}
 	}
 
-	if ctx.String(CmdFlag_Tags) != "" {
-		cmd.Tags = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_Tags)))
+	if v := ctx.String(CmdFlag_Tags); v != "" {
+		cmd.ExtraTags = schema.TrimSpaceSlice(schema.Split(v))
 	}
-	if ctx.String(CmdFlag_ReadOnly) != "" {
-		cmd.ReadOnly = schema.TrimSpaceSlice(schema.Split(ctx.String(CmdFlag_ReadOnly)))
+	if v := ctx.String(CmdFlag_ReadOnly); v != "" {
+		cmd.ReadOnly = schema.TrimSpaceSlice(schema.Split(v))
 	}
 
 	cmd.Scheme = ui.Scheme

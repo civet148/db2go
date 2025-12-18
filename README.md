@@ -87,8 +87,6 @@ rem 附加的json标签属性（例如: omitempty)
 set JSON_PROPERTIES=""
 rem 指定某表的某字段为指定类型,多个表字段以英文逗号分隔（例如：user.is_deleted=bool表示指定user表is_deleted字段为bool类型; 如果不指定表名则所有表的is_deleted字段均为bool类型；支持第三方包类型，例如：user.weight=github.com/shopspring/decimal.Decimal）
 set SPEC_TYPES="users.extra_data=struct{}"
-rem 指定其他orm的标签和值(以空格分隔)
-set COMMON_TAGS="id=gorm:primarykey create_time=gorm:\"autoCreateTime;type:timestamp\" update_time=gorm:\"autoUpdateTime;type:timestamp\""
 rem 数据库操作对象生成目录名
 set DAO_OUT=dao
 rem 数据库操作对象导入数据库表模型数据路径(指定--dao选项时必填)
@@ -117,7 +115,7 @@ rem 判断db2go是否安装成功
 If "%errorlevel%" == "0" (
 db2go --debug --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
 --suffix "%SUFFIX_NAME%" --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tinyint-as-bool "%TINYINT_TO_BOOL%" ^
---tag "%TAGS%" --common-tags "%COMMON_TAGS%" --dao "%DAO_OUT%" --import-models "%IMPORT_MODELS%" --export "%DEPLOY_SQL%"
+--tag "%TAGS%" --dao "%DAO_OUT%" --import-models "%IMPORT_MODELS%" --export "%DEPLOY_SQL%"
 
 echo generate go file ok, formatting...
 gofmt -w %OUT_DIR%/%PACK_NAME%
@@ -143,7 +141,6 @@ JSON_PROPERTIES="omitempty"
 SPEC_TYPES="users.extra_data=struct{}"
 IMPORT_MODELS="github.com/civet148/db2go/models"
 #指定其他orm的标签和值(以空格分隔)
-COMMON_TAGS="id=gorm:\"primarykey\" create_time=gorm:\"autoCreateTime;type:timestamp\" update_time=gorm:\"autoUpdateTime;type:timestamp\""
 DEPLOY_SQL="deploy/test.sql"
 
 # 检查 db2go 是否已安装
@@ -163,7 +160,7 @@ fi
 if [ $? -eq 0 ]; then
 db2go --debug --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
 --suffix "$SUFFIX_NAME" --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
---tag "$TAGS" --import-models "$IMPORT_MODELS" --common-tags "$COMMON_TAGS"  --export "$DEPLOY_SQL"
+--tag "$TAGS" --import-models "$IMPORT_MODELS" --export "$DEPLOY_SQL"
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME
