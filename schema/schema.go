@@ -205,7 +205,6 @@ func (c *CmdFlags) ParseBaseModel(strBaseModel string) {
 	}
 	c.BaseModel.Columns = columns
 	c.BaseModel.Type = strSpecType
-	log.Infof("base model [%+v]", c.BaseModel)
 	return
 }
 

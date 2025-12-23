@@ -13,8 +13,6 @@ const (
 	CustomizeCodeTip = "////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////"
 )
 
-var packages = make(map[string]bool)
-
 func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
 	if len(tables) == 0 {
 		return nil //no table found
@@ -103,7 +101,7 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 
 	var strHead, strContent string
-
+	var packages = make(map[string]bool)
 	//write package name
 	strHead += fmt.Sprintf("package %v\n\n", cmd.PackageName)
 
@@ -383,6 +381,9 @@ func makeColumnConsts(cmd *CmdFlags, table *TableSchema) (strContent string) {
 func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
 	strContent += fmt.Sprintf("type %v struct { \n", table.StructName)
+
+	strContent += makeTableBaseModel(cmd) //base model
+
 	for _, v := range table.Columns {
 		if cmd.IsBaseColumn(v.Name) {
 			continue
@@ -437,7 +438,6 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		v.GoType = strColType
 	}
 
-	strContent += makeTableBaseModel(cmd)
 	strContent += "}\n\n"
 
 	return
