@@ -145,7 +145,7 @@ SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 IMPORT_MODELS="github.com/civet148/db2go/models"
 # 基础模型声明(指定基础模型类型和字段)
 BASE_MODEL="github.com/civet148/db2go/types.BaseModel=create_time,update_time"
-#指定其他orm的标签和值(以空格分隔)
+# 指定生成数据库建表SQL输出文件路径
 DEPLOY_SQL="deploy/test.sql"
 
 # 检查 db2go 是否已安装
