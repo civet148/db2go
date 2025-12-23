@@ -2,49 +2,42 @@
 
 ## Usage
 ```shell
-$ db2go -h
-NAME:
-   db2go - db2go [options] --url <DSN>
-
-USAGE:
-   db2go [global options] command [command options] [arguments...]
-
 VERSION:
-   v2.13.0 2024-07-31 commit <N/A>
+   v3.4.0 20251223 17:47:02 commit 8c3a065
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --url value              data source name of database
-   --out value              output path (default: ".")
-   --db value               database name to export
-   --table value            database tables to export
-   --tag value              export tags for golang
-   --prefix value           filename prefix
-   --suffix value           filename suffix
-   --package value          package name
-   --without value          exclude columns split by colon
-   --readonly value         readonly columns split by colon
-   --proto                  export protobuf file (default: false)
-   --spec-type value        specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'
-   --enable-decimal         decimal as sqlca.Decimal type (default: false)
-   --gogo-options value     gogo proto options
-   --merge                  export to one file (default: false)
-   --dao value              generate data access object file
-   --import-models value    project name
-   --omitempty              json omitempty (default: false)
-   --json-properties value  customized properties for json tag
-   --tinyint-as-bool value  convert tinyint columns redeclare as bool type
-   --ssh value              ssh tunnel e.g ssh://root:123456@192.168.1.23:22
-   --v1                     v1 package imports (default: false)
-   --export value           export database DDL to file
-   --debug                  open debug mode (default: false)
-   --json-style value       json style: smallcamel or bigcamel (default: "default")
-   --common-tags value      set common tag values, e.g gorm
-   --proto-options value    set protobuf options, multiple options seperated by ';'
-   --help, -h               show help (default: false)
-   --version, -v            print the version (default: false)
+   --url value, -u value                data source name of database
+   --out value, -o value                output path (default: ".")
+   --db value                           database name to export
+   --table value, -t value              database tables to export
+   --tag value, -T value                export tags for golang
+   --prefix value, -p value             filename prefix
+   --suffix value, -s value             filename suffix
+   --package value, -P value            package name
+   --without value                      exclude columns split by colon
+   --readonly value, -R value           readonly columns split by colon
+   --proto                              export protobuf file (default: false)
+   --spec-type value, -S value          specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'
+   --enable-decimal, -D                 decimal as sqlca.Decimal type (default: false)
+   --gogo-options value, --gogo value   gogo proto options
+   --merge, -M                          export to one file (default: false)
+   --dao value                          generate data access object file
+   --import-models value, --im value    project name
+   --omitempty, -E                      json omitempty (default: false)
+   --json-properties value, --jp value  customized properties for json tag
+   --tinyint-as-bool value, -B value    convert tinyint columns redeclare as bool type
+   --ssh value                          ssh tunnel e.g ssh://root:123456@192.168.1.23:22
+   --v2                                 sqlca v2 package imports (default: false)
+   --export value, --ddl value          export database DDL to file
+   --debug, -d                          open debug mode (default: false)
+   --proto-options value, --po value    set protobuf options, multiple options seperated by ';'
+   --field-style value, --style value   protobuf message field camel style (small or big)
+   --base-model value, --bm value       specify base model. e.g github.com/civet148/db2go/types.BaseModel=create_time,update_time,is_deleted
+   --help, -h                           show help (default: false)
+   --version, -v                        print the version (default: false)
 
 ```
 
