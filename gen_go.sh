@@ -12,13 +12,14 @@ DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 JSON_PROPERTIES="omitempty"
 SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 IMPORT_MODELS="github.com/civet148/db2go/models"
+BASE_MODEL="github.com/civet148/db2go/types.BaseModel=create_time,update_time,is_deleted"
 
 go build -ldflags "-s -w"
 
 if [ $? -eq 0 ]; then
 ./db2go --debug --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
 --suffix "$SUFFIX_NAME" --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
---tag "$TAGS" --import-models $IMPORT_MODELS
+--tag "$TAGS" --import-models $IMPORT_MODELS --base-model "$BASE_MODEL"
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME

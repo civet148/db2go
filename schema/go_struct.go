@@ -13,6 +13,8 @@ const (
 	CustomizeCodeTip = "////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////"
 )
 
+var packages = make(map[string]bool)
+
 func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
 	if len(tables) == 0 {
 		return nil //no table found
@@ -118,13 +120,22 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	//检查此表是否存在需要导入第三方包类型的字段
 	spectTypes := getImportSpecTypes(cmd, table)
 
-	var packages = make(map[string]bool)
 	for _, st := range spectTypes {
 		if table.TableName != st.Table && st.Table != TABLE_ALL {
 			continue
 		}
 
 		for k, v := range st.Package {
+			if ok := packages[v]; ok {
+				continue //package already exist
+			}
+			strHead += fmt.Sprintf(`import %s "%s"`, k, v)
+			strHead += "\n"
+			packages[v] = true
+		}
+	}
+	if cmd.BaseModel != nil && len(cmd.BaseModel.Package) > 0 {
+		for k, v := range cmd.BaseModel.Package {
 			if ok := packages[v]; ok {
 				continue //package already exist
 			}
@@ -272,6 +283,20 @@ func makeOrmMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return
 }
 
+func makeTableBaseModel(cmd *CmdFlags) (strContent string) {
+	var baseModel = cmd.BaseModel
+	if baseModel != nil {
+		modelType := baseModel.Type
+		strContent = fmt.Sprintf("%s\n", modelType)
+		for k := range baseModel.Package {
+			if k != "" {
+				strContent = fmt.Sprintf("%s.%s\n", k, modelType)
+			}
+		}
+	}
+	return strContent
+}
+
 func makeOrmInsertMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert into table by data model
@@ -359,7 +384,9 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
 	strContent += fmt.Sprintf("type %v struct { \n", table.StructName)
 	for _, v := range table.Columns {
-
+		if cmd.IsBaseColumn(v.Name) {
+			continue
+		}
 		if IsInSlice(v.Name, cmd.Without) {
 			continue
 		}
@@ -410,6 +437,7 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		v.GoType = strColType
 	}
 
+	strContent += makeTableBaseModel(cmd)
 	strContent += "}\n\n"
 
 	return

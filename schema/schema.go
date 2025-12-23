@@ -47,6 +47,12 @@ type CommTagType struct {
 	TagValue string `json:"tag_value"`
 }
 
+type BaseModel struct {
+	Columns []string          `json:"columns"`
+	Type    string            `json:"type"`
+	Package map[string]string `json:"package"`
+}
+
 type CmdFlags struct {
 	ConnUrl        string
 	Database       string
@@ -83,6 +89,7 @@ type CmdFlags struct {
 	TagTypes       []*CommTagType
 	ProtoOptions   map[string]string
 	FieldStyle     FieldStyle
+	BaseModel      *BaseModel
 }
 
 func NewCmdFlags() *CmdFlags {
@@ -98,6 +105,18 @@ func (c *CmdFlags) String() string {
 
 func (c *CmdFlags) GoString() string {
 	return c.String()
+}
+
+func (c *CmdFlags) IsBaseColumn(strColumnName string) bool {
+	if c.BaseModel == nil || len(c.BaseModel.Columns) == 0 {
+		return false
+	}
+	for _, v := range c.BaseModel.Columns {
+		if v == strColumnName {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
@@ -125,13 +144,13 @@ func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
 			strTableName = tcs[0]
 			strColumnName = tcs[1]
 		}
-		var strSpectType = tt[1]
-		idx := strings.LastIndex(strSpectType, ".")
+		strSpecType = tt[1]
+		idx := strings.LastIndex(strSpecType, ".")
 		var pack = make(map[string]string)
 		var strPackage, strAliase string
 		if idx > 0 {
-			strPackage = strSpectType[:idx]
-			strSpectType = strSpectType[idx+1:]
+			strPackage = strSpecType[:idx]
+			strSpecType = strSpecType[idx+1:]
 			strAliase = strings.ReplaceAll(strPackage, "/", "_")
 			strAliase = strings.ReplaceAll(strAliase, "-", "_")
 			strAliase = strings.ReplaceAll(strAliase, ".", "_")
@@ -141,11 +160,52 @@ func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
 		sts = append(sts, &SpecType{
 			Table:   strTableName,
 			Column:  strColumnName,
-			Type:    strSpectType,
+			Type:    strSpecType,
 			Package: pack,
 		})
 	}
 	c.SpecTypes = sts
+	return
+}
+
+func (c *CmdFlags) ParseBaseModel(strBaseModel string) {
+	strBaseModel = strings.TrimSpace(strBaseModel)
+	if strBaseModel == "" {
+		return
+	}
+	tt := strings.Split(strBaseModel, "=")
+	if len(tt) != 2 {
+		log.Warnf("base model [%s] format illegal", strBaseModel)
+		return
+	}
+
+	c.BaseModel = &BaseModel{}
+
+	var strSpecType string
+	var strColumns string
+	var strPackage, strAlias string
+	strSpecType = tt[0]
+	strColumns = tt[1]
+
+	var columns = strings.Split(strColumns, ",")
+	for i, col := range columns {
+		columns[i] = strings.TrimSpace(col)
+	}
+
+	idx := strings.LastIndex(strSpecType, ".")
+	if idx > 0 {
+		strPackage = strSpecType[:idx]
+		strSpecType = strSpecType[idx+1:]
+		strAlias = strings.ReplaceAll(strPackage, "/", "_")
+		strAlias = strings.ReplaceAll(strAlias, "-", "_")
+		strAlias = strings.ReplaceAll(strAlias, ".", "_")
+		c.BaseModel.Package = map[string]string{
+			strAlias: strPackage,
+		}
+	}
+	c.BaseModel.Columns = columns
+	c.BaseModel.Type = strSpecType
+	log.Infof("base model [%+v]", c.BaseModel)
 	return
 }
 

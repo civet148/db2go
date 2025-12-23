@@ -54,6 +54,7 @@ const (
 	CmdFlag_JsonStyle      = "json-style"
 	CmdFlag_Export         = "export"
 	CmdFlag_FieldStyle     = "field-style"
+	CmdFlag_BaseModel      = "base-model"
 )
 
 func init() {
@@ -215,6 +216,11 @@ func main() {
 				Aliases: []string{"style"},
 				Usage:   "protobuf message field camel style (small or big)",
 			},
+			&cli.StringFlag{
+				Name:    CmdFlag_BaseModel,
+				Aliases: []string{"bm"},
+				Usage:   "specify base model. e.g github.com/civet148/db2go/types.BaseModel=create_time,update_time,is_deleted",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -247,6 +253,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.OneFile = ctx.Bool(CmdFlag_Merge)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
+	cmd.ParseBaseModel(ctx.String(CmdFlag_BaseModel))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportTo = ctx.String(CmdFlag_Export)
 	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
