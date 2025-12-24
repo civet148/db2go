@@ -162,17 +162,12 @@ if ! which db2go >/dev/null 2>&1; then
     fi
 fi
 
-if [ $? -eq 0 ]; then
 db2go --debug --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
 --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
 --tag "$TAGS" --import-models "$IMPORT_MODELS" --export "$DEPLOY_SQL" # --base-model "$BASE_MODEL"
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME
-
-else
-  echo "error: db2go build failed"
-fi
 
 ```
 
