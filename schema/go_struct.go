@@ -28,10 +28,18 @@ func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchem
 		strTemplate += t.TableCreateSQL
 		strTemplate += ";\n"
 	}
+	dir := filepath.Dir(cmd.ExportDDL)
+	_, errStat := os.Stat(dir)
+	if errStat != nil && os.IsNotExist(errStat) {
+		log.Info("mkdir [%v]", dir)
+		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+			return log.Errorf("mkdir [%v] error (%v)", dir, err.Error())
+		}
+	}
 	var fi *os.File
-	fi, err = os.OpenFile(cmd.ExportTo, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	fi, err = os.OpenFile(cmd.ExportDDL, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
-		return log.Errorf("open file [%v] error (%v)", cmd.ExportTo, err.Error())
+		return log.Errorf("open file [%v] error (%v)", cmd.ExportDDL, err.Error())
 	}
 	_, err = fi.WriteString(strTemplate)
 	if err != nil {
@@ -46,11 +54,9 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 
 		_, errStat := os.Stat(cmd.OutDir)
 		if errStat != nil && os.IsNotExist(errStat) {
-
 			log.Info("mkdir [%v]", cmd.OutDir)
-			if err = os.MkdirAll(cmd.OutDir, os.ModeDir); err != nil {
-				log.Error("mkdir [%v] error (%v)", cmd.OutDir, err.Error())
-				return
+			if err = os.MkdirAll(cmd.OutDir, os.ModePerm); err != nil {
+				return log.Errorf("mkdir [%v] error (%v)", cmd.OutDir, err.Error())
 			}
 		}
 

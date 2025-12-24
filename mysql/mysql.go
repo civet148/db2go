@@ -60,10 +60,10 @@ func (m *ExporterMysql) ExportGo() (err error) {
 		}
 	}
 
-	if cmd.ExportTo != "" {
+	if cmd.ExportDDL != "" {
 		err = schema.ExportToSqlFile(cmd, ddl, schemas)
 		if err != nil {
-			log.Errorf("export to file [%s] error [%s]", cmd.ExportTo, err.Error())
+			log.Errorf("export to file [%s] error [%s]", cmd.ExportDDL, err.Error())
 		}
 	}
 	return schema.ExportTableSchema(cmd, schemas)

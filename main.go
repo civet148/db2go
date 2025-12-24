@@ -17,12 +17,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.4.0"
+	Version     = "3.4.1"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2025-12-23"
+	BuildTime = "2025-12-24"
 	GitCommit = "<N/A>"
 )
 
@@ -255,7 +255,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
 	cmd.ParseBaseModel(ctx.String(CmdFlag_BaseModel))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
-	cmd.ExportTo = ctx.String(CmdFlag_Export)
+	cmd.ExportDDL = ctx.String(CmdFlag_Export)
 	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
 
 	if ctx.Bool(CmdFlag_V2) {

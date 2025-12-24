@@ -85,7 +85,7 @@ type CmdFlags struct {
 	ImportVer      string
 	SqlcaPkg       string
 	Debug          bool
-	ExportTo       string
+	ExportDDL      string
 	TagTypes       []*CommTagType
 	ProtoOptions   map[string]string
 	FieldStyle     FieldStyle
