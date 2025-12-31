@@ -18,10 +18,17 @@ const (
 	FieldStyle_BigCamel                     // 大驼峰
 )
 
-// hasGit 检查系统是否安装Git
+// hasGit 检查系统是否安装git并且本地存在git仓库
 func hasGit() bool {
 	_, err := exec.LookPath("git")
-	return err == nil
+	if err != nil {
+		return false
+	}
+	_, err = exec.Command("git", "status").Output()
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func writeToFile(strOutputPath, strBody string) (err error) {
@@ -40,6 +47,56 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	_, err = file.WriteString(strBody)
 	if err != nil {
 		return log.Errorf("write file [%v] error (%v)", strOutputPath, err.Error())
+	}
+	return nil
+}
+
+func gitCheckout() (err error) {
+	if hasGit() {
+		err = exec.Command("git", "stash").Run()
+		if err != nil {
+			return log.Errorf("git stash error: %v", err.Error())
+		}
+		defer func() {
+			if err != nil {
+				_ = gitStashPop() //命令行执行错误,提前恢复本地变更代码
+			}
+		}()
+
+		err = exec.Command("git", "checkout", "-b", "db2go").Run()
+		if err != nil {
+			return log.Errorf("git checkout db2go branch error: %v", err.Error())
+		}
+	}
+	return nil
+}
+
+func gitStashPop() (err error) {
+	if hasGit() {
+		err = exec.Command("git", "stash", "pop").Run()
+		if err != nil {
+			return log.Errorf("git stash pop error: %v", err.Error())
+		}
+	}
+	return nil
+}
+
+func gitCheckoutBack() (err error) {
+	if hasGit() {
+		err = exec.Command("git", "checkout", "-").Run()
+		if err != nil {
+			return log.Errorf("git checkout last branch error: %v", err.Error())
+		}
+	}
+	return nil
+}
+
+func gitMerge() (err error) {
+	if hasGit() {
+		err = exec.Command("git", "merge", "db2go").Run()
+		if err != nil {
+			return log.Errorf("git merge db2go branch error: %v", err.Error())
+		}
 	}
 	return nil
 }
