@@ -15,7 +15,6 @@
 # vendor/
 .idea
 /db2go
-/models/
 /dao/
 /go.work
 /go.work.bak
