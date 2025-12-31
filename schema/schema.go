@@ -26,18 +26,19 @@ type TableSchema struct {
 }
 
 type TableColumn struct {
-	Name         string `json:"column_name" db:"column_name"`
-	DataType     string `json:"data_type" db:"data_type"`
-	ColumnType   string `json:"column_type" db:"column_type"`
-	Key          string `json:"column_key" db:"column_key"`
-	Extra        string `json:"extra" db:"extra"`
-	Comment      string `json:"column_comment" db:"column_comment"`
-	IsNullable   string `json:"is_nullable" db:"is_nullable"`
-	IsPrimaryKey bool   // is primary key
-	IsDecimal    bool   // is decimal type
-	IsReadOnly   bool   // is read only
-	GoName       string // column name in golang
-	GoType       string // column type in golang
+	Name          string `json:"column_name" db:"column_name"`
+	DataType      string `json:"data_type" db:"data_type"`
+	ColumnType    string `json:"column_type" db:"column_type"`
+	ColumnDefault string `json:"column_default" db:"column_default"`
+	Key           string `json:"column_key" db:"column_key"`
+	Extra         string `json:"extra" db:"extra"`
+	Comment       string `json:"column_comment" db:"column_comment"`
+	IsNullable    string `json:"is_nullable" db:"is_nullable"`
+	IsPrimaryKey  bool   // is primary key
+	IsDecimal     bool   // is decimal type
+	IsReadOnly    bool   // is read only
+	GoName        string // column name in golang
+	GoType        string // column type in golang
 }
 
 type Exporter interface {

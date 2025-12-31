@@ -25,15 +25,15 @@ const (
 type InventoryData struct {
 	github_com_civet148_db2go_types.BaseModel
 	Id           uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                  //产品ID
-	CreateId     uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;"`                 //创建人ID
+	CreateId     uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;"`       //创建人ID
 	CreateName   string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);"`               //创建人姓名
-	UpdateId     uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;"`                 //更新人ID
+	UpdateId     uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;"`       //更新人ID
 	UpdateName   string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);"`               //更新人姓名
-	IsFrozen     int8          `json:"is_frozen,omitempty" db:"is_frozen" gorm:"column:is_frozen;type:tinyint(1);"`                      //冻结状态(0: 未冻结 1: 已冻结)
+	IsFrozen     int8          `json:"is_frozen,omitempty" db:"is_frozen" gorm:"column:is_frozen;type:tinyint(1);default:0;"`            //冻结状态(0: 未冻结 1: 已冻结)
 	Name         string        `json:"name,omitempty" db:"name" gorm:"column:name;type:varchar(255);"`                                   //产品名称
 	SerialNo     string        `json:"serial_no,omitempty" db:"serial_no" gorm:"column:serial_no;type:varchar(64);"`                     //产品编号
-	Quantity     sqlca.Decimal `json:"quantity,omitempty" db:"quantity" gorm:"column:quantity;type:decimal(16,3);"`                      //产品库存
-	Price        sqlca.Decimal `json:"price,omitempty" db:"price" gorm:"column:price;type:decimal(16,2);"`                               //产品均价
+	Quantity     sqlca.Decimal `json:"quantity,omitempty" db:"quantity" gorm:"column:quantity;type:decimal(16,3);default:0.000;"`        //产品库存
+	Price        sqlca.Decimal `json:"price,omitempty" db:"price" gorm:"column:price;type:decimal(16,2);default:0.00;"`                  //产品均价
 	ProductExtra string        `json:"product_extra,omitempty" db:"product_extra" gorm:"column:product_extra;type:text;" sqlca:"isnull"` //产品附带数据(JSON文本)
 	Location     sqlca.Point   `json:"location,omitempty" db:"location" gorm:"column:location;type:point;" sqlca:"isnull"`               //地理位置
 }

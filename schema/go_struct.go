@@ -409,14 +409,18 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 			if t == "bson" && tv == "id" {
 				tv = "_id"
 			} else if t == "gorm" {
+				var strColumnDefault string
+				if v.ColumnDefault != "" {
+					strColumnDefault = fmt.Sprintf("default:%s;", v.ColumnDefault)
+				}
 				if isPrimartyKey(tv) {
 					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement;", tv)
 				} else if isCreateTime(tv) {
-					tv = fmt.Sprintf("column:%s;type:%s;default:CURRENT_TIMESTAMP;autoCreateTime;", tv, v.ColumnType)
+					tv = fmt.Sprintf("column:%s;type:%s;autoCreateTime;%s", tv, v.ColumnType, strColumnDefault)
 				} else if isUpdateTime(tv) {
-					tv = fmt.Sprintf("column:%s;type:%s;default:CURRENT_TIMESTAMP;autoUpdateTime;", tv, v.ColumnType)
+					tv = fmt.Sprintf("column:%s;type:%s;autoUpdateTime;%s", tv, v.ColumnType, strColumnDefault)
 				} else {
-					tv = fmt.Sprintf("column:%s;type:%s;", tv, v.ColumnType)
+					tv = fmt.Sprintf("column:%s;type:%s;%s", tv, v.ColumnType, strColumnDefault)
 				}
 			}
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
