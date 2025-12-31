@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/civet148/log"
@@ -66,6 +67,22 @@ func gitCheckout() (err error) {
 		err = exec.Command("git", "checkout", "-b", "db2go").Run()
 		if err != nil {
 			return log.Errorf("git checkout db2go branch error: %v", err.Error())
+		}
+	}
+	return nil
+}
+
+func gitCommit() (err error) {
+	if hasGit() {
+		var now = time.Now().Format(time.DateTime)
+		err = exec.Command("git", "add", "-A").Run()
+		if err != nil {
+			return log.Errorf("git add error: %v", err.Error())
+		}
+		var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
+		err = exec.Command("git", "commit", "-m", commitMsg).Run()
+		if err != nil {
+			return log.Errorf("git commit error: %v", err.Error())
 		}
 	}
 	return nil
