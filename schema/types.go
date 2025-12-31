@@ -1,8 +1,11 @@
 package schema
 
 import (
-	"github.com/civet148/log"
+	"encoding/json"
 	"strings"
+
+	"github.com/civet148/log"
+	"github.com/civet148/sqlca/v2"
 )
 
 const (
@@ -203,6 +206,227 @@ var db2protoTypesUnsigned = map[string]string{
 	DB_COLUMN_TYPE_DOUBLE:    "double",
 	DB_COLUMN_TYPE_FLOAT:     "float",
 	DB_COLUMN_TYPE_NUMERIC:   "double",
+}
+
+const (
+	SCHEME_MYSQL             = "mysql"
+	SCHEME_POSTGRES          = "postgres"
+	SCHEME_MSSQL             = "mssql"
+	SCHEME_OPEN_GAUSS        = "opengauss"
+	JSON_PROPERTY_OMIT_EMTPY = "omitempty"
+	DAO_SUFFIX               = "dao"
+	TABLE_ALL                = "__all_tables__"
+)
+
+const (
+	IMPORT_GOGO_PROTO = `import "github.com/gogo/protobuf/gogoproto/gogo.proto";`
+	SQLCA_V2_PKG      = `github.com/civet148/sqlca/v2`
+	SQLCA_V3_PKG      = `github.com/civet148/sqlca/v3`
+	IMPORT_SQLCA_V3   = `import "github.com/civet148/sqlca/v3"`
+	IMPORT_SQLCA_V2   = `import "github.com/civet148/sqlca/v2"`
+)
+
+const (
+	JSON_STYLE_DEFAULT         = "default"
+	JSON_STYLE_SMALL_CAMELCASE = "smallcamel"
+	JSON_STYLE_BIG_CAMELCASE   = "bigcamel"
+)
+
+type SpecType struct {
+	Table   string            `json:"table"`
+	Column  string            `json:"column"`
+	Type    string            `json:"type"`
+	Package map[string]string `json:"package"`
+}
+
+type CommTagType struct {
+	Table    string `json:"table"`
+	Column   string `json:"column"`
+	TagName  string `json:"tag_name"`
+	TagValue string `json:"tag_value"`
+}
+
+type BaseModel struct {
+	Columns []string          `json:"columns"`
+	Type    string            `json:"type"`
+	Package map[string]string `json:"package"`
+}
+
+type CmdFlags struct {
+	ConnUrl        string
+	Database       string
+	Tables         []string
+	Without        []string
+	ReadOnly       []string
+	ExtraTags      []string
+	Scheme         string
+	Host           string
+	User           string
+	Password       string
+	Charset        string
+	OutDir         string
+	Prefix         string
+	Suffix         string
+	PackageName    string
+	Protobuf       bool
+	EnableDecimal  bool
+	OneFile        bool
+	GogoOptions    []string
+	DAO            string
+	ImportModels   string
+	OmitEmpty      bool
+	TinyintAsBool  []string
+	Engine         *sqlca.Engine
+	JsonProperties string
+	JsonStyle      string
+	SSH            string
+	SpecTypes      []*SpecType
+	ImportVer      string
+	SqlcaPkg       string
+	Debug          bool
+	ExportDDL      string
+	TagTypes       []*CommTagType
+	ProtoOptions   map[string]string
+	FieldStyle     FieldStyle
+	BaseModel      *BaseModel
+}
+
+func NewCmdFlags() *CmdFlags {
+	return &CmdFlags{
+		ProtoOptions: make(map[string]string),
+	}
+}
+
+func (c *CmdFlags) String() string {
+	data, _ := json.Marshal(c)
+	return string(data)
+}
+
+func (c *CmdFlags) GoString() string {
+	return c.String()
+}
+
+func (c *CmdFlags) IsBaseColumn(strColumnName string) bool {
+	if c.BaseModel == nil || len(c.BaseModel.Columns) == 0 {
+		return false
+	}
+	for _, v := range c.BaseModel.Columns {
+		if v == strColumnName {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
+	var sts []*SpecType
+	if strSpecType == "" {
+		return
+	}
+	ss := strings.Split(strSpecType, ",")
+	for _, v := range ss {
+		v = strings.TrimSpace(v)
+		tt := strings.Split(v, "=")
+		if len(tt) != 2 {
+			log.Errorf("spec type [%s] format illegal", v)
+			continue
+		}
+		var strTableName, strColumnName string
+		tcs := strings.Split(tt[0], ".")
+		if len(tcs) == 0 {
+			continue
+		}
+		if len(tcs) == 1 {
+			strTableName = TABLE_ALL
+			strColumnName = tcs[0]
+		} else {
+			strTableName = tcs[0]
+			strColumnName = tcs[1]
+		}
+		strSpecType = tt[1]
+		idx := strings.LastIndex(strSpecType, ".")
+		var pack = make(map[string]string)
+		var strPackage, strAliase string
+		if idx > 0 {
+			strPackage = strSpecType[:idx]
+			strSpecType = strSpecType[idx+1:]
+			strAliase = strings.ReplaceAll(strPackage, "/", "_")
+			strAliase = strings.ReplaceAll(strAliase, "-", "_")
+			strAliase = strings.ReplaceAll(strAliase, ".", "_")
+			pack[strAliase] = strPackage
+		}
+
+		sts = append(sts, &SpecType{
+			Table:   strTableName,
+			Column:  strColumnName,
+			Type:    strSpecType,
+			Package: pack,
+		})
+	}
+	c.SpecTypes = sts
+	return
+}
+
+func (c *CmdFlags) ParseBaseModel(strBaseModel string) {
+	strBaseModel = strings.TrimSpace(strBaseModel)
+	if strBaseModel == "" {
+		return
+	}
+	tt := strings.Split(strBaseModel, "=")
+	if len(tt) != 2 {
+		log.Warnf("base model [%s] format illegal", strBaseModel)
+		return
+	}
+
+	c.BaseModel = &BaseModel{}
+
+	var strSpecType string
+	var strColumns string
+	var strPackage, strAlias string
+	strSpecType = tt[0]
+	strColumns = tt[1]
+
+	var columns = strings.Split(strColumns, ",")
+	for i, col := range columns {
+		columns[i] = strings.TrimSpace(col)
+	}
+
+	idx := strings.LastIndex(strSpecType, ".")
+	if idx > 0 {
+		strPackage = strSpecType[:idx]
+		strSpecType = strSpecType[idx+1:]
+		strAlias = strings.ReplaceAll(strPackage, "/", "_")
+		strAlias = strings.ReplaceAll(strAlias, "-", "_")
+		strAlias = strings.ReplaceAll(strAlias, ".", "_")
+		c.BaseModel.Package = map[string]string{
+			strAlias: strPackage,
+		}
+	}
+	c.BaseModel.Columns = columns
+	c.BaseModel.Type = strSpecType
+	return
+}
+
+func (c *CmdFlags) GetJsonPropertiesSlice() (jsonProps []string) {
+	var dup bool
+
+	if c.JsonProperties != "" {
+		jsonProps = strings.Split(c.JsonProperties, ",")
+	}
+
+	if c.OmitEmpty {
+		for _, v := range jsonProps {
+			if v == JSON_PROPERTY_OMIT_EMTPY {
+				dup = true
+				break
+			}
+		}
+		if !dup {
+			jsonProps = append(jsonProps, JSON_PROPERTY_OMIT_EMTPY)
+		}
+	}
+	//log.Debugf("jsonProps [%+v]", jsonProps)
+	return
 }
 
 func ConvertPostgresColumnType(table *TableSchema) (err error) {

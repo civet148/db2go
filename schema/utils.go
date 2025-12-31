@@ -182,3 +182,69 @@ func isAllUpper(s string) bool {
 	}
 	return s != ""
 }
+
+func BigCamelCase(strIn string) (strOut string) {
+	var idxUnderLine = int(-1)
+	for i, v := range strIn {
+		strChr := string(v)
+		if i == 0 {
+			strOut += strings.ToUpper(strChr)
+		} else {
+			if v == '_' {
+				idxUnderLine = i //ignore
+			} else {
+				if i == idxUnderLine+1 {
+					strOut += strings.ToUpper(strChr)
+				} else {
+					strOut += strChr
+				}
+			}
+		}
+	}
+	return strOut
+}
+
+func SmallCamelCase(strIn string) (strOut string) {
+	var idxUnderLine = int(-1)
+	for i, v := range strIn {
+		strChr := string(v)
+		if i == 0 {
+			strOut += strings.ToLower(strChr)
+		} else {
+			if v == '_' {
+				idxUnderLine = i //ignore
+			} else {
+				if i == idxUnderLine+1 {
+					strOut += strings.ToUpper(strChr)
+				} else {
+					strOut += strChr
+				}
+			}
+		}
+	}
+	return
+}
+
+func Split(s string) (ss []string) {
+	if strings.Contains(s, ",") {
+		ss = strings.Split(s, ",")
+	} else {
+		ss = strings.Split(s, ";")
+	}
+	return ss
+}
+
+func TrimSpaceSlice(s []string) (ts []string) {
+	for _, v := range s {
+		ts = append(ts, strings.TrimSpace(v))
+	}
+	return
+}
+
+func GetDatabaseName(strPath string) (strName string) {
+	idx := strings.LastIndex(strPath, "/")
+	if idx == -1 {
+		return
+	}
+	return strPath[idx+1:]
+}
