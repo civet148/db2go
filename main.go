@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"strings"
+
 	_ "github.com/civet148/db2go/mssql"
 	_ "github.com/civet148/db2go/mysql"
 	_ "github.com/civet148/db2go/opengauss"
@@ -10,19 +14,16 @@ import (
 	"github.com/civet148/log"
 	"github.com/civet148/sqlca/v2"
 	"github.com/urfave/cli/v2"
-	"os"
-	"os/signal"
-	"strings"
 )
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.4.1"
+	Version     = "3.4.2"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2025-12-24"
+	BuildTime = "2025-12-31"
 	GitCommit = "<N/A>"
 )
 

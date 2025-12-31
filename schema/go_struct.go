@@ -2,10 +2,11 @@ package schema
 
 import (
 	"fmt"
-	"github.com/civet148/log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/civet148/log"
 )
 
 const (
@@ -409,13 +410,13 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 				tv = "_id"
 			} else if t == "gorm" {
 				if isPrimartyKey(tv) {
-					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement", tv)
+					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement;", tv)
 				} else if isCreateTime(tv) {
-					tv = fmt.Sprintf("column:%s;default:CURRENT_TIMESTAMP;autoCreateTime", tv)
+					tv = fmt.Sprintf("column:%s;type:%s;default:CURRENT_TIMESTAMP;autoCreateTime;", tv, v.ColumnType)
 				} else if isUpdateTime(tv) {
-					tv = fmt.Sprintf("column:%s;default:CURRENT_TIMESTAMP;autoUpdateTime", tv)
+					tv = fmt.Sprintf("column:%s;type:%s;default:CURRENT_TIMESTAMP;autoUpdateTime;", tv, v.ColumnType)
 				} else {
-					tv = fmt.Sprintf("column:%s", tv)
+					tv = fmt.Sprintf("column:%s;type:%s;", tv, v.ColumnType)
 				}
 			}
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
