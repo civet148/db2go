@@ -2,13 +2,12 @@ package schema
 
 import (
 	"fmt"
-	"github.com/civet148/log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
-	"time"
 	"unicode"
+
+	"github.com/civet148/log"
 )
 
 type FieldStyle int
@@ -33,67 +32,18 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 		_ = exec.Command("gofmt", "-w", strOutputPath).Run() //格式化本地文件
 	}()
 
-	if !hasGit() || !isFileExist(strOutputPath) {
-		// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
-		file, err = os.OpenFile(strOutputPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
-		if err != nil {
-			return log.Errorf(err)
-		}
-		_, err = file.WriteString(strBody)
-		return log.Errorf(err)
-	}
-	var dir = filepath.Dir(strOutputPath)
-	var name = filepath.Base(strOutputPath)
-	var datetime = time.Now().Format("20060102150405")
-
-	baseFile := filepath.Join(dir, fmt.Sprintf(".%s-%s", datetime, name))
-	blankFile := filepath.Join(dir, fmt.Sprintf(".%s-blank.go", datetime))
-	bf, err := os.Create(blankFile)
-	if err != nil {
-		return log.Errorf(err)
-	}
-	defer func() {
-		_ = bf.Close()
-		_ = os.Remove(blankFile)
-	}()
-
-	file, err = os.OpenFile(baseFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
+	file, err = os.OpenFile(strOutputPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return log.Errorf(err)
 	}
 	_, err = file.WriteString(strBody)
 	if err != nil {
-		return log.Errorf(err)
-	}
-
-	defer os.Remove(baseFile)
-
-	_ = exec.Command("gofmt", "-w", baseFile).Run() //格式化新的数据模型副本
-
-	cmd := exec.Command("git", "merge-file", "-q", strOutputPath, blankFile, baseFile)
-	if err = cmd.Run(); err != nil {
-		log.Errorf("file %s merge conflict occurred", strOutputPath)
-		//err = gitMergeFile(strOutputPath)
-		//if err != nil {
-		//	log.Errorf("file %s merge conflict error: %s", strOutputPath, err.Error())
-		//}
+		return log.Errorf("write file [%v] error (%v)", strOutputPath, err.Error())
 	}
 	return nil
 }
 
-//	func gitMergeFile(strOutputPath string) (err error) {
-//		/*
-//			git config merge.tool vimdiff
-//			git config mergetool.keepBackup false
-//			git mergetool --no-prompt --tool=vimdiff output.go
-//		*/
-//		if hasGit() {
-//			//_ = exec.Command("git", "config", "merge.tool", "vimdiff").Run()
-//			//_ = exec.Command("git", "config", "mergetool.keepBackup", "false").Run()
-//			_ = exec.Command("git", "mergetool", "--no-prompt", "--tool=vimdiff", strOutputPath).Run()
-//		}
-//		return nil
-//	}
 func isFileExist(strFilePath string) bool {
 	_, err := os.Stat(strFilePath)
 	return err == nil
