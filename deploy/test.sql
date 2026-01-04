@@ -59,5 +59,7 @@ CREATE TABLE `inventory_out` (
   `weight` decimal(16,6) NOT NULL DEFAULT '0.000000' COMMENT '净重',
   `remark` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`) USING BTREE
+  UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`) USING BTREE,
+  KEY `IDX_user_id` (`user_id`) USING BTREE,
+  FULLTEXT KEY `FULTXT_user_name` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='出库主表';

@@ -19,19 +19,6 @@ const (
 	FieldStyle_BigCamel                     // 大驼峰
 )
 
-// hasGit 检查系统是否安装git并且本地存在git仓库
-func hasGit() bool {
-	_, err := exec.LookPath("git")
-	if err != nil {
-		return false
-	}
-	_, err = exec.Command("git", "status").Output()
-	if err != nil {
-		return false
-	}
-	return true
-}
-
 func writeToFile(strOutputPath, strBody string) (err error) {
 	var file *os.File
 	strBody += fmt.Sprintf("\n\n%s\n\n", CustomizeCodeTip)
@@ -52,68 +39,99 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	return nil
 }
 
-func gitCheckout() (err error) {
-	if hasGit() {
-		err = exec.Command("git", "stash").Run()
-		if err != nil {
-			return log.Errorf("git stash error: %v", err.Error())
-		}
-		defer func() {
-			if err != nil {
-				_ = gitStashPop() //命令行执行错误,提前恢复本地变更代码
-			}
-		}()
+// hasGit 检查系统是否安装git并且本地存在git仓库
+func hasGit() bool {
+	_, err := exec.LookPath("git")
+	if err != nil {
+		return false
+	}
+	_, err = exec.Command("git", "status").Output()
+	if err != nil {
+		return false
+	}
+	return true
+}
 
-		err = exec.Command("git", "checkout", "-b", "db2go").Run()
+func gitCheckout() (err error) {
+	err = exec.Command("git", "stash").Run()
+	if err != nil {
+		return log.Errorf("git stash error: %v", err.Error())
+	}
+	defer func() {
 		if err != nil {
-			return log.Errorf("git checkout db2go branch error: %v", err.Error())
+			_ = gitStashPop() //命令行执行错误,提前恢复本地变更代码
 		}
+	}()
+
+	err = exec.Command("git", "checkout", "-b", "db2go").Run()
+	if err != nil {
+		return log.Errorf("git checkout db2go branch error: %v", err.Error())
 	}
 	return nil
 }
 
 func gitCommit() (err error) {
-	if hasGit() {
-		var now = time.Now().Format(time.DateTime)
-		err = exec.Command("git", "add", "-A").Run()
-		if err != nil {
-			return log.Errorf("git add error: %v", err.Error())
-		}
-		var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
-		err = exec.Command("git", "commit", "-m", commitMsg).Run()
-		if err != nil {
-			return log.Errorf("git commit error: %v", err.Error())
-		}
+	var now = time.Now().Format(time.DateTime)
+	err = exec.Command("git", "add", "-A").Run()
+	if err != nil {
+		return log.Errorf("git add error: %v", err.Error())
+	}
+	var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
+	err = exec.Command("git", "commit", "-m", commitMsg).Run()
+	if err != nil {
+		return log.Errorf("git commit error: %v", err.Error())
 	}
 	return nil
 }
 
 func gitStashPop() (err error) {
-	if hasGit() {
-		err = exec.Command("git", "stash", "pop").Run()
-		if err != nil {
-			return log.Errorf("git stash pop error: %v", err.Error())
-		}
+	err = exec.Command("git", "stash", "pop").Run()
+	if err != nil {
+		return log.Errorf("git stash pop error: %v", err.Error())
 	}
 	return nil
 }
 
 func gitCheckoutBack() (err error) {
-	if hasGit() {
-		err = exec.Command("git", "checkout", "-").Run()
-		if err != nil {
-			return log.Errorf("git checkout last branch error: %v", err.Error())
-		}
+	err = exec.Command("git", "checkout", "-").Run()
+	if err != nil {
+		return log.Errorf("git checkout last branch error: %v", err.Error())
 	}
 	return nil
 }
 
 func gitMerge() (err error) {
-	if hasGit() {
-		err = exec.Command("git", "merge", "db2go").Run()
+	err = exec.Command("git", "merge", "db2go").Run()
+	if err != nil {
+		return log.Errorf("git merge db2go branch error: %v", err.Error())
+	}
+	return nil
+}
+
+func gitReset() (err error) {
+	err = exec.Command("git", "reset", "--hard", "HEAD").Run()
+	if err != nil {
+		return log.Errorf("git reset error: %v", err.Error())
+	}
+	return nil
+}
+
+func gitCommitAndMerge() (err error) {
+	defer func() {
 		if err != nil {
-			return log.Errorf("git merge db2go branch error: %v", err.Error())
+			_ = gitReset()        //回滚本地代码
+			_ = gitCheckoutBack() //回到上一个分支
+			_ = gitStashPop()     //恢复本地变更代码
 		}
+	}()
+	if err = gitCommit(); err != nil {
+		return err
+	}
+	if err = gitCheckoutBack(); err != nil {
+		return err
+	}
+	if err = gitMerge(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -271,4 +289,15 @@ func GetDatabaseName(strPath string) (strName string) {
 		return
 	}
 	return strPath[idx+1:]
+}
+
+func MakeDir(strDir string) (err error) {
+	if !isFileExist(strDir) {
+		err = os.MkdirAll(strDir, os.ModePerm)
+		if err != nil {
+			return log.Errorf("make directory error: %v", err.Error())
+		}
+		log.Info("make directory [%v] successful", strDir)
+	}
+	return nil
 }

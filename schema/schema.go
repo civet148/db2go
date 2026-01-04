@@ -30,15 +30,38 @@ type TableColumn struct {
 	DataType      string `json:"data_type" db:"data_type"`
 	ColumnType    string `json:"column_type" db:"column_type"`
 	ColumnDefault string `json:"column_default" db:"column_default"`
-	Key           string `json:"column_key" db:"column_key"`
+	ColumnKey     string `json:"column_key" db:"column_key"`
 	Extra         string `json:"extra" db:"extra"`
 	Comment       string `json:"column_comment" db:"column_comment"`
 	IsNullable    string `json:"is_nullable" db:"is_nullable"`
-	IsPrimaryKey  bool   // is primary key
-	IsDecimal     bool   // is decimal type
-	IsReadOnly    bool   // is read only
 	GoName        string // column name in golang
 	GoType        string // column type in golang
+}
+
+func (c TableColumn) IsPrimaryKey() bool {
+	if c.ColumnKey == "PRI" {
+		return true
+	}
+	var colName = strings.ToLower(c.Name)
+	if colName == "id" || colName == "uid" {
+		return true
+	}
+	return false
+}
+
+func (c TableColumn) IsCreateTime() bool {
+	var colName = strings.ToLower(c.Name)
+	return colName == "create_time" || colName == "create_at" || colName == "created_time" || colName == "created_at"
+}
+
+func (c TableColumn) IsUpdateTime() bool {
+	var colName = strings.ToLower(c.Name)
+	return colName == "update_time" || colName == "update_at" || colName == "updated_time" || colName == "updated_at"
+}
+
+func (c TableColumn) IsDeleteTime() bool {
+	var colName = strings.ToLower(c.Name)
+	return colName == "delete_time" || colName == "delete_at" || colName == "deleted_time" || colName == "deleted_at"
 }
 
 type Exporter interface {

@@ -30,13 +30,10 @@ func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchem
 		strTemplate += ";\n"
 	}
 	dir := filepath.Dir(cmd.ExportDDL)
-	_, errStat := os.Stat(dir)
-	if errStat != nil && os.IsNotExist(errStat) {
-		log.Info("mkdir [%v]", dir)
-		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-			return log.Errorf("mkdir [%v] error (%v)", dir, err.Error())
-		}
+	if err = MakeDir(dir); err != nil {
+		return err
 	}
+
 	var fi *os.File
 	fi, err = os.OpenFile(cmd.ExportDDL, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
@@ -51,14 +48,15 @@ func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchem
 
 func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 
+	var git = hasGit()
+	if git {
+		if err = gitCheckout(); err != nil {
+			return err
+		}
+	}
 	for _, v := range tables {
-
-		_, errStat := os.Stat(cmd.OutDir)
-		if errStat != nil && os.IsNotExist(errStat) {
-			log.Info("mkdir [%v]", cmd.OutDir)
-			if err = os.MkdirAll(cmd.OutDir, os.ModePerm); err != nil {
-				return log.Errorf("mkdir [%v] error (%v)", cmd.OutDir, err.Error())
-			}
+		if err = MakeDir(cmd.OutDir); err != nil {
+			return err
 		}
 
 		v.OutDir = cmd.OutDir
@@ -75,15 +73,8 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 			v.SchemeDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.PackageName) //mkdir by package name
 		}
 
-		_, errStat = os.Stat(v.SchemeDir)
-
-		if errStat != nil && os.IsNotExist(errStat) {
-
-			log.Info("mkdir [%v]", v.SchemeDir)
-			if err = os.MkdirAll(v.SchemeDir, os.ModePerm); err != nil {
-				log.Errorf("mkdir path name [%v] error (%v)", v.SchemeDir, err.Error())
-				return
-			}
+		if err = MakeDir(v.SchemeDir); err != nil {
+			return err
 		}
 
 		var strPrefix, strSuffix string
@@ -99,6 +90,12 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 			return err
 		}
 		if err = exportDAO(cmd, v); err != nil {
+			return err
+		}
+	}
+
+	if git {
+		if err = gitCommitAndMerge(); err != nil {
 			return err
 		}
 	}
@@ -194,10 +191,8 @@ func exportDAO(cmd *CmdFlags, table *TableSchema) (err error) {
 	} else {
 		strDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.DAO)
 	}
-	if _, err = os.Stat(strDir); err != nil {
-		if err = os.MkdirAll(strDir, os.ModePerm); err != nil {
-			return log.Errorf("mkdir %s error [%s]", strDir, err.Error())
-		}
+	if err = MakeDir(strDir); err != nil {
+		return err
 	}
 
 	var fi os.FileInfo
@@ -413,11 +408,11 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 				if v.ColumnDefault != "" {
 					strColumnDefault = fmt.Sprintf("default:%s;", v.ColumnDefault)
 				}
-				if isPrimartyKey(tv) {
+				if v.IsPrimaryKey() {
 					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement;", tv)
-				} else if isCreateTime(tv) {
+				} else if v.IsCreateTime() {
 					tv = fmt.Sprintf("column:%s;type:%s;autoCreateTime;%s", tv, v.ColumnType, strColumnDefault)
-				} else if isUpdateTime(tv) {
+				} else if v.IsUpdateTime() {
 					tv = fmt.Sprintf("column:%s;type:%s;autoUpdateTime;%s", tv, v.ColumnType, strColumnDefault)
 				} else {
 					tv = fmt.Sprintf("column:%s;type:%s;%s", tv, v.ColumnType, strColumnDefault)
@@ -452,22 +447,6 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	strContent += "}\n\n"
 
 	return
-}
-
-func isPrimartyKey(tv string) bool {
-	return tv == "id" || tv == "uid"
-}
-
-func isCreateTime(tv string) bool {
-	return tv == "create_time" || tv == "create_at" || tv == "created_time" || tv == "created_at"
-}
-
-func isUpdateTime(tv string) bool {
-	return tv == "update_time" || tv == "update_at" || tv == "updated_time" || tv == "updated_at"
-}
-
-func isDeleteTime(tv string) bool {
-	return tv == "delete_time" || tv == "delete_at" || tv == "deleted_time" || tv == "deleted_at"
 }
 
 func GenerateMethodDeclare(strShortName, strStructName, strMethodName, strArgs, strReturn, strLogic string) (strFunc string) {
