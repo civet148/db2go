@@ -59,10 +59,10 @@ func command(name string, args ...string) (err error) {
 	log.Infof(fmt.Sprint(prints...))
 	out, err := exec.Command(name, args...).CombinedOutput()
 	if err != nil {
-		log.Errorf(out)
+		log.Errorf(string(out))
 		return err
 	}
-	fmt.Println(out)
+	fmt.Println(string(out))
 	return nil
 }
 
