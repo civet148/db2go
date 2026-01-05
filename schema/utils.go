@@ -91,7 +91,7 @@ func gitCheckout() (err error) {
 func gitCommit() (err error) {
 	var now = time.Now().Format(time.DateTime)
 	var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
-	_ = command("sh", "-c", fmt.Sprintf("git add -A && git commit -am %s 2>/dev/null", commitMsg))
+	_ = command("sh", "-c", fmt.Sprintf("git add -A && git commit -am '%s' 2>/dev/null", commitMsg))
 	return nil
 }
 
