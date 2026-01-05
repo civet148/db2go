@@ -62,6 +62,7 @@ func command(name string, args ...string) (err error) {
 		log.Errorf(out)
 		return err
 	}
+	fmt.Println(out)
 	return nil
 }
 
