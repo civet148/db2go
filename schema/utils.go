@@ -64,8 +64,8 @@ func gitCheckout() (err error) {
 		}
 	}()
 
-	log.Infof("git checkout -b db2go")
-	err = exec.Command("git", "checkout", "-b", "db2go").Run()
+	log.Infof("git checkout -b db2go 2>/dev/null || git checkout db2go")
+	err = exec.Command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go").Run()
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
 	}
