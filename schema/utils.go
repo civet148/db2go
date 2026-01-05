@@ -24,7 +24,7 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	strBody += fmt.Sprintf("\n\n%s\n\n", CustomizeCodeTip)
 	defer func() {
 		defer file.Close()
-		_ = exec.Command("gofmt", "-w", strOutputPath).Run() //格式化本地文件
+		_ = command("gofmt", "-w", strOutputPath) //格式化本地文件
 	}()
 
 	// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
@@ -45,16 +45,28 @@ func hasGit() bool {
 	if err != nil {
 		return false
 	}
-	_, err = exec.Command("git", "status").Output()
+	err = command("git", "status")
 	if err != nil {
 		return false
 	}
 	return true
 }
 
+func command(name string, args ...string) (err error) {
+	var prints []any
+	prints = append(prints, name)
+	prints = append(prints, []any{args}...)
+	log.Infof(fmt.Sprint(prints...))
+	out, err := exec.Command(name, args...).CombinedOutput()
+	if err != nil {
+		log.Errorf(out)
+		return err
+	}
+	return nil
+}
+
 func gitCheckout() (err error) {
-	log.Infof("git stash")
-	err = exec.Command("git", "stash").Run()
+	err = command("git", "stash")
 	if err != nil {
 		return log.Errorf("git stash error: %v", err.Error())
 	}
@@ -65,7 +77,7 @@ func gitCheckout() (err error) {
 	}()
 
 	log.Infof("git checkout -b db2go 2>/dev/null || git checkout db2go")
-	err = exec.Command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go").Run()
+	err = command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
 	}
@@ -74,54 +86,32 @@ func gitCheckout() (err error) {
 
 func gitCommit() (err error) {
 	var now = time.Now().Format(time.DateTime)
-	log.Infof("git add -A")
-	err = exec.Command("git", "add", "-A").Run()
+	err = command("git", "add", "-A")
 	if err != nil {
-		return log.Errorf("git add error: %v", err.Error())
+		return err
 	}
 	var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
-	log.Infof("git commit -m %s", commitMsg)
-	err = exec.Command("git", "commit", "-m", commitMsg).Run()
+	err = command("git", "commit", "-m", commitMsg)
 	if err != nil {
-		return log.Errorf("git commit error: %v", err.Error())
+		return err
 	}
 	return nil
 }
 
 func gitStashPop() (err error) {
-	log.Infof("git stash pop")
-	err = exec.Command("git", "stash", "pop").Run()
-	if err != nil {
-		return log.Errorf("git stash pop error: %v", err.Error())
-	}
-	return nil
+	return command("git", "stash", "pop")
 }
 
 func gitCheckoutBack() (err error) {
-	log.Infof("git checkout -")
-	err = exec.Command("git", "checkout", "-").Run()
-	if err != nil {
-		return log.Errorf("git checkout last branch error: %v", err.Error())
-	}
-	return nil
+	return command("git", "checkout", "-")
 }
 
 func gitMerge() (err error) {
-	log.Infof("git merge db2go")
-	err = exec.Command("git", "merge", "db2go").Run()
-	if err != nil {
-		return log.Errorf("git merge db2go branch error: %v", err.Error())
-	}
-	return nil
+	return command("git", "merge", "db2go")
 }
 
 func gitReset() (err error) {
-	log.Infof("git reset --hard HEAD")
-	err = exec.Command("git", "reset", "--hard", "HEAD").Run()
-	if err != nil {
-		return log.Errorf("git reset error: %v", err.Error())
-	}
-	return nil
+	return command("git", "reset", "--hard", "HEAD")
 }
 
 func gitCommitAndMerge() (err error) {
