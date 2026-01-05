@@ -55,14 +55,18 @@ func hasGit() bool {
 func command(name string, args ...string) (err error) {
 	var prints []any
 	prints = append(prints, name)
+	prints = append(prints, " ")
 	prints = append(prints, []any{args}...)
 	log.Infof(fmt.Sprint(prints...))
 	out, err := exec.Command(name, args...).CombinedOutput()
+	var strOutput = string(out)
 	if err != nil {
-		log.Errorf(string(out))
+		log.Errorf(strOutput)
 		return err
 	}
-	fmt.Println(string(out))
+	if len(strOutput) > 0 {
+		fmt.Println(strOutput)
+	}
 	return nil
 }
 
@@ -77,7 +81,6 @@ func gitCheckout() (err error) {
 		}
 	}()
 
-	log.Infof("git checkout -b db2go 2>/dev/null || git checkout db2go")
 	err = command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
@@ -87,20 +90,14 @@ func gitCheckout() (err error) {
 
 func gitCommit() (err error) {
 	var now = time.Now().Format(time.DateTime)
-	err = command("git", "add", "-A")
-	if err != nil {
-		return err
-	}
 	var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
-	err = command("git", "commit", "-m", commitMsg)
-	if err != nil {
-		return err
-	}
+	_ = command("sh", "-c", fmt.Sprintf("git add -A && git commit -am %s 2>/dev/null", commitMsg))
 	return nil
 }
 
 func gitStashPop() (err error) {
-	return command("git", "stash", "pop")
+	_ = command("sh", "-c", "git stash pop 2>/dev/null")
+	return nil
 }
 
 func gitCheckoutBack() (err error) {
