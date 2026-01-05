@@ -53,6 +53,7 @@ func hasGit() bool {
 }
 
 func gitCheckout() (err error) {
+	log.Infof("git stash")
 	err = exec.Command("git", "stash").Run()
 	if err != nil {
 		return log.Errorf("git stash error: %v", err.Error())
@@ -63,6 +64,7 @@ func gitCheckout() (err error) {
 		}
 	}()
 
+	log.Infof("git checkout -b db2go")
 	err = exec.Command("git", "checkout", "-b", "db2go").Run()
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
@@ -72,11 +74,13 @@ func gitCheckout() (err error) {
 
 func gitCommit() (err error) {
 	var now = time.Now().Format(time.DateTime)
+	log.Infof("git add -A")
 	err = exec.Command("git", "add", "-A").Run()
 	if err != nil {
 		return log.Errorf("git add error: %v", err.Error())
 	}
 	var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
+	log.Infof("git commit -m %s", commitMsg)
 	err = exec.Command("git", "commit", "-m", commitMsg).Run()
 	if err != nil {
 		return log.Errorf("git commit error: %v", err.Error())
@@ -85,6 +89,7 @@ func gitCommit() (err error) {
 }
 
 func gitStashPop() (err error) {
+	log.Infof("git stash pop")
 	err = exec.Command("git", "stash", "pop").Run()
 	if err != nil {
 		return log.Errorf("git stash pop error: %v", err.Error())
@@ -93,6 +98,7 @@ func gitStashPop() (err error) {
 }
 
 func gitCheckoutBack() (err error) {
+	log.Infof("git checkout -")
 	err = exec.Command("git", "checkout", "-").Run()
 	if err != nil {
 		return log.Errorf("git checkout last branch error: %v", err.Error())
@@ -101,6 +107,7 @@ func gitCheckoutBack() (err error) {
 }
 
 func gitMerge() (err error) {
+	log.Infof("git merge db2go")
 	err = exec.Command("git", "merge", "db2go").Run()
 	if err != nil {
 		return log.Errorf("git merge db2go branch error: %v", err.Error())
@@ -109,6 +116,7 @@ func gitMerge() (err error) {
 }
 
 func gitReset() (err error) {
+	log.Infof("git reset --hard HEAD")
 	err = exec.Command("git", "reset", "--hard", "HEAD").Run()
 	if err != nil {
 		return log.Errorf("git reset error: %v", err.Error())
