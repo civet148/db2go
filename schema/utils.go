@@ -53,11 +53,11 @@ func hasGit() bool {
 }
 
 func command(name string, args ...string) (err error) {
-	var prints []any
+	var prints []string
 	prints = append(prints, name)
-	prints = append(prints, " ")
-	prints = append(prints, []any{args}...)
-	log.Infof(fmt.Sprint(prints...))
+	prints = append(prints, args...)
+	msg := strings.Join(prints, " ")
+	log.Infof("[%v]", msg)
 	out, err := exec.Command(name, args...).CombinedOutput()
 	var strOutput = string(out)
 	if err != nil {
