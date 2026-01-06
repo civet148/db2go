@@ -129,6 +129,9 @@ func gitCommitAndMerge() (err error) {
 	if err = gitMerge(); err != nil {
 		return err
 	}
+	if err = gitStashPop(); err != nil { //恢复本地变更代码
+		return err
+	}
 	return nil
 }
 
