@@ -61,7 +61,7 @@ func command(name string, args ...string) (err error) {
 	out, err := exec.Command(name, args...).CombinedOutput()
 	var strOutput = string(out)
 	if err != nil {
-		log.Errorf(strOutput)
+		log.Printf(strOutput)
 		return err
 	}
 	if len(strOutput) > 0 {
