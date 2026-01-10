@@ -30,7 +30,7 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
 	file, err = os.OpenFile(strOutputPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
-		return log.Errorf(err)
+		return log.Errorf(err.Error())
 	}
 	_, err = file.WriteString(strBody)
 	if err != nil {
