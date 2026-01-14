@@ -9,6 +9,15 @@ import (
 	"github.com/civet148/sqlca/v2"
 )
 
+type TableIndex struct {
+	IndexName    string `json:"index_name" db:"index_name"`
+	ColumnName   string `json:"column_name" db:"column_name"`
+	SeqInIndex   int32  `json:"seq_in_index" db:"seq_in_index"`
+	IndexType    string `json:"index_type" db:"index_type"`
+	NonUnique    bool   `json:"non_unique" db:"non_unique"`
+	IndexComment string `json:"index_comment" db:"index_comment"`
+}
+
 type TableSchema struct {
 	SchemeName         string        `json:"table_schema" db:"table_schema"`   //database name
 	TableName          string        `json:"table_name" db:"table_name"`       //table name
@@ -23,6 +32,23 @@ type TableSchema struct {
 	Columns            []TableColumn `json:"table_columns" db:"table_columns"` //columns with database and golang
 	TableNameCamelCase string        `json:"-"`                                //table name in camel case
 	TableCreateSQL     string        `json:"-"`                                //table create SQL
+	Indexes            []TableIndex  `json:"indexes" db:"-"`                   //table indexes
+}
+
+func (t TableSchema) GetGormIndexes(column string) (index string, ok bool) {
+	var colIndexes []string
+	for _, idx := range t.Indexes {
+		if idx.ColumnName == column {
+			var strGormIndex string
+			if idx.NonUnique {
+				strGormIndex = fmt.Sprintf("index:%s", idx.IndexName)
+			} else {
+				strGormIndex = fmt.Sprintf("uniqueIndex:%s", idx.IndexName)
+			}
+			colIndexes = append(colIndexes, strGormIndex)
+		}
+	}
+	return strings.Join(colIndexes, ";"), len(colIndexes) > 0
 }
 
 type TableColumn struct {

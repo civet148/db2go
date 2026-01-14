@@ -36,8 +36,7 @@ func (m *ExporterMysql) ExportGo() (err error) {
 
 	if cmd.Database == "" {
 		err = fmt.Errorf("no database selected")
-		log.Error(err.Error())
-		return
+		return log.Error(err.Error())
 	}
 	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
 	log.Infof("ready to export tables %v", cmd.Tables)
@@ -47,24 +46,25 @@ func (m *ExporterMysql) ExportGo() (err error) {
 		return err
 	}
 	if schemas, err = m.queryTableSchemas(cmd, e); err != nil {
-		log.Errorf("query tables error [%s]", err.Error())
-		return
+
+		return log.Errorf("query tables error [%s]", err.Error())
 	}
 	for _, v := range schemas {
 		if err = m.queryTableColumns(v); err != nil {
-			log.Error(err.Error())
-			return
+			return log.Error(err.Error())
+		}
+		if err = m.queryTableIndexes(v); err != nil {
+			return log.Error(err.Error())
 		}
 		if err = m.queryTableCreateStructure(v); err != nil {
-			log.Error(err.Error())
-			return
+			return log.Error(err.Error())
 		}
 	}
 
 	if cmd.ExportDDL != "" {
 		err = schema.ExportToSqlFile(cmd, ddl, schemas)
 		if err != nil {
-			log.Errorf("export to file [%s] error [%s]", cmd.ExportDDL, err.Error())
+			log.Warnf("export to file [%s] error [%s]", cmd.ExportDDL, err.Error())
 		}
 	}
 	return schema.ExportTableSchema(cmd, schemas)
@@ -183,4 +183,27 @@ func (m *ExporterMysql) queryTableCreateStructure(table *schema.TableSchema) (er
 		return
 	}
 	return
+}
+
+func (m *ExporterMysql) queryTableIndexes(table *schema.TableSchema) (err error) {
+	/*
+		SELECT
+		    TABLE_SCHEMA AS 'db_name', TABLE_NAME AS 'table_name', INDEX_NAME AS 'index_name', COLUMN_NAME AS 'column_name',
+			SEQ_IN_INDEX AS 'seq_in_index', INDEX_TYPE AS 'index_type', NON_UNIQUE AS 'non_unique', INDEX_COMMENT AS 'index_comment'
+		FROM INFORMATION_SCHEMA.STATISTICS
+		WHERE TABLE_SCHEMA = 'test' AND TABLE_NAME = 'inventory_out'
+		ORDER BY INDEX_NAME, SEQ_IN_INDEX;
+	*/
+	var e = m.Engine
+	_, err = e.Model(&table.Indexes).QueryRaw(`SELECT
+		    TABLE_SCHEMA AS 'db_name', TABLE_NAME AS 'table_name', INDEX_NAME AS 'index_name', COLUMN_NAME AS 'column_name',
+			SEQ_IN_INDEX AS 'seq_in_index', INDEX_TYPE AS 'index_type', NON_UNIQUE AS 'non_unique', INDEX_COMMENT AS 'index_comment'
+		FROM INFORMATION_SCHEMA.STATISTICS
+		WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'
+		ORDER BY INDEX_NAME, SEQ_IN_INDEX`, table.SchemeName, table.TableName)
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+	return nil
 }

@@ -2,11 +2,12 @@ package postgres
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/civet148/db2go/schema"
 	"github.com/civet148/log"
 	"github.com/civet148/sqlca/v2"
-	"os"
-	"strings"
 )
 
 /*
@@ -76,8 +77,10 @@ func (m *ExporterPostgres) ExportGo() (err error) {
 	}
 	for _, v := range schemas {
 		if err = m.queryTableColumns(v); err != nil {
-			log.Error(err.Error())
-			return
+			return log.Error(err.Error())
+		}
+		if err = m.queryTableIndexes(v); err != nil {
+			return log.Error(err.Error())
 		}
 	}
 	return schema.ExportTableSchema(cmd, schemas)
@@ -192,4 +195,60 @@ func (m *ExporterPostgres) queryTableColumns(table *schema.TableSchema) (err err
 	}
 	schema.HandleCommentCRLF(table)
 	return schema.ConvertPostgresColumnType(table) //转换postgres数据库字段类型为MYSQL映射的类型
+}
+
+/*
+SELECT
+
+	n.nspname AS db_name,
+	t.relname AS table_name,
+	i.relname AS index_name,
+	a.attname AS column_name,
+	row_number() OVER (PARTITION BY i.relname ORDER BY array_position(ix.indkey, a.attnum)) AS seq_in_index,
+	am.amname AS index_type,
+	NOT ix.indisunique AS non_unique,
+	obj_description(i.oid, 'pg_class') AS index_comment
+
+FROM pg_index ix
+JOIN pg_class t ON t.oid = ix.indrelid
+JOIN pg_class i ON i.oid = ix.indexrelid
+JOIN pg_namespace n ON n.oid = t.relnamespace
+JOIN pg_am am ON i.relam = am.oid
+CROSS JOIN LATERAL unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ord)
+JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.attnum AND a.attnum > 0
+WHERE n.nspname = 'test'
+
+	AND t.relname = 'inventory_out'
+	AND NOT ix.indisprimary  -- 排除主键，如果需要主键则移除这个条件
+
+ORDER BY index_name, k.ord;
+*/
+func (m *ExporterPostgres) queryTableIndexes(table *schema.TableSchema) (err error) {
+	var e = m.Engine
+	_, err = e.Model(&table.Indexes).QueryRaw(`SELECT
+
+	n.nspname AS db_name,
+	t.relname AS table_name,
+	i.relname AS index_name,
+	a.attname AS column_name,
+	row_number() OVER (PARTITION BY i.relname ORDER BY array_position(ix.indkey, a.attnum)) AS seq_in_index,
+	am.amname AS index_type,
+	NOT ix.indisunique AS non_unique,
+	obj_description(i.oid, 'pg_class') AS index_comment
+
+FROM pg_index ix
+JOIN pg_class t ON t.oid = ix.indrelid
+JOIN pg_class i ON i.oid = ix.indexrelid
+JOIN pg_namespace n ON n.oid = t.relnamespace
+JOIN pg_am am ON i.relam = am.oid
+CROSS JOIN LATERAL unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ord)
+JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.attnum AND a.attnum > 0
+WHERE n.nspname = '%s' AND t.relname = '%s' AND NOT ix.indisprimary  
+
+ORDER BY index_name, k.ord;`, table.SchemeName, table.TableName)
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+	return nil
 }

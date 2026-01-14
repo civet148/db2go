@@ -386,42 +386,47 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
 	strContent += makeTableBaseModel(cmd) //base model
 
-	for _, v := range table.Columns {
-		if cmd.IsBaseColumn(v.Name) {
+	for _, col := range table.Columns {
+		if cmd.IsBaseColumn(col.Name) {
 			continue
 		}
-		if IsInSlice(v.Name, cmd.Without) {
+		if IsInSlice(col.Name, cmd.Without) {
 			continue
 		}
 
 		var tagValues []string
 		var strColType, strColName string
-		strColName = BigCamelCase(v.Name)
-		strColType, _ = GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColName = BigCamelCase(col.Name)
+		strColType, _ = GetGoColumnType(cmd, table.TableName, col, cmd.EnableDecimal, cmd.TinyintAsBool)
 
 		for _, t := range cmd.ExtraTags {
-			tv := v.Name
+			tv := col.Name
 			if t == "bson" && tv == "id" {
 				tv = "_id"
 			} else if t == "gorm" {
-				var strColumnDefault string
-				if v.ColumnDefault != "" {
-					strColumnDefault = fmt.Sprintf("default:%s;", v.ColumnDefault)
-				}
-				if v.IsPrimaryKey() {
+				if col.IsPrimaryKey() {
 					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement;", tv)
-				} else if v.IsCreateTime() {
-					tv = fmt.Sprintf("column:%s;type:%s;autoCreateTime;%s", tv, v.ColumnType, strColumnDefault)
-				} else if v.IsUpdateTime() {
-					tv = fmt.Sprintf("column:%s;type:%s;autoUpdateTime;%s", tv, v.ColumnType, strColumnDefault)
 				} else {
-					tv = fmt.Sprintf("column:%s;type:%s;%s", tv, v.ColumnType, strColumnDefault)
+					if col.IsCreateTime() {
+						tv = fmt.Sprintf("column:%s;type:%s;autoCreateTime;", tv, col.ColumnType)
+					} else if col.IsUpdateTime() {
+						tv = fmt.Sprintf("column:%s;type:%s;autoUpdateTime;", tv, col.ColumnType)
+					} else {
+						tv = fmt.Sprintf("column:%s;type:%s;", tv, col.ColumnType)
+					}
+					index, ok := table.GetGormIndexes(col.Name)
+					if ok {
+						tv += fmt.Sprintf("%s;", index)
+					}
+					if col.ColumnDefault != "" {
+						tv += fmt.Sprintf("default:%s;", col.ColumnDefault)
+					}
 				}
 			}
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
 		}
 		for _, t := range cmd.TagTypes {
-			if t.Column != v.Name {
+			if t.Column != col.Name {
 				continue
 			}
 			if t.Table == table.TableName || t.Table == TABLE_ALL {
@@ -432,16 +437,16 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 				tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t.TagName, tv))
 			}
 		}
-		if IsInSlice(v.Name, cmd.ReadOnly) {
+		if IsInSlice(col.Name, cmd.ReadOnly) {
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_READ_ONLY))
-		} else if v.IsNullable == "YES" {
+		} else if col.IsNullable == "YES" {
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_IS_NULL))
 		}
 		//添加成员和标签
-		strContent += MakeTags(cmd, strColName, strColType, v.Name, v.Comment, strings.Join(tagValues, " "))
+		strContent += MakeTags(cmd, strColName, strColType, col.Name, col.Comment, strings.Join(tagValues, " "))
 
-		v.GoName = strColName
-		v.GoType = strColType
+		col.GoName = strColName
+		col.GoType = strColType
 	}
 
 	strContent += "}\n\n"
