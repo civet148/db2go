@@ -38,33 +38,34 @@ type InventoryData struct {
 	Location     sqlca.Point   `json:"location,omitempty" db:"location" gorm:"column:location;type:point;" sqlca:"isnull"`               //地理位置
 }
 
-func (do *InventoryData) GetId() uint64               { return do.Id }
+func (do InventoryData) TableName() string            { return "inventory_data" }
+func (do InventoryData) GetId() uint64                { return do.Id }
 func (do *InventoryData) SetId(v uint64)              { do.Id = v }
-func (do *InventoryData) GetCreateId() uint64         { return do.CreateId }
+func (do InventoryData) GetCreateId() uint64          { return do.CreateId }
 func (do *InventoryData) SetCreateId(v uint64)        { do.CreateId = v }
-func (do *InventoryData) GetCreateName() string       { return do.CreateName }
+func (do InventoryData) GetCreateName() string        { return do.CreateName }
 func (do *InventoryData) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryData) GetCreateTime() string       { return do.CreateTime }
+func (do InventoryData) GetCreateTime() string        { return do.CreateTime }
 func (do *InventoryData) SetCreateTime(v string)      { do.CreateTime = v }
-func (do *InventoryData) GetUpdateId() uint64         { return do.UpdateId }
+func (do InventoryData) GetUpdateId() uint64          { return do.UpdateId }
 func (do *InventoryData) SetUpdateId(v uint64)        { do.UpdateId = v }
-func (do *InventoryData) GetUpdateName() string       { return do.UpdateName }
+func (do InventoryData) GetUpdateName() string        { return do.UpdateName }
 func (do *InventoryData) SetUpdateName(v string)      { do.UpdateName = v }
-func (do *InventoryData) GetUpdateTime() string       { return do.UpdateTime }
+func (do InventoryData) GetUpdateTime() string        { return do.UpdateTime }
 func (do *InventoryData) SetUpdateTime(v string)      { do.UpdateTime = v }
-func (do *InventoryData) GetIsFrozen() int8           { return do.IsFrozen }
+func (do InventoryData) GetIsFrozen() int8            { return do.IsFrozen }
 func (do *InventoryData) SetIsFrozen(v int8)          { do.IsFrozen = v }
-func (do *InventoryData) GetName() string             { return do.Name }
+func (do InventoryData) GetName() string              { return do.Name }
 func (do *InventoryData) SetName(v string)            { do.Name = v }
-func (do *InventoryData) GetSerialNo() string         { return do.SerialNo }
+func (do InventoryData) GetSerialNo() string          { return do.SerialNo }
 func (do *InventoryData) SetSerialNo(v string)        { do.SerialNo = v }
-func (do *InventoryData) GetQuantity() sqlca.Decimal  { return do.Quantity }
+func (do InventoryData) GetQuantity() sqlca.Decimal   { return do.Quantity }
 func (do *InventoryData) SetQuantity(v sqlca.Decimal) { do.Quantity = v }
-func (do *InventoryData) GetPrice() sqlca.Decimal     { return do.Price }
+func (do InventoryData) GetPrice() sqlca.Decimal      { return do.Price }
 func (do *InventoryData) SetPrice(v sqlca.Decimal)    { do.Price = v }
-func (do *InventoryData) GetProductExtra() string     { return do.ProductExtra }
+func (do InventoryData) GetProductExtra() string      { return do.ProductExtra }
 func (do *InventoryData) SetProductExtra(v string)    { do.ProductExtra = v }
-func (do *InventoryData) GetLocation() sqlca.Point    { return do.Location }
+func (do InventoryData) GetLocation() sqlca.Point     { return do.Location }
 func (do *InventoryData) SetLocation(v sqlca.Point)   { do.Location = v }
 
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

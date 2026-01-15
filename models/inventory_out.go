@@ -42,37 +42,38 @@ type InventoryOut struct {
 	Remark     string        `json:"remark,omitempty" db:"remark" gorm:"column:remark;type:varchar(512);"`                                                                        //备注
 }
 
-func (do *InventoryOut) GetId() uint64               { return do.Id }
+func (do InventoryOut) TableName() string            { return "inventory_out" }
+func (do InventoryOut) GetId() uint64                { return do.Id }
 func (do *InventoryOut) SetId(v uint64)              { do.Id = v }
-func (do *InventoryOut) GetCreateId() uint64         { return do.CreateId }
+func (do InventoryOut) GetCreateId() uint64          { return do.CreateId }
 func (do *InventoryOut) SetCreateId(v uint64)        { do.CreateId = v }
-func (do *InventoryOut) GetCreateName() string       { return do.CreateName }
+func (do InventoryOut) GetCreateName() string        { return do.CreateName }
 func (do *InventoryOut) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryOut) GetCreateTime() string       { return do.CreateTime }
+func (do InventoryOut) GetCreateTime() string        { return do.CreateTime }
 func (do *InventoryOut) SetCreateTime(v string)      { do.CreateTime = v }
-func (do *InventoryOut) GetUpdateId() uint64         { return do.UpdateId }
+func (do InventoryOut) GetUpdateId() uint64          { return do.UpdateId }
 func (do *InventoryOut) SetUpdateId(v uint64)        { do.UpdateId = v }
-func (do *InventoryOut) GetUpdateName() string       { return do.UpdateName }
+func (do InventoryOut) GetUpdateName() string        { return do.UpdateName }
 func (do *InventoryOut) SetUpdateName(v string)      { do.UpdateName = v }
-func (do *InventoryOut) GetUpdateTime() string       { return do.UpdateTime }
+func (do InventoryOut) GetUpdateTime() string        { return do.UpdateTime }
 func (do *InventoryOut) SetUpdateTime(v string)      { do.UpdateTime = v }
-func (do *InventoryOut) GetIsDeleted() int8          { return do.IsDeleted }
+func (do InventoryOut) GetIsDeleted() int8           { return do.IsDeleted }
 func (do *InventoryOut) SetIsDeleted(v int8)         { do.IsDeleted = v }
-func (do *InventoryOut) GetDeleteTime() string       { return do.DeleteTime }
+func (do InventoryOut) GetDeleteTime() string        { return do.DeleteTime }
 func (do *InventoryOut) SetDeleteTime(v string)      { do.DeleteTime = v }
-func (do *InventoryOut) GetProductId() uint64        { return do.ProductId }
+func (do InventoryOut) GetProductId() uint64         { return do.ProductId }
 func (do *InventoryOut) SetProductId(v uint64)       { do.ProductId = v }
-func (do *InventoryOut) GetOrderNo() string          { return do.OrderNo }
+func (do InventoryOut) GetOrderNo() string           { return do.OrderNo }
 func (do *InventoryOut) SetOrderNo(v string)         { do.OrderNo = v }
-func (do *InventoryOut) GetUserId() uint64           { return do.UserId }
+func (do InventoryOut) GetUserId() uint64            { return do.UserId }
 func (do *InventoryOut) SetUserId(v uint64)          { do.UserId = v }
-func (do *InventoryOut) GetUserName() string         { return do.UserName }
+func (do InventoryOut) GetUserName() string          { return do.UserName }
 func (do *InventoryOut) SetUserName(v string)        { do.UserName = v }
-func (do *InventoryOut) GetQuantity() sqlca.Decimal  { return do.Quantity }
+func (do InventoryOut) GetQuantity() sqlca.Decimal   { return do.Quantity }
 func (do *InventoryOut) SetQuantity(v sqlca.Decimal) { do.Quantity = v }
-func (do *InventoryOut) GetWeight() sqlca.Decimal    { return do.Weight }
+func (do InventoryOut) GetWeight() sqlca.Decimal     { return do.Weight }
 func (do *InventoryOut) SetWeight(v sqlca.Decimal)   { do.Weight = v }
-func (do *InventoryOut) GetRemark() string           { return do.Remark }
+func (do InventoryOut) GetRemark() string            { return do.Remark }
 func (do *InventoryOut) SetRemark(v string)          { do.Remark = v }
 
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////
