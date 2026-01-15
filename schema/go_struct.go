@@ -253,17 +253,26 @@ func makeModelStructName(cmd *CmdFlags, table *TableSchema) string {
 }
 
 func makeObjectMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
-
-	for _, v := range table.Columns { //添加结构体成员Get/Set方法
-
+	strContent += MakeTableNameGetter(table.StructName, table.TableName)
+	strContent += "\n"
+	for _, v := range table.Columns { //添加结构体成员Getter方法
 		if IsInSlice(v.Name, cmd.Without) {
 			continue
 		}
 		strColName := BigCamelCase(v.Name)
 		strColType, _ := GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		strContent += MakeGetter(table.StructName, strColName, strColType)
+	}
+	strContent += "\n"
+	for _, v := range table.Columns { //添加结构体成员Setter方法
+		if IsInSlice(v.Name, cmd.Without) {
+			continue
+		}
+		strColName := BigCamelCase(v.Name)
+		strColType, _ := GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		strContent += MakeSetter(table.StructName, strColName, strColType)
 	}
+	strContent += "\n"
 	return
 }
 
