@@ -300,3 +300,11 @@ func MakeDir(strDir string) (err error) {
 	}
 	return nil
 }
+
+func handleColumnComment(comment string) string {
+	comment = strings.ReplaceAll(comment, "\r", "")
+	comment = strings.ReplaceAll(comment, "\n", "")
+	comment = strings.ReplaceAll(comment, ":", "：") //英文冒号替换成中文冒号
+	comment = strings.ReplaceAll(comment, ";", "；") //英文分号替换成中文分号
+	return comment
+}

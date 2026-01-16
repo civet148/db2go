@@ -430,6 +430,9 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 					if col.ColumnDefault != "" {
 						tv += fmt.Sprintf("default:%s;", col.ColumnDefault)
 					}
+					if col.Comment != "" {
+						tv += fmt.Sprintf("comment:%s;", handleColumnComment(col.Comment))
+					}
 				}
 			}
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
