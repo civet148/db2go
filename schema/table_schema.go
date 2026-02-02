@@ -69,7 +69,7 @@ func (c TableColumn) IsPrimaryKey() bool {
 		return true
 	}
 	var colName = strings.ToLower(c.Name)
-	if colName == "id" || colName == "uid" {
+	if colName == "id" {
 		return true
 	}
 	return false

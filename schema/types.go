@@ -232,6 +232,11 @@ const (
 	JSON_STYLE_BIG_CAMELCASE   = "bigcamel"
 )
 
+const (
+	HookType_Sqlca = "sqlca"
+	HookType_Gorm  = "gorm"
+)
+
 type SpecType struct {
 	Table   string            `json:"table"`
 	Column  string            `json:"column"`
