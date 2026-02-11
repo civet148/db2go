@@ -114,8 +114,8 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	table.TableComment = ReplaceCRLF(table.TableComment)
 	strContent += fmt.Sprintf("const %s%v = \"%v\" //%v \n\n", TableNamePrefix, table.TableNameCamelCase, fmt.Sprintf("%s", table.TableName), table.TableComment)
 
-	table.StructName = fmt.Sprintf("%s%s", table.TableNameCamelCase, strings.ToUpper(cmd.Suffix))
-	table.StructDAO = fmt.Sprintf("%sDAO", table.TableNameCamelCase)
+	table.StructName = TableNameToStructName(table.TableNameCamelCase)
+	table.StructDAO = TableNameToStructName(table.TableNameCamelCase)
 	for i, v := range table.Columns {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}

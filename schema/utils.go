@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 	"unicode"
@@ -309,4 +310,108 @@ func handleColumnComment(comment string) string {
 	comment = strings.ReplaceAll(comment, "\"", "‘") //英文双引号替换中文单引号
 	comment = strings.ReplaceAll(comment, "'", "")   //英文单引号替换中文单引号
 	return comment
+}
+
+// 特殊复数→单数映射（覆盖所有不规则/特殊情况）
+var pluralToSingular = map[string]string{
+	"boxes":      "box",
+	"bases":      "base",
+	"cases":      "case",
+	"children":   "child",
+	"feet":       "foot",
+	"geese":      "goose",
+	"teeth":      "tooth",
+	"mice":       "mouse",
+	"men":        "man",
+	"women":      "woman",
+	"people":     "person",
+	"knives":     "knife",
+	"lives":      "life",
+	"wives":      "wife",
+	"leaves":     "leaf",
+	"loaves":     "loaf",
+	"potatoes":   "potato",
+	"tomatoes":   "tomato",
+	"phenomena":  "phenomenon",
+	"profiles":   "profile",
+	"data":       "data",
+	"datas":      "data",
+	"media":      "media",
+	"quizzes":    "quiz",
+	"analyses":   "analysis",
+	"cities":     "city",
+	"categories": "category",
+	"classes":    "class",
+	"buses":      "bus",
+	"roles":      "role",
+	"phases":     "phase",
+	"houses":     "house",
+	"radius":     "radius",
+}
+
+// 不可数/单复数同形单词
+var uncountableWords = map[string]bool{
+	"news": true,
+	"is":   true,
+	"as":   true,
+}
+
+// 驼峰转下划线正则
+var camelRegex = regexp.MustCompile(`([a-z0-9])([A-Z])`)
+
+// TableNameToStructName 表名转结构体名（终极极简版）
+func TableNameToStructName(tableName string) string {
+	if tableName == "" {
+		return ""
+	}
+
+	// 步骤1：移除前缀
+	lowerName := strings.ToLower(tableName)
+	cleaned := tableName
+	switch {
+	case strings.HasPrefix(lowerName, "tbl_"):
+		cleaned = tableName[4:]
+	case strings.HasPrefix(lowerName, "tb_"):
+		cleaned = tableName[3:]
+	case strings.HasPrefix(lowerName, "t_"):
+		cleaned = tableName[2:]
+	}
+
+	// 步骤2：标准化（驼峰转下划线+小写）
+	standardized := camelRegex.ReplaceAllString(cleaned, `${1}_${2}`)
+	words := strings.Split(strings.ToLower(standardized), "_")
+	// 过滤空单词
+	filtered := make([]string, 0, len(words))
+	for _, w := range words {
+		if w != "" {
+			filtered = append(filtered, w)
+		}
+	}
+	if len(filtered) == 0 {
+		return ""
+	}
+
+	// 步骤3：处理最后一个单词的复数（核心修复：直接用字符串函数，不用rune）
+	lastWord := filtered[len(filtered)-1]
+	// 优先特殊映射
+	if singular, ok := pluralToSingular[lastWord]; ok {
+		filtered[len(filtered)-1] = singular
+	} else if !uncountableWords[lastWord] {
+		// 极简复数规则：只处理最常见场景，避免截取错误
+		switch {
+		case strings.HasSuffix(lastWord, "ies"):
+			filtered[len(filtered)-1] = strings.TrimSuffix(lastWord, "ies") + "y"
+		case strings.HasSuffix(lastWord, "es"):
+			filtered[len(filtered)-1] = strings.TrimSuffix(lastWord, "es")
+		case strings.HasSuffix(lastWord, "s"):
+			filtered[len(filtered)-1] = strings.TrimSuffix(lastWord, "s")
+		}
+	}
+
+	// 步骤4：转大驼峰
+	var result strings.Builder
+	for _, w := range filtered {
+		result.WriteString(strings.ToUpper(w[:1]) + w[1:])
+	}
+	return result.String()
 }

@@ -31,7 +31,7 @@ func MakeProtoHead(cmd *CmdFlags) (strContent string) {
 
 func MakeProtoBody(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
-	strTableName := BigCamelCase(table.TableName)
+	strTableName := TableNameToStructName(table.TableName)
 	strContent += fmt.Sprintf("message %v {\n", strTableName)
 	for i, v := range table.Columns {
 

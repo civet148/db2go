@@ -11,12 +11,12 @@ CREATE TABLE `inventory_data` (
   `update_name` longtext COLLATE utf8mb4_unicode_ci,
   `update_time` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT 'CURRENT_TIMESTAMP',
   `is_frozen` tinyint(1) DEFAULT '0',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '产品:名称;不能为空',
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '产品：名称；不能为空',
   `serial_no` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '产品序列号',
   `quantity` decimal(16,3) DEFAULT '0.000',
   `price` decimal(16,2) DEFAULT '0.00',
-  `product_extra` text COLLATE utf8mb4_unicode_ci,
   `location` point DEFAULT NULL,
+  `product_extra` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `i_serial_no` (`serial_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='产品库存数据表';
@@ -66,3 +66,12 @@ CREATE TABLE `inventory_out` (
   KEY `i_product_id` (`product_id`) USING BTREE,
   FULLTEXT KEY `FULTXT_user_name` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='出库主表';
+
+CREATE TABLE `user_role_id` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `role_id` bigint NOT NULL COMMENT '角色ID',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_role_id_unique` (`user_id`,`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
