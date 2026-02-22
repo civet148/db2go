@@ -72,16 +72,6 @@ func command(name string, args ...string) (err error) {
 }
 
 func gitCheckout() (err error) {
-	err = command("git", "stash")
-	if err != nil {
-		return log.Errorf("git stash error: %v", err.Error())
-	}
-	defer func() {
-		if err != nil {
-			_ = gitStashPop() //命令行执行错误,提前恢复本地变更代码
-		}
-	}()
-
 	err = command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
@@ -91,13 +81,8 @@ func gitCheckout() (err error) {
 
 func gitCommit() (err error) {
 	var now = time.Now().Format(time.DateTime)
-	var commitMsg = fmt.Sprintf("db2go export data models at %s", now)
+	var commitMsg = fmt.Sprintf("db2go export database models at %s", now)
 	_ = command("sh", "-c", fmt.Sprintf("git add -A && git commit -am '%s' 2>/dev/null", commitMsg))
-	return nil
-}
-
-func gitStashPop() (err error) {
-	_ = command("sh", "-c", "git stash pop 2>/dev/null")
 	return nil
 }
 
@@ -118,7 +103,6 @@ func gitCommitAndMerge() (err error) {
 		if err != nil {
 			_ = gitReset()        //回滚本地代码
 			_ = gitCheckoutBack() //回到上一个分支
-			_ = gitStashPop()     //恢复本地变更代码
 		}
 	}()
 	if err = gitCommit(); err != nil {
@@ -128,9 +112,6 @@ func gitCommitAndMerge() (err error) {
 		return err
 	}
 	if err = gitMerge(); err != nil {
-		return err
-	}
-	if err = gitStashPop(); err != nil { //恢复本地变更代码
 		return err
 	}
 	return nil
@@ -300,6 +281,25 @@ func MakeDir(strDir string) (err error) {
 		log.Info("make directory [%v] successful", strDir)
 	}
 	return nil
+}
+
+// hasUnstagedChanges 检测执行git status命令行是否存在未暂存的代码变更
+// 如果没有git或不在git仓库中，直接返回false
+func hasUnstagedChanges() (ok bool, err error) {
+	cmd := exec.Command("git", "status", "--porcelain")
+	output, err := cmd.Output()
+	if err != nil {
+		// 如果命令执行失败（例如没有安装git或不在git仓库中），返回false
+		return false, err
+	}
+
+	// 解析输出，如果存在非空输出，说明有未暂存的变更
+	statusOutput := string(output)
+	if strings.TrimSpace(statusOutput) == "" {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func handleColumnComment(comment string) string {
