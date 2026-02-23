@@ -19,20 +19,21 @@ type TableIndex struct {
 }
 
 type TableSchema struct {
-	SchemeName         string        `json:"table_schema" db:"table_schema"`   //database name
-	TableName          string        `json:"table_name" db:"table_name"`       //table name
-	TableEngine        string        `json:"engine" db:"engine"`               //database engine
-	TableComment       string        `json:"table_comment" db:"table_comment"` //comment of table schema
-	SchemeDir          string        `json:"schema_dir" db:"schema_dir"`       //output path
-	PkName             string        `json:"pk_name" db:"pk_name"`             //primary key column name
-	StructName         string        `json:"struct_name" db:"struct_name"`     //struct name
-	StructDAO          string        `json:"struct_dao" db:"struct_dao"`       //struct DAO name
-	OutDir             string        `json:"out_dir" db:"out_dir"`             //output directory
-	OutFilePath        string        `json:"file_name" db:"file_name"`         //output file path
-	Columns            []TableColumn `json:"table_columns" db:"table_columns"` //columns with database and golang
-	TableNameCamelCase string        `json:"-"`                                //table name in camel case
-	TableCreateSQL     string        `json:"-"`                                //table create SQL
-	Indexes            []TableIndex  `json:"indexes" db:"-"`                   //table indexes
+	SchemeName         string          `json:"table_schema" db:"table_schema"`   //database name
+	TableName          string          `json:"table_name" db:"table_name"`       //table name
+	TableEngine        string          `json:"engine" db:"engine"`               //database engine
+	TableComment       string          `json:"table_comment" db:"table_comment"` //comment of table schema
+	SchemeDir          string          `json:"schema_dir" db:"schema_dir"`       //output path
+	PkName             string          `json:"pk_name" db:"pk_name"`             //primary key column name
+	StructName         string          `json:"struct_name" db:"struct_name"`     //struct name
+	StructDAO          string          `json:"struct_dao" db:"struct_dao"`       //struct DAO name
+	OutDir             string          `json:"out_dir" db:"out_dir"`             //output directory
+	OutFilePath        string          `json:"file_name" db:"file_name"`         //output file path
+	Columns            []TableColumn   `json:"table_columns" db:"table_columns"` //columns with database and golang
+	TableNameCamelCase string          `json:"-"`                                //table name in camel case
+	TableCreateSQL     string          `json:"-"`                                //table create SQL
+	Indexes            []TableIndex    `json:"indexes" db:"-"`                   //table indexes
+	ImportPackages     map[string]bool `json:"import_packages" db:"-"`           //import packages
 }
 
 func (t TableSchema) GetGormIndexes(column string) (index string, ok bool) {
@@ -244,15 +245,15 @@ func CreateOutputFile(cmd *CmdFlags, table *TableSchema, strFileSuffix string, a
 }
 
 // 将数据库字段类型转为go语言对应的数据类型
-func GetGoColumnType(cmd *CmdFlags, strTableName string, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
+func GetGoColumnType(cmd *CmdFlags, table *TableSchema, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
 
 	var bUnsigned bool
-	var strColName, strDataType, strColumnType string
+	var strColName, strDataType, strColumnType, strTableName string
 	strColName = col.Name
 	strDataType = col.DataType
 	strColumnType = col.ColumnType
+	strTableName = table.TableName
 
-	//log.Debugf("table [%s] column name [%s] type [%s]", strTableName, strColName, strDataType)
 	//tinyint type column redeclare as bool
 	if len(tinyintAsBool) > 0 && strDataType == DB_COLUMN_TYPE_TINYINT {
 		if IsInSlice(strColName, tinyintAsBool) {
@@ -284,6 +285,12 @@ func GetGoColumnType(cmd *CmdFlags, strTableName string, col TableColumn, enable
 		} else {
 			isDecimal = true
 			strGoColType = "sqlca.Decimal"
+		}
+	default:
+		ss := strings.Split(strGoColType, ".")
+		if len(ss) > 1 {
+			pkg := ss[0]
+			table.ImportPackages[pkg] = true
 		}
 	}
 

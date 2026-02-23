@@ -63,6 +63,9 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		}
 	}
 	for _, v := range tables {
+		if len(v.ImportPackages) == 0 {
+			v.ImportPackages = make(map[string]bool)
+		}
 		if err = MakeDir(cmd.OutDir); err != nil {
 			return err
 		}
@@ -127,6 +130,12 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	for i, v := range table.Columns {
 		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
+	//导入固定的系统包(比如time)
+	for k, _ := range table.ImportPackages {
+		strHead += fmt.Sprintf(`import "%s"`, k)
+		strHead += "\n"
+		packages[k] = true
+	}
 	//检查此表是否存在需要导入第三方包类型的字段
 	spectTypes := getImportSpecTypes(cmd, table)
 
@@ -179,7 +188,7 @@ func getImportSpecTypes(cmd *CmdFlags, table *TableSchema) (specTypes []*SpecTyp
 
 func haveDecimal(cmd *CmdFlags, table *TableSchema, TableCols []TableColumn, enableDecimal bool) (ok bool) {
 	for _, v := range TableCols {
-		_, ok = GetGoColumnType(cmd, table.TableName, v, enableDecimal, nil)
+		_, ok = GetGoColumnType(cmd, table, v, enableDecimal, nil)
 		if ok {
 			break
 		}
@@ -268,7 +277,7 @@ func makeObjectMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 			continue
 		}
 		strColName := BigCamelCase(v.Name)
-		strColType, _ := GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColType, _ := GetGoColumnType(cmd, table, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		strContent += MakeGetter(table.StructName, strColName, strColType)
 	}
 	strContent += "\n"
@@ -277,7 +286,7 @@ func makeObjectMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 			continue
 		}
 		strColName := BigCamelCase(v.Name)
-		strColType, _ := GetGoColumnType(cmd, table.TableName, v, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColType, _ := GetGoColumnType(cmd, table, v, cmd.EnableDecimal, cmd.TinyintAsBool)
 		strContent += MakeSetter(table.StructName, strColName, strColType)
 	}
 	strContent += "\n"
@@ -414,7 +423,7 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		var tagValues []string
 		var strColType, strColName string
 		strColName = BigCamelCase(col.Name)
-		strColType, _ = GetGoColumnType(cmd, table.TableName, col, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColType, _ = GetGoColumnType(cmd, table, col, cmd.EnableDecimal, cmd.TinyintAsBool)
 
 		for _, t := range cmd.ExtraTags {
 			tv := col.Name
