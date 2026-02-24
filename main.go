@@ -229,7 +229,6 @@ func main() {
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
-		log.Errorf("exit in error %s", err)
 		os.Exit(1)
 		return
 	}
@@ -376,7 +375,6 @@ func export(cmd *schema.CmdFlags, e *sqlca.Engine) (err error) {
 	} else {
 		log.Infof("generate golang files...")
 		if err := exporter.ExportGo(); err != nil {
-			log.Errorf("export [%v] to go file error [%v]", cmd.Scheme, err.Error())
 			return err
 		}
 	}

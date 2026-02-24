@@ -55,7 +55,7 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		if err != nil {
 			return log.Errorf("git status error: %s", err)
 		}
-		if !ok {
+		if ok {
 			return log.Errorf("请先暂存/提交本地代码再重试 (Please stash or commit your work code and try it later)")
 		}
 		if err = gitCheckout(); err != nil {

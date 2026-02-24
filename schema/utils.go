@@ -114,6 +114,25 @@ func gitCommitAndMerge() (err error) {
 	return nil
 }
 
+// hasUnstagedChanges 检测执行git status命令行是否存在未暂存的代码变更
+// 如果没有git或不在git仓库中，直接返回false
+func hasUnstagedChanges() (ok bool, err error) {
+	cmd := exec.Command("git", "status", "--porcelain")
+	output, err := cmd.Output()
+	if err != nil {
+		// 如果命令执行失败（例如没有安装git或不在git仓库中），返回false
+		return false, err
+	}
+
+	// 解析输出，如果存在非空输出，说明有未暂存的变更
+	statusOutput := string(output)
+	if strings.TrimSpace(statusOutput) == "" {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func isFileExist(strFilePath string) bool {
 	_, err := os.Stat(strFilePath)
 	return err == nil
@@ -278,25 +297,6 @@ func MakeDir(strDir string) (err error) {
 		log.Info("make directory [%v] successful", strDir)
 	}
 	return nil
-}
-
-// hasUnstagedChanges 检测执行git status命令行是否存在未暂存的代码变更
-// 如果没有git或不在git仓库中，直接返回false
-func hasUnstagedChanges() (ok bool, err error) {
-	cmd := exec.Command("git", "status", "--porcelain")
-	output, err := cmd.Output()
-	if err != nil {
-		// 如果命令执行失败（例如没有安装git或不在git仓库中），返回false
-		return false, err
-	}
-
-	// 解析输出，如果存在非空输出，说明有未暂存的变更
-	statusOutput := string(output)
-	if strings.TrimSpace(statusOutput) == "" {
-		return false, nil
-	}
-
-	return true, nil
 }
 
 func handleColumnComment(comment string) string {
