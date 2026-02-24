@@ -4,15 +4,11 @@ import "time"
 import github_com_civet148_db2go_types "github.com/civet148/db2go/types"
 import "github.com/civet148/sqlca/v3"
 
-const TableNameInventoryOut = "inventory_out" //出库主表
+const TableNameInventoryOut = "inventory_out" //
 
 const (
 	INVENTORY_OUT_COLUMN_ID          = "id"
-	INVENTORY_OUT_COLUMN_CREATE_ID   = "create_id"
-	INVENTORY_OUT_COLUMN_CREATE_NAME = "create_name"
 	INVENTORY_OUT_COLUMN_CREATE_TIME = "create_time"
-	INVENTORY_OUT_COLUMN_UPDATE_ID   = "update_id"
-	INVENTORY_OUT_COLUMN_UPDATE_NAME = "update_name"
 	INVENTORY_OUT_COLUMN_UPDATE_TIME = "update_time"
 	INVENTORY_OUT_COLUMN_IS_DELETED  = "is_deleted"
 	INVENTORY_OUT_COLUMN_DELETE_TIME = "delete_time"
@@ -27,11 +23,7 @@ const (
 
 type InventoryOut struct {
 	github_com_civet148_db2go_types.BaseModel
-	Id         uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                            //主键ID
-	CreateId   uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;" sqlca:"isnull"`                                                            //
-	CreateName string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:longtext;" sqlca:"isnull"`                                                             //
-	UpdateId   uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;" sqlca:"isnull"`                                                            //
-	UpdateName string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:longtext;" sqlca:"isnull"`                                                             //
+	Id         uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                            //
 	IsDeleted  int8          `json:"is_deleted,omitempty" db:"is_deleted" gorm:"column:is_deleted;type:tinyint(1);default:0;" sqlca:"isnull"`                                                    //
 	DeleteTime time.Time     `json:"delete_time,omitempty" db:"delete_time" gorm:"column:delete_time;type:datetime;" sqlca:"isnull"`                                                             //
 	ProductId  uint64        `json:"product_id,omitempty" db:"product_id" gorm:"column:product_id;type:bigint unsigned;index:i_product_id;uniqueIndex:UNIQ_PROD_USER;default:0;" sqlca:"isnull"` //
@@ -46,11 +38,7 @@ type InventoryOut struct {
 func (do InventoryOut) TableName() string { return "inventory_out" }
 
 func (do InventoryOut) GetId() uint64              { return do.Id }
-func (do InventoryOut) GetCreateId() uint64        { return do.CreateId }
-func (do InventoryOut) GetCreateName() string      { return do.CreateName }
 func (do InventoryOut) GetCreateTime() time.Time   { return do.CreateTime }
-func (do InventoryOut) GetUpdateId() uint64        { return do.UpdateId }
-func (do InventoryOut) GetUpdateName() string      { return do.UpdateName }
 func (do InventoryOut) GetUpdateTime() time.Time   { return do.UpdateTime }
 func (do InventoryOut) GetIsDeleted() int8         { return do.IsDeleted }
 func (do InventoryOut) GetDeleteTime() time.Time   { return do.DeleteTime }
@@ -63,11 +51,7 @@ func (do InventoryOut) GetWeight() sqlca.Decimal   { return do.Weight }
 func (do InventoryOut) GetRemark() string          { return do.Remark }
 
 func (do *InventoryOut) SetId(v uint64)              { do.Id = v }
-func (do *InventoryOut) SetCreateId(v uint64)        { do.CreateId = v }
-func (do *InventoryOut) SetCreateName(v string)      { do.CreateName = v }
 func (do *InventoryOut) SetCreateTime(v time.Time)   { do.CreateTime = v }
-func (do *InventoryOut) SetUpdateId(v uint64)        { do.UpdateId = v }
-func (do *InventoryOut) SetUpdateName(v string)      { do.UpdateName = v }
 func (do *InventoryOut) SetUpdateTime(v time.Time)   { do.UpdateTime = v }
 func (do *InventoryOut) SetIsDeleted(v int8)         { do.IsDeleted = v }
 func (do *InventoryOut) SetDeleteTime(v time.Time)   { do.DeleteTime = v }
