@@ -72,7 +72,7 @@ func command(name string, args ...string) (err error) {
 }
 
 func gitCheckout() (err error) {
-	err = command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
+	err = command("sh", "-c", "git branch -D db2go || git checkout -b db2go 2>/dev/null || git checkout db2go")
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
 	}
@@ -99,13 +99,9 @@ func gitReset() (err error) {
 }
 
 func gitCommitAndMerge() (err error) {
-	defer func() {
-		if err != nil {
-			_ = gitReset()        //回滚本地代码
-			_ = gitCheckoutBack() //回到上一个分支
-		}
-	}()
 	if err = gitCommit(); err != nil {
+		_ = gitReset()        //回滚本地代码
+		_ = gitCheckoutBack() //切换到上个分支
 		return err
 	}
 	if err = gitCheckoutBack(); err != nil {
