@@ -52,6 +52,25 @@ func (t TableSchema) GetGormIndexes(column string) (index string, ok bool) {
 	return strings.Join(colIndexes, ";"), len(colIndexes) > 0
 }
 
+// 初始化字段类型导入包名
+func (t *TableSchema) InitGoColumnPackage() {
+	if t.ImportPackages == nil {
+		t.ImportPackages = make(map[string]bool, 1)
+	}
+	for _, col := range t.Columns {
+		var ok bool
+		var strGoColType string
+		if strGoColType, ok = db2goTypes[col.DataType]; !ok {
+			continue
+		}
+		ss := strings.Split(strGoColType, ".")
+		if len(ss) > 1 {
+			pkg := ss[0]
+			t.ImportPackages[pkg] = true
+		}
+	}
+}
+
 type TableColumn struct {
 	Name          string `json:"column_name" db:"column_name"`
 	DataType      string `json:"data_type" db:"data_type"`
@@ -285,13 +304,6 @@ func GetGoColumnType(cmd *CmdFlags, table *TableSchema, col TableColumn, enableD
 		} else {
 			isDecimal = true
 			strGoColType = "sqlca.Decimal"
-		}
-	default:
-		ss := strings.Split(strGoColType, ".")
-		if len(ss) > 1 {
-			pkg := ss[0]
-			table.ImportPackages[pkg] = true
-			log.Warnf("go column type [%v] import package [%v]", strGoColType, pkg)
 		}
 	}
 
