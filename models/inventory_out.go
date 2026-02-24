@@ -48,10 +48,10 @@ func (do InventoryOut) TableName() string { return "inventory_out" }
 func (do InventoryOut) GetId() uint64              { return do.Id }
 func (do InventoryOut) GetCreateId() uint64        { return do.CreateId }
 func (do InventoryOut) GetCreateName() string      { return do.CreateName }
-func (do InventoryOut) GetCreateTime() string      { return do.CreateTime }
+func (do InventoryOut) GetCreateTime() time.Time   { return do.CreateTime }
 func (do InventoryOut) GetUpdateId() uint64        { return do.UpdateId }
 func (do InventoryOut) GetUpdateName() string      { return do.UpdateName }
-func (do InventoryOut) GetUpdateTime() string      { return do.UpdateTime }
+func (do InventoryOut) GetUpdateTime() time.Time   { return do.UpdateTime }
 func (do InventoryOut) GetIsDeleted() int8         { return do.IsDeleted }
 func (do InventoryOut) GetDeleteTime() time.Time   { return do.DeleteTime }
 func (do InventoryOut) GetProductId() uint64       { return do.ProductId }
@@ -65,10 +65,10 @@ func (do InventoryOut) GetRemark() string          { return do.Remark }
 func (do *InventoryOut) SetId(v uint64)              { do.Id = v }
 func (do *InventoryOut) SetCreateId(v uint64)        { do.CreateId = v }
 func (do *InventoryOut) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryOut) SetCreateTime(v string)      { do.CreateTime = v }
+func (do *InventoryOut) SetCreateTime(v time.Time)   { do.CreateTime = v }
 func (do *InventoryOut) SetUpdateId(v uint64)        { do.UpdateId = v }
 func (do *InventoryOut) SetUpdateName(v string)      { do.UpdateName = v }
-func (do *InventoryOut) SetUpdateTime(v string)      { do.UpdateTime = v }
+func (do *InventoryOut) SetUpdateTime(v time.Time)   { do.UpdateTime = v }
 func (do *InventoryOut) SetIsDeleted(v int8)         { do.IsDeleted = v }
 func (do *InventoryOut) SetDeleteTime(v time.Time)   { do.DeleteTime = v }
 func (do *InventoryOut) SetProductId(v uint64)       { do.ProductId = v }
