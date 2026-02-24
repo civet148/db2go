@@ -60,14 +60,17 @@ func (m *ExporterMysql) ExportGo() (err error) {
 			return log.Error(err.Error())
 		}
 	}
-
+	err = schema.ExportTableSchema(cmd, schemas)
+	if err != nil {
+		return err
+	}
 	if cmd.ExportDDL != "" {
 		err = schema.ExportToSqlFile(cmd, ddl, schemas)
 		if err != nil {
 			log.Warnf("export to file [%s] error [%s]", cmd.ExportDDL, err.Error())
 		}
 	}
-	return schema.ExportTableSchema(cmd, schemas)
+	return nil
 }
 
 func (m *ExporterMysql) ExportProto() (err error) {
