@@ -1,5 +1,6 @@
 package models
 
+import "sqlca"
 import github_com_civet148_db2go_types "github.com/civet148/db2go/types"
 import "github.com/civet148/sqlca/v3"
 
