@@ -291,6 +291,7 @@ func GetGoColumnType(cmd *CmdFlags, table *TableSchema, col TableColumn, enableD
 		if len(ss) > 1 {
 			pkg := ss[0]
 			table.ImportPackages[pkg] = true
+			log.Warnf("go column type [%v] import package [%v]", strGoColType, pkg)
 		}
 	}
 

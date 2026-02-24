@@ -63,7 +63,7 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		}
 	}
 	for _, v := range tables {
-		if len(v.ImportPackages) == 0 {
+		if v.ImportPackages == nil {
 			v.ImportPackages = make(map[string]bool)
 		}
 		if err = MakeDir(cmd.OutDir); err != nil {
