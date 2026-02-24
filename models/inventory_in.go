@@ -32,7 +32,7 @@ type InventoryIn struct {
 	UpdateId   uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;" sqlca:"isnull"`                    //
 	UpdateName string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:longtext;" sqlca:"isnull"`                     //
 	IsDeleted  int8          `json:"is_deleted,omitempty" db:"is_deleted" gorm:"column:is_deleted;type:tinyint(1);default:0;" sqlca:"isnull"`            //
-	DeleteTime string        `json:"delete_time,omitempty" db:"delete_time" gorm:"column:delete_time;type:datetime;" sqlca:"isnull"`                     //
+	DeleteTime time.Time     `json:"delete_time,omitempty" db:"delete_time" gorm:"column:delete_time;type:datetime;" sqlca:"isnull"`                     //
 	ProductId  uint64        `json:"product_id,omitempty" db:"product_id" gorm:"column:product_id;type:bigint unsigned;" sqlca:"isnull"`                 //
 	OrderNo    string        `json:"order_no,omitempty" db:"order_no" gorm:"column:order_no;type:varchar(64);uniqueIndex:UNIQ_ORDER_NO;" sqlca:"isnull"` //
 	UserId     uint64        `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                //
@@ -52,7 +52,7 @@ func (do InventoryIn) GetUpdateId() uint64        { return do.UpdateId }
 func (do InventoryIn) GetUpdateName() string      { return do.UpdateName }
 func (do InventoryIn) GetUpdateTime() string      { return do.UpdateTime }
 func (do InventoryIn) GetIsDeleted() int8         { return do.IsDeleted }
-func (do InventoryIn) GetDeleteTime() string      { return do.DeleteTime }
+func (do InventoryIn) GetDeleteTime() time.Time   { return do.DeleteTime }
 func (do InventoryIn) GetProductId() uint64       { return do.ProductId }
 func (do InventoryIn) GetOrderNo() string         { return do.OrderNo }
 func (do InventoryIn) GetUserId() uint64          { return do.UserId }
@@ -69,7 +69,7 @@ func (do *InventoryIn) SetUpdateId(v uint64)        { do.UpdateId = v }
 func (do *InventoryIn) SetUpdateName(v string)      { do.UpdateName = v }
 func (do *InventoryIn) SetUpdateTime(v string)      { do.UpdateTime = v }
 func (do *InventoryIn) SetIsDeleted(v int8)         { do.IsDeleted = v }
-func (do *InventoryIn) SetDeleteTime(v string)      { do.DeleteTime = v }
+func (do *InventoryIn) SetDeleteTime(v time.Time)   { do.DeleteTime = v }
 func (do *InventoryIn) SetProductId(v uint64)       { do.ProductId = v }
 func (do *InventoryIn) SetOrderNo(v string)         { do.OrderNo = v }
 func (do *InventoryIn) SetUserId(v uint64)          { do.UserId = v }

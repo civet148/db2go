@@ -67,11 +67,45 @@ CREATE TABLE `inventory_out` (
   FULLTEXT KEY `FULTXT_user_name` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='出库主表';
 
-CREATE TABLE `user_role_id` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `role_id` bigint NOT NULL COMMENT '角色ID',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+CREATE TABLE `roles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_role_id_unique` (`user_id`,`role_id`)
+  UNIQUE KEY `idx_roles_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user_profiles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `avatar` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_user_profiles_user_id` (`user_id`),
+  CONSTRAINT `fk_users_profile` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user_roles` (
+  `role_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`role_id`,`user_id`),
+  KEY `fk_user_roles_user` (`user_id`),
+  CONSTRAINT `fk_user_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  CONSTRAINT `fk_user_roles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_id` bigint unsigned DEFAULT NULL,
+  `create_name` longtext COLLATE utf8mb4_general_ci,
+  `update_id` bigint unsigned DEFAULT NULL,
+  `update_name` longtext COLLATE utf8mb4_general_ci,
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_name` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_users_user_name` (`user_name`),
+  UNIQUE KEY `idx_users_email` (`email`),
+  KEY `idx_users_create_time` (`create_time`),
+  KEY `idx_users_update_time` (`update_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
