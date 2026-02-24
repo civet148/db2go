@@ -4,8 +4,8 @@ USE `test`;
 
 CREATE TABLE `inventory_data` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_frozen` tinyint(1) DEFAULT '0',
   `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品：名称；不能为空',
   `serial_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品序列号',
@@ -21,8 +21,8 @@ CREATE TABLE `inventory_data` (
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT '0',
   `delete_time` datetime DEFAULT NULL,
   `product_id` bigint unsigned DEFAULT NULL,
@@ -40,8 +40,8 @@ CREATE TABLE `inventory_in` (
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT '0',
   `delete_time` datetime DEFAULT NULL,
   `product_id` bigint unsigned DEFAULT '0',
@@ -89,8 +89,8 @@ CREATE TABLE `user_roles` (
 
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_name` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
