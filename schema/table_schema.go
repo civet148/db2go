@@ -66,7 +66,9 @@ func (t *TableSchema) InitGoColumnPackage() {
 		ss := strings.Split(strGoColType, ".")
 		if len(ss) > 1 {
 			pkg := ss[0]
-			t.ImportPackages[pkg] = true
+			if pkg != "sqlca" {
+				t.ImportPackages[pkg] = true
+			}
 		}
 	}
 }
