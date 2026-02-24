@@ -72,7 +72,8 @@ func command(name string, args ...string) (err error) {
 }
 
 func gitCheckout() (err error) {
-	err = command("sh", "-c", "git branch -D db2go || git checkout -b db2go 2>/dev/null || git checkout db2go")
+	_ = command("sh", "-c", "git branch -D db2go 2>/dev/null")
+	err = command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
 	}
