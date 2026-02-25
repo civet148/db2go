@@ -165,6 +165,9 @@ func (m *ExporterPostgres) queryTableSchemas() (schemas []*schema.TableSchema, e
 	}
 
 	for _, v := range cmd.Tables {
+		if v[0] == '-' {
+			continue
+		}
 		tables = append(tables, fmt.Sprintf("'%v'", v))
 	}
 

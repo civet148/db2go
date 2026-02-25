@@ -2,11 +2,12 @@ package opengauss
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/civet148/db2go/schema"
 	"github.com/civet148/log"
 	"github.com/civet148/sqlca/v2"
-	"os"
-	"strings"
 )
 
 /*
@@ -162,6 +163,9 @@ func (m *ExporterOpenGauss) queryTableSchemas() (schemas []*schema.TableSchema, 
 	}
 
 	for _, v := range cmd.Tables {
+		if v[0] == '-' {
+			continue
+		}
 		tables = append(tables, fmt.Sprintf("'%v'", v))
 	}
 
