@@ -69,7 +69,6 @@ func (m *ExporterPostgres) ExportGo() (err error) {
 		return
 	}
 	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
-	log.Infof("ready to export tables %v", cmd.Tables)
 
 	if schemas, err = m.queryTableSchemas(); err != nil {
 		log.Errorf("query tables error [%s]", err.Error())
@@ -170,8 +169,6 @@ func (m *ExporterPostgres) queryTableSchemas() (schemas []*schema.TableSchema, e
 		}
 		tables = append(tables, fmt.Sprintf("'%v'", v))
 	}
-
-	log.Infof("ready to export tables %v", tables)
 
 	strQuery = fmt.Sprintf(
 		`SELECT '%v' as table_schema, relname AS table_name, CAST ( obj_description ( relfilenode, 'pg_class' ) AS VARCHAR ) AS table_comment

@@ -47,8 +47,7 @@ func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchem
 }
 
 func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
-
-	var git = hasGit()
+	var git = hasGit(cmd)
 	if git {
 		var ok bool
 		ok, err = hasUnstagedChanges()
@@ -63,7 +62,9 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		}
 	}
 	for _, v := range tables {
-	
+		if IsInSlice(v.TableName, cmd.ExcludeTables) {
+			continue
+		}
 		v.InitGoColumnPackage()
 
 		if err = MakeDir(cmd.OutDir); err != nil {

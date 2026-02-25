@@ -25,7 +25,7 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	strBody += fmt.Sprintf("\n\n%s\n\n", CustomizeCodeTip)
 	defer func() {
 		defer file.Close()
-		_ = command("gofmt", "-w", strOutputPath) //格式化本地文件
+		_ = command(false, "gofmt", "-w", strOutputPath) //格式化本地文件
 	}()
 
 	// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
@@ -41,39 +41,65 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 }
 
 // hasGit 检查系统是否安装git并且本地存在git仓库
-func hasGit() bool {
+func hasGit(cmd *CmdFlags) bool {
+	if cmd.IgnoreGit {
+		return false
+	}
 	_, err := exec.LookPath("git")
 	if err != nil {
 		return false
 	}
-	err = command("git", "status")
+	err = command(true, "git", "status")
 	if err != nil {
 		return false
 	}
 	return true
 }
 
-func command(name string, args ...string) (err error) {
+// command 执行一个命令并处理其输出和错误
+// 参数:
+//
+//	name: 要执行的命令名称
+//	args: 命令的参数（可变参数）
+//
+// 返回值:
+//
+//	err: 执行命令过程中可能发生的错误
+func command(debug bool, name string, args ...string) (err error) {
+	// 用于存储命令及其参数的字符串切片
 	var prints []string
+	// 将命令名称添加到切片中
 	prints = append(prints, name)
+	// 将所有参数添加到切片中
 	prints = append(prints, args...)
+	// 将命令及其参数用空格连接成一个完整的命令字符串
 	msg := strings.Join(prints, " ")
-	log.Infof("[%v]", msg)
+	if debug {
+		log.Infof("[%v]", msg)
+	}
 	out, err := exec.Command(name, args...).CombinedOutput()
+	// 执行命令并获取输出和错误
 	var strOutput = string(out)
+	// 将输出转换为字符串
 	if err != nil {
+		// 如果执行过程中发生错误
 		log.Printf(strOutput)
+		// 打印错误输出
 		return err
+		// 返回错误
 	}
 	if len(strOutput) > 0 {
+		// 如果有输出内容且不为空
 		fmt.Println(strOutput)
+		// 打印命令输出
 	}
 	return nil
+	// 执行成功，返回nil
 }
 
 func gitCheckout() (err error) {
-	_ = command("sh", "-c", "git branch -D db2go 2>/dev/null")
-	err = command("sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
+	_ = command(true, "sh", "-c", "git branch -D db2go 2>/dev/null")
+	err = command(true, "sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
 	if err != nil {
 		return log.Errorf("git checkout db2go branch error: %v", err.Error())
 	}
@@ -83,20 +109,20 @@ func gitCheckout() (err error) {
 func gitCommit() (err error) {
 	var now = time.Now().Format(time.DateTime)
 	var commitMsg = fmt.Sprintf("db2go export database models at %s", now)
-	_ = command("sh", "-c", fmt.Sprintf("git add -A && git commit -am '%s' 2>/dev/null", commitMsg))
+	_ = command(true, "sh", "-c", fmt.Sprintf("git add -A && git commit -am '%s' 2>/dev/null", commitMsg))
 	return nil
 }
 
 func gitCheckoutBack() (err error) {
-	return command("git", "checkout", "-")
+	return command(true, "git", "checkout", "-")
 }
 
 func gitMerge() (err error) {
-	return command("git", "merge", "db2go")
+	return command(true, "git", "merge", "db2go")
 }
 
 func gitReset() (err error) {
-	return command("git", "reset", "--hard", "HEAD")
+	return command(true, "git", "reset", "--hard", "HEAD")
 }
 
 func gitCommitAndMerge() (err error) {

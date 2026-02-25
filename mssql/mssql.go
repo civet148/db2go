@@ -49,8 +49,6 @@ func (m *ExporterMssql) ExportGo() (err error) {
 		log.Error(err.Error())
 		return
 	}
-	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
-	log.Infof("ready to export tables %v", cmd.Tables)
 
 	if schemas, err = m.queryTableSchemas(); err != nil {
 		log.Errorf("query tables error [%s]", err.Error())
@@ -149,8 +147,6 @@ func (m *ExporterMssql) queryTableSchemas() (schemas []*schema.TableSchema, err 
 		}
 		tables = append(tables, fmt.Sprintf("'%v'", v))
 	}
-
-	log.Infof("ready to export tables %v", tables)
 
 	strQuery = fmt.Sprintf(
 		`SELECT '%v' as table_schema, A.name as table_name, C.value as table_comment FROM sys.tables A 

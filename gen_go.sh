@@ -43,7 +43,7 @@ DDL_FILE="deploy/test.sql"
 
 ./db2go --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
  --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
- --tag "$TAGS" --import-models $IMPORT_MODELS --base-model "$BASE_MODEL" --ddl "$DDL_FILE"
+ --tag "$TAGS" --import-models $IMPORT_MODELS --base-model "$BASE_MODEL" --ddl "$DDL_FILE" --ignore-git
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME

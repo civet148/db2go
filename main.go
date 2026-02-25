@@ -18,12 +18,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.5.10"
+	Version     = "3.5.11"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-02-24"
+	BuildTime = "2026-02-25"
 	GitCommit = "<N/A>"
 )
 
@@ -56,6 +56,7 @@ const (
 	CmdFlag_Export         = "export"
 	CmdFlag_FieldStyle     = "field-style"
 	CmdFlag_BaseModel      = "base-model"
+	CmdFlag_IgnoreGit      = "ignore-git"
 )
 
 func init() {
@@ -165,6 +166,11 @@ func main() {
 				Aliases: []string{"M"},
 				Usage:   "export to one file",
 			},
+			&cli.BoolFlag{
+				Name:    CmdFlag_IgnoreGit,
+				Aliases: []string{"ig"},
+				Usage:   "force overwrite model file, ignore git",
+			},
 			&cli.StringFlag{
 				Name:  CmdFlag_DAO,
 				Usage: "generate data access object file",
@@ -257,6 +263,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportDDL = ctx.String(CmdFlag_Export)
 	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
+	cmd.IgnoreGit = ctx.Bool(CmdFlag_IgnoreGit)
 
 	if ctx.Bool(CmdFlag_V2) {
 		cmd.SqlcaPkg = schema.SQLCA_V2_PKG
@@ -300,7 +307,15 @@ func doAction(ctx *cli.Context) error {
 	}
 
 	if v := ctx.String(CmdFlag_Tables); v != "" {
-		cmd.Tables = schema.TrimSpaceSlice(schema.Split(v))
+		var tables []string
+		tables = schema.TrimSpaceSlice(schema.Split(v))
+		for _, t := range tables {
+			if t[0] == '-' {
+				cmd.ExcludeTables = append(cmd.ExcludeTables, t[1:])
+			} else {
+				cmd.Tables = append(cmd.Tables, t)
+			}
+		}
 	}
 
 	if v := ctx.String(CmdFlag_Without); v != "" {

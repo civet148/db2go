@@ -264,6 +264,7 @@ type CmdFlags struct {
 	Without        []string
 	ReadOnly       []string
 	ExtraTags      []string
+	ExcludeTables  []string
 	Scheme         string
 	Host           string
 	User           string
@@ -294,6 +295,7 @@ type CmdFlags struct {
 	ProtoOptions   map[string]string
 	FieldStyle     FieldStyle
 	BaseModel      *BaseModel
+	IgnoreGit      bool
 }
 
 func NewCmdFlags() *CmdFlags {
