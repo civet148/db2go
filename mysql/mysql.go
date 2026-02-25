@@ -134,6 +134,7 @@ func (m *ExporterMysql) queryTableSchemas(cmd *schema.CmdFlags, e *sqlca.Engine)
 	var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
 
 	log.Infof("ready to export tables %v", cmd.Tables)
+	log.Warnf("tables %+v", cmd.Tables)
 	for _, v := range cmd.Tables {
 		if v[0] == '-' {
 			continue
