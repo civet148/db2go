@@ -37,6 +37,7 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 	if err != nil {
 		return log.Errorf("write file [%v] error (%v)", strOutputPath, err.Error())
 	}
+	log.Infof("write file [%v] ok", strOutputPath)
 	return nil
 }
 

@@ -222,7 +222,6 @@ func exportDAO(cmd *CmdFlags, table *TableSchema) (err error) {
 		}
 	}
 
-	log.Infof("generate [%v]", strOutputFilePath)
 	strContent += fmt.Sprintf("package %v\n\n", cmd.DAO)
 	strContent += fmt.Sprintf(`import (
     "fmt"
