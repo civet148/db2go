@@ -1,7 +1,6 @@
 package models
 
 import "time"
-import github_com_civet148_db2go_types "github.com/civet148/db2go/types"
 
 const TableNameUsers = "users" //
 
@@ -14,12 +13,10 @@ const (
 )
 
 type User struct {
-	github_com_civet148_db2go_types.BaseModel
-	Id        uint64    `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                                    //
-	CreatedAt time.Time `json:"created_at,omitempty" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_users_created_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"` //
-	UpdatedAt time.Time `json:"updated_at,omitempty" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_users_updated_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"` //
-	UserName  string    `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"`                                        //
-	Email     string    `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                                                        //
+	BaseModel
+	Id       uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //
+	UserName string `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` //
+	Email    string `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 //
 }
 
 func (do User) TableName() string { return "users" }

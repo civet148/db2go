@@ -18,7 +18,7 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.5.11"
+	Version     = "3.5.12"
 	ProgramName = "db2go"
 )
 

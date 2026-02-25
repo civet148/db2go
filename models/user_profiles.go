@@ -1,7 +1,6 @@
 package models
 
 import "time"
-import github_com_civet148_db2go_types "github.com/civet148/db2go/types"
 
 const TableNameUserProfiles = "user_profiles" //
 
@@ -15,13 +14,11 @@ const (
 )
 
 type UserProfile struct {
-	github_com_civet148_db2go_types.BaseModel
-	Id        uint64    `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                                            //
-	CreatedAt time.Time `json:"created_at,omitempty" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_user_profiles_created_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"` //
-	UpdatedAt time.Time `json:"updated_at,omitempty" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_user_profiles_updated_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"` //
-	UserId    uint64    `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;uniqueIndex:idx_user_profiles_user_id;" sqlca:"isnull"`                                            //
-	Avatar    string    `json:"avatar,omitempty" db:"avatar" gorm:"column:avatar;type:varchar(512);" sqlca:"isnull"`                                                                                        //
-	Address   string    `json:"address,omitempty" db:"address" gorm:"column:address;type:varchar(128);" sqlca:"isnull"`                                                                                     //
+	BaseModel
+	Id      uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                 //
+	UserId  uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;uniqueIndex:idx_user_profiles_user_id;" sqlca:"isnull"` //
+	Avatar  string `json:"avatar,omitempty" db:"avatar" gorm:"column:avatar;type:varchar(512);" sqlca:"isnull"`                                             //
+	Address string `json:"address,omitempty" db:"address" gorm:"column:address;type:varchar(128);" sqlca:"isnull"`                                          //
 }
 
 func (do UserProfile) TableName() string { return "user_profiles" }

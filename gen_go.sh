@@ -7,7 +7,7 @@ PACK_NAME="models"
 # 只读字段(不更新)
 READ_ONLY="created_at, updated_at"
 # 指定表名(不指定则整个数据库全部导出)
-TABLE_NAME="-user_roles"
+TABLE_NAME="" #"-user_roles"
 # 忽略字段名(逗号分隔)
 WITH_OUT=""
 # 添加标签
@@ -23,7 +23,7 @@ SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 # 导入models路径(仅生成DAO文件使用)
 IMPORT_MODELS="github.com/civet148/db2go/models"
 # 基础模型声明
-BASE_MODEL="github.com/civet148/db2go/types.BaseModel=create_time,update_time"
+BASE_MODEL="BaseModel=created_at,updated_at"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 

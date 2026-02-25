@@ -87,11 +87,8 @@ type TableColumn struct {
 }
 
 func (c TableColumn) IsPrimaryKey() bool {
-	if c.ColumnKey == "PRI" {
-		return true
-	}
 	var colName = strings.ToLower(c.Name)
-	if colName == "id" {
+	if c.ColumnKey == "PRI" && (colName == "id" || colName == "uid" || colName == "uuid") {
 		return true
 	}
 	return false
