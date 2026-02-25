@@ -4,8 +4,8 @@ USE `test`;
 
 CREATE TABLE `inventory_data` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_frozen` tinyint(1) DEFAULT '0',
   `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品：名称；不能为空',
   `serial_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品序列号',
@@ -14,15 +14,15 @@ CREATE TABLE `inventory_data` (
   `location` point DEFAULT NULL,
   `product_extra` json DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_inventory_data_create_time` (`create_time`),
-  KEY `idx_inventory_data_update_time` (`update_time`),
+  KEY `idx_inventory_data_created_at` (`created_at`),
+  KEY `idx_inventory_data_updated_at` (`updated_at`),
   KEY `i_serial_no` (`serial_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT '0',
   `delete_time` datetime DEFAULT NULL,
   `product_id` bigint unsigned DEFAULT NULL,
@@ -34,14 +34,14 @@ CREATE TABLE `inventory_in` (
   `remark` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
-  KEY `idx_inventory_in_create_time` (`create_time`),
-  KEY `idx_inventory_in_update_time` (`update_time`)
+  KEY `idx_inventory_in_created_at` (`created_at`),
+  KEY `idx_inventory_in_updated_at` (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT '0',
   `delete_time` datetime DEFAULT NULL,
   `product_id` bigint unsigned DEFAULT '0',
@@ -54,8 +54,8 @@ CREATE TABLE `inventory_out` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_PROD_USER` (`product_id`,`user_id`),
   UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
-  KEY `idx_inventory_out_create_time` (`create_time`),
-  KEY `idx_inventory_out_update_time` (`update_time`),
+  KEY `idx_inventory_out_created_at` (`created_at`),
+  KEY `idx_inventory_out_updated_at` (`updated_at`),
   KEY `i_product_id` (`product_id`),
   KEY `i_user_id` (`user_id`),
   KEY `FULTXT_user_name` (`user_name`)
@@ -63,39 +63,47 @@ CREATE TABLE `inventory_out` (
 
 CREATE TABLE `roles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_roles_name` (`name`)
+  UNIQUE KEY `idx_roles_name` (`name`),
+  KEY `idx_roles_created_at` (`created_at`),
+  KEY `idx_roles_updated_at` (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `user_profiles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` bigint unsigned DEFAULT NULL,
   `avatar` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `address` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_user_profiles_user_id` (`user_id`),
+  KEY `idx_user_profiles_created_at` (`created_at`),
+  KEY `idx_user_profiles_updated_at` (`updated_at`),
   CONSTRAINT `fk_users_profile` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `user_roles` (
-  `role_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned NOT NULL,
-  PRIMARY KEY (`role_id`,`user_id`),
-  KEY `fk_user_roles_user` (`user_id`),
+  `role_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`user_id`,`role_id`),
+  KEY `fk_user_roles_role` (`role_id`),
   CONSTRAINT `fk_user_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
   CONSTRAINT `fk_user_roles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_name` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_users_user_name` (`user_name`),
   UNIQUE KEY `idx_users_email` (`email`),
-  KEY `idx_users_create_time` (`create_time`),
-  KEY `idx_users_update_time` (`update_time`)
+  KEY `idx_users_created_at` (`created_at`),
+  KEY `idx_users_updated_at` (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
