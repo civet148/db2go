@@ -42,10 +42,7 @@ func writeToFile(strOutputPath, strBody string) (err error) {
 }
 
 // hasGit 检查系统是否安装git并且本地存在git仓库
-func hasGit(cmd *CmdFlags) bool {
-	if cmd.IgnoreGit {
-		return false
-	}
+func hasGit() bool {
 	_, err := exec.LookPath("git")
 	if err != nil {
 		return false

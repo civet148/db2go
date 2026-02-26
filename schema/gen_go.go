@@ -47,20 +47,6 @@ func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchem
 }
 
 func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
-	var git = hasGit(cmd)
-	if git {
-		var ok bool
-		ok, err = hasUnstagedChanges()
-		if err != nil {
-			return log.Errorf("git status error: %s", err)
-		}
-		if ok {
-			return log.Errorf("请先暂存/提交本地代码再重试 (Please stash or commit your work code and try it later)")
-		}
-		if err = gitCheckout(); err != nil {
-			return err
-		}
-	}
 	for _, v := range tables {
 		if IsInSlice(v.TableName, cmd.ExcludeTables) {
 			continue
@@ -106,11 +92,6 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		}
 	}
 
-	if git {
-		if err = gitCommitAndMerge(); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
