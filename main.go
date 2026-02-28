@@ -220,7 +220,7 @@ func main() {
 			&cli.StringFlag{
 				Name:    CmdFlag_BaseModel,
 				Aliases: []string{"bm"},
-				Usage:   "specify base model. e.g github.com/civet148/db2go/types.BaseModel=create_time,update_time,is_deleted",
+				Usage:   "specify base model. e.g types.BaseModel=created_at,updated_at",
 			},
 		},
 		Action: func(ctx *cli.Context) error {

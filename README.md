@@ -3,7 +3,7 @@
 ## Usage
 ```shell
 VERSION:
-   v3.4.0 20251223 17:47:02 commit 8c3a065
+   v3.5.14 20260228 11:38:23 commit 426c24c
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -35,7 +35,7 @@ GLOBAL OPTIONS:
    --debug, -d                          open debug mode (default: false)
    --proto-options value, --po value    set protobuf options, multiple options seperated by ';'
    --field-style value, --style value   protobuf message field camel style (small or big)
-   --base-model value, --bm value       specify base model. e.g github.com/civet148/db2go/types.BaseModel=create_time,update_time,is_deleted
+   --base-model value, --bm value       specify base model. e.g types.BaseModel=created_at,updated_at
    --help, -h                           show help (default: false)
    --version, -v                        print the version (default: false)
 
