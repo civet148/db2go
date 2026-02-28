@@ -6,8 +6,8 @@ OUT_DIR=.
 PACK_NAME="models"
 # 只读字段(不更新)
 READ_ONLY="created_at, updated_at"
-# 指定表名(不指定则整个数据库全部导出)
-TABLE_NAME="" #"-user_roles"
+# 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
+TABLE_NAME="-user_roles"
 # 忽略字段名(逗号分隔)
 WITH_OUT=""
 # 添加标签
