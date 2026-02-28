@@ -19,7 +19,7 @@ DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 # JSON属性
 JSON_PROPERTIES="omitempty"
 # 指定具体表对应字段类型(不指定表则全局生效)
-SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
+SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool, delete_time=*time.Time"
 # 导入models路径(仅生成DAO文件使用)
 IMPORT_MODELS="github.com/civet148/db2go/models"
 # 基础模型声明

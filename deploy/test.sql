@@ -13,11 +13,15 @@ CREATE TABLE `inventory_data` (
   `price` decimal(16,2) DEFAULT '0.00',
   `location` point DEFAULT NULL,
   `product_extra` json DEFAULT NULL,
+  `create_id` bigint unsigned DEFAULT '0',
+  `create_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `update_id` bigint unsigned DEFAULT '0',
+  `update_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_inventory_data_created_at` (`created_at`),
   KEY `idx_inventory_data_updated_at` (`updated_at`),
   KEY `i_serial_no` (`serial_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2027576772932931586 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -32,11 +36,15 @@ CREATE TABLE `inventory_in` (
   `quantity` decimal(16,6) DEFAULT '0.000000',
   `weight` decimal(16,6) DEFAULT '0.000000',
   `remark` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `create_id` bigint unsigned DEFAULT '0',
+  `create_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `update_id` bigint unsigned DEFAULT '0',
+  `update_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
   KEY `idx_inventory_in_created_at` (`created_at`),
   KEY `idx_inventory_in_updated_at` (`updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2027576772928737281 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -51,6 +59,10 @@ CREATE TABLE `inventory_out` (
   `quantity` decimal(16,6) DEFAULT '0.000000',
   `weight` decimal(16,6) DEFAULT '0.000000',
   `remark` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `create_id` bigint unsigned DEFAULT '0',
+  `create_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `update_id` bigint unsigned DEFAULT '0',
+  `update_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_PROD_USER` (`product_id`,`user_id`),
   UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
@@ -59,6 +71,15 @@ CREATE TABLE `inventory_out` (
   KEY `i_product_id` (`product_id`),
   KEY `i_user_id` (`user_id`),
   KEY `FULTXT_user_name` (`user_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `role_users` (
+  `user_id` bigint unsigned NOT NULL,
+  `role_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`user_id`,`role_id`),
+  KEY `fk_role_users_role` (`role_id`),
+  CONSTRAINT `fk_role_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  CONSTRAINT `fk_role_users_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `roles` (
@@ -70,7 +91,7 @@ CREATE TABLE `roles` (
   UNIQUE KEY `idx_roles_name` (`name`),
   KEY `idx_roles_created_at` (`created_at`),
   KEY `idx_roles_updated_at` (`updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `user_profiles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -84,7 +105,7 @@ CREATE TABLE `user_profiles` (
   KEY `idx_user_profiles_created_at` (`created_at`),
   KEY `idx_user_profiles_updated_at` (`updated_at`),
   CONSTRAINT `fk_users_profile` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `user_roles` (
   `user_id` bigint unsigned NOT NULL,
@@ -106,4 +127,4 @@ CREATE TABLE `users` (
   UNIQUE KEY `idx_users_email` (`email`),
   KEY `idx_users_created_at` (`created_at`),
   KEY `idx_users_updated_at` (`updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

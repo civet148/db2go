@@ -241,6 +241,7 @@ type SpecType struct {
 	Table   string            `json:"table"`
 	Column  string            `json:"column"`
 	Type    string            `json:"type"`
+	IsPtr   bool              `json:"is_ptr"`
 	Package map[string]string `json:"package"`
 }
 
@@ -351,21 +352,28 @@ func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
 		}
 		strSpecType = tt[1]
 		idx := strings.LastIndex(strSpecType, ".")
+
+		var isPtr bool
 		var pack = make(map[string]string)
-		var strPackage, strAliase string
+		var strPackage, strAlias string
 		if idx > 0 {
 			strPackage = strSpecType[:idx]
 			strSpecType = strSpecType[idx+1:]
-			strAliase = strings.ReplaceAll(strPackage, "/", "_")
-			strAliase = strings.ReplaceAll(strAliase, "-", "_")
-			strAliase = strings.ReplaceAll(strAliase, ".", "_")
-			pack[strAliase] = strPackage
+			if strings.HasPrefix(strPackage, "*") {
+				strPackage = strPackage[1:]
+				isPtr = true
+			}
+			strAlias = strings.ReplaceAll(strPackage, "/", "_")
+			strAlias = strings.ReplaceAll(strAlias, "-", "_")
+			strAlias = strings.ReplaceAll(strAlias, ".", "_")
+			pack[strAlias] = strPackage
 		}
 
 		sts = append(sts, &SpecType{
 			Table:   strTableName,
 			Column:  strColumnName,
 			Type:    strSpecType,
+			IsPtr:   isPtr,
 			Package: pack,
 		})
 	}

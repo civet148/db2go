@@ -164,7 +164,11 @@ func ReplaceColumnType(cmd *CmdFlags, strTableName, strColName, strColType strin
 		if (st.Table == strTableName || st.Table == TABLE_ALL) && strColName == st.Column {
 			if len(st.Package) != 0 {
 				for k, _ := range st.Package {
-					strColType = fmt.Sprintf("%s.%s", k, st.Type)
+					if st.IsPtr {
+						strColType = fmt.Sprintf("*%s.%s", k, st.Type)
+					} else {
+						strColType = fmt.Sprintf("%s.%s", k, st.Type)
+					}
 				}
 			} else {
 				strColType = st.Type

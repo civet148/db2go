@@ -16,6 +16,10 @@ const (
 	INVENTORY_DATA_COLUMN_PRICE         = "price"
 	INVENTORY_DATA_COLUMN_LOCATION      = "location"
 	INVENTORY_DATA_COLUMN_PRODUCT_EXTRA = "product_extra"
+	INVENTORY_DATA_COLUMN_CREATE_ID     = "create_id"
+	INVENTORY_DATA_COLUMN_CREATE_NAME   = "create_name"
+	INVENTORY_DATA_COLUMN_UPDATE_ID     = "update_id"
+	INVENTORY_DATA_COLUMN_UPDATE_NAME   = "update_name"
 )
 
 type InventoryData struct {
@@ -28,6 +32,10 @@ type InventoryData struct {
 	Price        sqlca.Decimal `json:"price,omitempty" db:"price" gorm:"column:price;type:decimal(16,2);default:0.00;" sqlca:"isnull"`                              //
 	Location     sqlca.Point   `json:"location,omitempty" db:"location" gorm:"column:location;type:point;" sqlca:"isnull"`                                          //
 	ProductExtra struct{}      `json:"product_extra,omitempty" db:"product_extra" gorm:"column:product_extra;type:json;" sqlca:"isnull"`                            //
+	CreateId     uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                   //
+	CreateName   string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);" sqlca:"isnull"`                           //
+	UpdateId     uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                   //
+	UpdateName   string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);" sqlca:"isnull"`                           //
 }
 
 func (do InventoryData) TableName() string { return "inventory_data" }
@@ -42,6 +50,10 @@ func (do InventoryData) GetQuantity() sqlca.Decimal { return do.Quantity }
 func (do InventoryData) GetPrice() sqlca.Decimal    { return do.Price }
 func (do InventoryData) GetLocation() sqlca.Point   { return do.Location }
 func (do InventoryData) GetProductExtra() struct{}  { return do.ProductExtra }
+func (do InventoryData) GetCreateId() uint64        { return do.CreateId }
+func (do InventoryData) GetCreateName() string      { return do.CreateName }
+func (do InventoryData) GetUpdateId() uint64        { return do.UpdateId }
+func (do InventoryData) GetUpdateName() string      { return do.UpdateName }
 
 func (do *InventoryData) SetId(v uint64)              { do.Id = v }
 func (do *InventoryData) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
@@ -53,5 +65,9 @@ func (do *InventoryData) SetQuantity(v sqlca.Decimal) { do.Quantity = v }
 func (do *InventoryData) SetPrice(v sqlca.Decimal)    { do.Price = v }
 func (do *InventoryData) SetLocation(v sqlca.Point)   { do.Location = v }
 func (do *InventoryData) SetProductExtra(v struct{})  { do.ProductExtra = v }
+func (do *InventoryData) SetCreateId(v uint64)        { do.CreateId = v }
+func (do *InventoryData) SetCreateName(v string)      { do.CreateName = v }
+func (do *InventoryData) SetUpdateId(v uint64)        { do.UpdateId = v }
+func (do *InventoryData) SetUpdateName(v string)      { do.UpdateName = v }
 
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////
