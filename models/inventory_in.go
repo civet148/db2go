@@ -78,4 +78,29 @@ func (do *InventoryIn) SetCreateName(v string)      { do.CreateName = v }
 func (do *InventoryIn) SetUpdateId(v uint64)        { do.UpdateId = v }
 func (do *InventoryIn) SetUpdateName(v string)      { do.UpdateName = v }
 
+/*
+CREATE TABLE `inventory_in` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  `delete_time` datetime DEFAULT NULL,
+  `product_id` bigint unsigned DEFAULT NULL,
+  `order_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_id` bigint unsigned DEFAULT '0',
+  `user_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quantity` decimal(16,6) DEFAULT '0.000000',
+  `weight` decimal(16,6) DEFAULT '0.000000',
+  `remark` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `create_id` bigint unsigned DEFAULT '0',
+  `create_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `update_id` bigint unsigned DEFAULT '0',
+  `update_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
+  KEY `idx_inventory_in_created_at` (`created_at`),
+  KEY `idx_inventory_in_updated_at` (`updated_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=2027587914958901249 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

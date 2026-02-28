@@ -83,9 +83,16 @@ type TableColumn struct {
 	Comment       string `json:"column_comment" db:"column_comment"`
 	IsNullable    string `json:"is_nullable" db:"is_nullable"`
 	GoName        string // column name in golang
-	GoType        string // column type in golang
 }
 
+// IsPrimaryKey 方法用于判断表列是否为主键
+// 参数:
+//
+//	无
+//
+// 返回值:
+//
+//	bool: 如果列是主键则返回true，否则返回false
 func (c TableColumn) IsPrimaryKey() bool {
 	var colName = strings.ToLower(c.Name)
 	if c.ColumnKey == "PRI" && (colName == "id" || colName == "uid" || colName == "uuid") {
@@ -309,7 +316,10 @@ func GetGoColumnType(cmd *CmdFlags, table *TableSchema, col TableColumn, enableD
 			strGoColType = "sqlca.Decimal"
 		}
 	}
-
+	// 处理可空的时间类型
+	if col.IsNullable == "YES" && strGoColType == "time.Time" {
+		strGoColType = "*time.Time"
+	}
 	return ReplaceColumnType(cmd, strTableName, col.Name, strGoColType), isDecimal
 }
 

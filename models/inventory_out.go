@@ -78,4 +78,33 @@ func (do *InventoryOut) SetCreateName(v string)      { do.CreateName = v }
 func (do *InventoryOut) SetUpdateId(v uint64)        { do.UpdateId = v }
 func (do *InventoryOut) SetUpdateName(v string)      { do.UpdateName = v }
 
+/*
+CREATE TABLE `inventory_out` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  `delete_time` datetime DEFAULT NULL,
+  `product_id` bigint unsigned DEFAULT '0',
+  `order_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_id` bigint unsigned DEFAULT '0',
+  `user_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `quantity` decimal(16,6) DEFAULT '0.000000',
+  `weight` decimal(16,6) DEFAULT '0.000000',
+  `remark` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `create_id` bigint unsigned DEFAULT '0',
+  `create_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `update_id` bigint unsigned DEFAULT '0',
+  `update_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_PROD_USER` (`product_id`,`user_id`),
+  UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
+  KEY `idx_inventory_out_created_at` (`created_at`),
+  KEY `idx_inventory_out_updated_at` (`updated_at`),
+  KEY `i_product_id` (`product_id`),
+  KEY `i_user_id` (`user_id`),
+  KEY `FULTXT_user_name` (`user_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

@@ -33,4 +33,19 @@ func (do *User) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
 func (do *User) SetUserName(v string)     { do.UserName = v }
 func (do *User) SetEmail(v string)        { do.Email = v }
 
+/*
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_name` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_users_user_name` (`user_name`),
+  UNIQUE KEY `idx_users_email` (`email`),
+  KEY `idx_users_created_at` (`created_at`),
+  KEY `idx_users_updated_at` (`updated_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

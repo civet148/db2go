@@ -21,4 +21,15 @@ func (do RoleUser) GetRoleId() uint64 { return do.RoleId }
 func (do *RoleUser) SetUserId(v uint64) { do.UserId = v }
 func (do *RoleUser) SetRoleId(v uint64) { do.RoleId = v }
 
+/*
+CREATE TABLE `role_users` (
+  `user_id` bigint unsigned NOT NULL,
+  `role_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`user_id`,`role_id`),
+  KEY `fk_role_users_role` (`role_id`),
+  CONSTRAINT `fk_role_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  CONSTRAINT `fk_role_users_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

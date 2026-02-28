@@ -29,4 +29,17 @@ func (do *Role) SetCreatedAt(v time.Time) { do.CreatedAt = v }
 func (do *Role) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
 func (do *Role) SetName(v string)         { do.Name = v }
 
+/*
+CREATE TABLE `roles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_roles_name` (`name`),
+  KEY `idx_roles_created_at` (`created_at`),
+  KEY `idx_roles_updated_at` (`updated_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

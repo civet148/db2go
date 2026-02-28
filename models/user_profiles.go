@@ -37,4 +37,20 @@ func (do *UserProfile) SetUserId(v uint64)       { do.UserId = v }
 func (do *UserProfile) SetAvatar(v string)       { do.Avatar = v }
 func (do *UserProfile) SetAddress(v string)      { do.Address = v }
 
+/*
+CREATE TABLE `user_profiles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `avatar` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_user_profiles_user_id` (`user_id`),
+  KEY `idx_user_profiles_created_at` (`created_at`),
+  KEY `idx_user_profiles_updated_at` (`updated_at`),
+  CONSTRAINT `fk_users_profile` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

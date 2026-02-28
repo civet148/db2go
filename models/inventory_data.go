@@ -70,4 +70,27 @@ func (do *InventoryData) SetCreateName(v string)      { do.CreateName = v }
 func (do *InventoryData) SetUpdateId(v uint64)        { do.UpdateId = v }
 func (do *InventoryData) SetUpdateName(v string)      { do.UpdateName = v }
 
+/*
+CREATE TABLE `inventory_data` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_frozen` tinyint(1) DEFAULT '0',
+  `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品：名称；不能为空',
+  `serial_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品序列号',
+  `quantity` decimal(16,3) DEFAULT '0.000',
+  `price` decimal(16,2) DEFAULT '0.00',
+  `location` point DEFAULT NULL,
+  `product_extra` json DEFAULT NULL,
+  `create_id` bigint unsigned DEFAULT '0',
+  `create_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `update_id` bigint unsigned DEFAULT '0',
+  `update_name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_inventory_data_created_at` (`created_at`),
+  KEY `idx_inventory_data_updated_at` (`updated_at`),
+  KEY `i_serial_no` (`serial_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=2027587914967289858 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////

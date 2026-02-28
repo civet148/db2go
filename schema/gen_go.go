@@ -152,7 +152,7 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	strContent += makeColumnConsts(cmd, table)
 	strContent += makeTableStructure(cmd, table)
 	strContent += makeObjectMethods(cmd, table)
-	//strContent += makeTableCreateSQL(cmd, table)
+	strContent += makeTableCreateSQL(cmd, table)
 
 	return writeToFile(table.OutFilePath, strHead+strContent)
 }
@@ -387,33 +387,50 @@ func makeColumnConsts(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return
 }
 
+// makeTableStructure 根据表结构生成Go语言的struct结构体定义
+// 参数:
+//   - cmd: 命令标志，包含各种配置选项
+//   - table: 表结构信息，包含列名、类型等详细信息
+//
+// 返回值:
+//   - strContent: 生成的Go结构体定义字符串
 func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 
+	// 添加结构体类型定义开始部分，使用表名作为结构体名称
 	strContent += fmt.Sprintf("type %v struct { \n", table.StructName)
 
+	// 添加基础模型部分
 	strContent += makeTableBaseModel(cmd) //base model
 
+	// 遍历表的每一列
 	for _, col := range table.Columns {
+		// 跳过基础列
 		if cmd.IsBaseColumn(col.Name) {
 			continue
 		}
+		// 跳过在排除列表中的列
 		if IsInSlice(col.Name, cmd.Without) {
 			continue
 		}
 
-		var tagValues []string
-		var strColType, strColName string
+		var tagValues []string            // 存储标签值的切片
+		var strColType, strColName string // 列类型和列名的Go语言表示
+		// 将列名转换为大驼峰命名
 		strColName = BigCamelCase(col.Name)
+		// 获取列的Go语言类型
 		strColType, _ = GetGoColumnType(cmd, table, col, cmd.EnableDecimal, cmd.TinyintAsBool)
-
+		// 处理额外的标签
 		for _, t := range cmd.ExtraTags {
 			tv := col.Name
+			// 特殊处理bson标签中的id字段
 			if t == "bson" && tv == "id" {
 				tv = "_id"
 			} else if t == "gorm" {
+				// 处理主键
 				if col.IsPrimaryKey() {
 					tv = fmt.Sprintf("column:%s;primaryKey;autoIncrement;", tv)
 				} else {
+					// 处理创建时间和更新时间
 					if col.IsCreateTime() {
 						tv = fmt.Sprintf("column:%s;type:%s;autoCreateTime;", tv, col.ColumnType)
 					} else if col.IsUpdateTime() {
@@ -421,20 +438,25 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 					} else {
 						tv = fmt.Sprintf("column:%s;type:%s;", tv, col.ColumnType)
 					}
+					// 添加索引信息
 					index, ok := table.GetGormIndexes(col.Name)
 					if ok {
 						tv += fmt.Sprintf("%s;", index)
 					}
+					// 添加默认值
 					if col.ColumnDefault != "" {
 						tv += fmt.Sprintf("default:%s;", col.ColumnDefault)
 					}
+					// 添加列注释
 					if col.Comment != "" {
 						tv += fmt.Sprintf("comment:%s;", handleColumnComment(col.Comment))
 					}
 				}
 			}
+			// 将标签值添加到切片中
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t, tv))
 		}
+		// 处理自定义标签类型
 		for _, t := range cmd.TagTypes {
 			if t.Column != col.Name {
 				continue
@@ -447,6 +469,7 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 				tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", t.TagName, tv))
 			}
 		}
+		// 处理只读列和可空列
 		if IsInSlice(col.Name, cmd.ReadOnly) {
 			tagValues = append(tagValues, fmt.Sprintf("%v:\"%v\"", TAG_NAME_SQLCA, TAG_VALUE_READ_ONLY))
 		} else if col.IsNullable == "YES" {
@@ -456,7 +479,6 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		strContent += MakeTags(cmd, strColName, strColType, col.Name, col.Comment, strings.Join(tagValues, " "))
 
 		col.GoName = strColName
-		col.GoType = strColType
 	}
 
 	strContent += "}\n\n"
