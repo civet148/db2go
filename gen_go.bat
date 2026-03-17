@@ -52,5 +52,5 @@ db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properti
  --tag "%TAGS%" --import-models %IMPORT_MODELS% --base-model "%BASE_MODEL%" --ddl "%DDL_FILE%" --preload-model "%PRELOAD_MODEL%"
 
 echo "generate go file ok, formatting..."
-gofmt -w OUT_DIR/PACK_NAME
+gofmt -w %OUT_DIR%/%PACK_NAME%
 pause
