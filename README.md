@@ -2,8 +2,14 @@
 
 ## Usage
 ```shell
+NAME:
+   db2go - db2go [options] --url <DSN>
+
+USAGE:
+   db2go [global options] command [command options] [arguments...]
+
 VERSION:
-   v3.5.14 20260228 11:38:23 commit 426c24c
+   v3.6.0 20260317 17:47:51 commit ffd2e42
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -36,6 +42,7 @@ GLOBAL OPTIONS:
    --proto-options value, --po value    set protobuf options, multiple options seperated by ';'
    --field-style value, --style value   protobuf message field camel style (small or big)
    --base-model value, --bm value       specify base model. e.g types.BaseModel=created_at,updated_at
+   --preload-model value, --pm value    specify gorm preload model. e.g users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)t
    --help, -h                           show help (default: false)
    --version, -v                        print the version (default: false)
 
@@ -58,34 +65,35 @@ $ make
 ```batch
 @echo off
 
-rem 数据源连接串
-set DSN_URL="mysql://root:12345678@127.0.0.1:3306/test?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true&loc=Local"
-rem 数据模型(models)和数据库操作对象(dao)文件输出基础目录
+rem 输出文件根目录
 set OUT_DIR=.
-rem 数据模型包名(数据模型文件目录名)
+rem 数据模型文件包名
 set PACK_NAME="models"
-rem 文件名后缀(一般不需要加)
-set SUFFIX_NAME=""
-rem 只读字段（例如create_at/update_at这种通过设置数据库自动生成/更新的时间字段）,使用sqlca包Insert/Update/Upsert方法时不会对这些字段进行插入和更新操作）
-set READ_ONLY=""
-rem 指定数据库表名（留空表示导出全部表结构）
-set TABLE_NAME=""
-rem 忽略哪些数据库表字段
+rem 只读字段(不更新)
+set READ_ONLY="created_at, updated_at"
+rem 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
+set TABLE_NAME="-user_roles"
+rem 忽略字段名(逗号分隔)
 set WITH_OUT=""
-rem 增加自定义标签名（例如: bson）
-set TAGS=""
-rem 指定所有表结构中属于tinyint类型的某些字段为布尔类型
-set TINYINT_TO_BOOL=""
-rem 附加的json标签属性（例如: omitempty)
-set JSON_PROPERTIES=""
-rem 指定某表的某字段为指定类型,多个表字段以英文逗号分隔（例如：user.is_deleted=bool表示指定user表is_deleted字段为bool类型; 如果不指定表名则所有表的is_deleted字段均为bool类型；支持第三方包类型，例如：user.weight=github.com/shopspring/decimal.Decimal）
-set SPEC_TYPES="users.extra_data=struct{}"
-rem 数据库操作对象生成目录名
-set DAO_OUT=dao
-rem 数据库操作对象导入数据库表模型数据路径(指定--dao选项时必填)
-set IMPORT_MODELS="test/sqler/models"
-rem 导出全部建表SQL到指定文件
-set DEPLOY_SQL="deploy/test.sql"
+rem 添加标签
+set TAGS="gorm"
+rem tinyint转换成bool
+set TINYINT_TO_BOOL="deleted,is_admin,disable"
+rem 数据库连接源DSN
+set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
+rem JSON属性
+set JSON_PROPERTIES="omitempty"
+rem 指定具体表对应字段类型(不指定表则全局生效)
+set SPEC_TYPES="users.extra_data=struct%%, users.is_deleted=bool"
+rem 导入models路径(仅生成DAO文件使用)
+set IMPORT_MODELS="github.com/civet148/db2go/models"
+rem 基础模型声明
+set BASE_MODEL="BaseModel=created_at,updated_at"
+rem 预加载模型声明
+set PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
+rem 数据库DDL文件
+set DDL_FILE="deploy/test.sql"
+
 
 rem 判断本地系统是否已安装db2go工具，没有则进行安装
 where db2go.exe
@@ -104,22 +112,18 @@ IF "%errorlevel%" == "0" (
 )
 
 
-rem 判断db2go是否安装成功
-If "%errorlevel%" == "0" (
-db2go --debug --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
---suffix "%SUFFIX_NAME%" --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tinyint-as-bool "%TINYINT_TO_BOOL%" ^
---tag "%TAGS%" --dao "%DAO_OUT%" --import-models "%IMPORT_MODELS%" --export "%DEPLOY_SQL%"
+db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" \
+ --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --dao dao --tinyint-as-bool "%TINYINT_TO_BOOL%" \
+ --tag "%TAGS%" --import-models %IMPORT_MODELS% --base-model "%BASE_MODEL%" --ddl "%DDL_FILE%" --preload-model "%PRELOAD_MODEL%"
 
-echo generate go file ok, formatting...
-gofmt -w %OUT_DIR%/%PACK_NAME%
-)
+echo "generate go file ok, formatting..."
+gofmt -w OUT_DIR/PACK_NAME)
 pause
 
 ```
 - Linux/Unix shell脚本
 
 ```shell
-#!/bin/sh
 #!/bin/sh
 
 # 输出文件根目录
@@ -141,11 +145,13 @@ DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 # JSON属性
 JSON_PROPERTIES="omitempty"
 # 指定具体表对应字段类型(不指定表则全局生效)
-SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool, delete_time=*time.Time"
+SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 # 导入models路径(仅生成DAO文件使用)
 IMPORT_MODELS="github.com/civet148/db2go/models"
 # 基础模型声明
 BASE_MODEL="BaseModel=created_at,updated_at"
+# 预加载模型声明
+PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
@@ -163,13 +169,12 @@ if ! which db2go >/dev/null 2>&1; then
     fi
 fi
 
-./db2go --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
- --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
- --tag "$TAGS" --import-models $IMPORT_MODELS --base-model "$BASE_MODEL" --ddl "$DDL_FILE"
+db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
+ --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --dao dao --tinyint-as-bool "${TINYINT_TO_BOOL}" \
+ --tag "${TAGS}" --import-models ${IMPORT_MODELS} --base-model "${BASE_MODEL}" --ddl "${DDL_FILE}" --preload-model "${PRELOAD_MODEL}"
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME
-
 
 ```
 
