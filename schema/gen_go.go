@@ -152,7 +152,7 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	strContent += makeColumnConsts(cmd, table)
 	strContent += makeTableStructure(cmd, table)
 	strContent += makeObjectMethods(cmd, table)
-	strContent += makeTableCreateSQL(cmd, table)
+	//strContent += makeTableCreateSQL(cmd, table)
 
 	return writeToFile(table.OutFilePath, strHead+strContent)
 }
@@ -479,6 +479,15 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		strContent += MakeTags(cmd, strColName, strColType, col.Name, col.Comment, strings.Join(tagValues, " "))
 
 		col.GoName = strColName
+	}
+
+	// 生成gorm preload声明变量
+	for k, vs := range cmd.Preloads {
+		if k == table.TableName {
+			for _, v := range vs {
+				strContent += fmt.Sprintf("%s %s `json:\"%s\" db:\"-\" gorm:\"%s\"`\n", v.VarVal, v.TypeVal, strings.ToLower(v.VarVal), v.TagVal)
+			}
+		}
 	}
 
 	strContent += "}\n\n"

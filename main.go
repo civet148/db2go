@@ -18,12 +18,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.5.15"
+	Version     = "3.6.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-02-28"
+	BuildTime = "2026-03-17"
 	GitCommit = "<N/A>"
 )
 
@@ -56,6 +56,7 @@ const (
 	CmdFlag_Export         = "export"
 	CmdFlag_FieldStyle     = "field-style"
 	CmdFlag_BaseModel      = "base-model"
+	CmdFlag_PreloadModel   = "preload-model"
 )
 
 func init() {
@@ -222,6 +223,11 @@ func main() {
 				Aliases: []string{"bm"},
 				Usage:   "specify base model. e.g types.BaseModel=created_at,updated_at",
 			},
+			&cli.StringFlag{
+				Name:    CmdFlag_PreloadModel,
+				Aliases: []string{"pm"},
+				Usage:   "specify gorm preload model. e.g users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)t",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 
@@ -254,6 +260,7 @@ func doAction(ctx *cli.Context) error {
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
 	cmd.ParseBaseModel(ctx.String(CmdFlag_BaseModel))
+	cmd.ParsePreloadModel(ctx.String(CmdFlag_PreloadModel))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportDDL = ctx.String(CmdFlag_Export)
 	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))

@@ -24,6 +24,8 @@ SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 IMPORT_MODELS="github.com/civet148/db2go/models"
 # 基础模型声明
 BASE_MODEL="BaseModel=created_at,updated_at"
+# 预加载模型声明
+PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
@@ -41,9 +43,9 @@ DDL_FILE="deploy/test.sql"
 #    fi
 #fi
 
-./db2go --url "$DSN_URL" --out "$OUT_DIR" --table "$TABLE_NAME" --json-properties "$JSON_PROPERTIES" --enable-decimal  --spec-type "$SPEC_TYPES" \
- --package "$PACK_NAME" --readonly "$READ_ONLY" --without "$WITH_OUT" --dao dao --tinyint-as-bool "$TINYINT_TO_BOOL" \
- --tag "$TAGS" --import-models $IMPORT_MODELS --base-model "$BASE_MODEL" --ddl "$DDL_FILE"
+./db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
+ --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --dao dao --tinyint-as-bool "${TINYINT_TO_BOOL}" \
+ --tag "${TAGS}" --import-models ${IMPORT_MODELS} --base-model "${BASE_MODEL}" --ddl "${DDL_FILE}" --preload-model "${PRELOAD_MODEL}"
 
 echo "generate go file ok, formatting..."
 gofmt -w $OUT_DIR/$PACK_NAME
