@@ -18,12 +18,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.6.0"
+	Version     = "3.6.1"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-03-17"
+	BuildTime = "2026-03-18"
 	GitCommit = "<N/A>"
 )
 
@@ -335,6 +335,15 @@ func doAction(ctx *cli.Context) error {
 
 	if v := ctx.String(CmdFlag_Tags); v != "" {
 		cmd.ExtraTags = schema.TrimSpaceSlice(schema.Split(v))
+		var hasGorm bool
+		for _, tag := range cmd.ExtraTags {
+			if tag == "gorm" {
+				hasGorm = true
+			}
+		}
+		if !hasGorm {
+			cmd.ExtraTags = append(cmd.ExtraTags, "gorm")
+		}
 	}
 	if v := ctx.String(CmdFlag_ReadOnly); v != "" {
 		cmd.ReadOnly = schema.TrimSpaceSlice(schema.Split(v))
