@@ -41,8 +41,8 @@ GLOBAL OPTIONS:
    --debug, -d                          open debug mode (default: false)
    --proto-options value, --po value    set protobuf options, multiple options seperated by ';'
    --field-style value, --style value   protobuf message field camel style (small or big)
-   --base-model value, --bm value       specify base model. e.g types.BaseModel=created_at,updated_at
-   --preload-model value, --pm value    specify gorm preload model. e.g users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)t
+   --base-model value, --bm value       specify base model. e.g "BaseModel=created_at,updated_at"
+   --preload-model value, --pm value    specify gorm preload model. e.g "users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
    --help, -h                           show help (default: false)
    --version, -v                        print the version (default: false)
 
