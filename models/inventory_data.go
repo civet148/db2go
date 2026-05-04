@@ -6,9 +6,9 @@ import "github.com/civet148/sqlca/v3"
 const TableNameInventoryData = "inventory_data" //
 
 const (
-	INVENTORY_DATA_COLUMN_ID            = "id"
 	INVENTORY_DATA_COLUMN_CREATED_AT    = "created_at"
 	INVENTORY_DATA_COLUMN_UPDATED_AT    = "updated_at"
+	INVENTORY_DATA_COLUMN_ID            = "id"
 	INVENTORY_DATA_COLUMN_IS_FROZEN     = "is_frozen"
 	INVENTORY_DATA_COLUMN_NAME          = "name"
 	INVENTORY_DATA_COLUMN_SERIAL_NO     = "serial_no"
@@ -40,9 +40,9 @@ type InventoryData struct {
 
 func (do InventoryData) TableName() string { return "inventory_data" }
 
-func (do InventoryData) GetId() uint64              { return do.Id }
 func (do InventoryData) GetCreatedAt() time.Time    { return do.CreatedAt }
 func (do InventoryData) GetUpdatedAt() time.Time    { return do.UpdatedAt }
+func (do InventoryData) GetId() uint64              { return do.Id }
 func (do InventoryData) GetIsFrozen() int8          { return do.IsFrozen }
 func (do InventoryData) GetName() string            { return do.Name }
 func (do InventoryData) GetSerialNo() string        { return do.SerialNo }
@@ -55,9 +55,9 @@ func (do InventoryData) GetCreateName() string      { return do.CreateName }
 func (do InventoryData) GetUpdateId() uint64        { return do.UpdateId }
 func (do InventoryData) GetUpdateName() string      { return do.UpdateName }
 
-func (do *InventoryData) SetId(v uint64)              { do.Id = v }
 func (do *InventoryData) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
 func (do *InventoryData) SetUpdatedAt(v time.Time)    { do.UpdatedAt = v }
+func (do *InventoryData) SetId(v uint64)              { do.Id = v }
 func (do *InventoryData) SetIsFrozen(v int8)          { do.IsFrozen = v }
 func (do *InventoryData) SetName(v string)            { do.Name = v }
 func (do *InventoryData) SetSerialNo(v string)        { do.SerialNo = v }

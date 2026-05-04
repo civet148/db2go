@@ -5,9 +5,9 @@ import "time"
 const TableNameUserProfiles = "user_profiles" //
 
 const (
-	USER_PROFILES_COLUMN_ID         = "id"
 	USER_PROFILES_COLUMN_CREATED_AT = "created_at"
 	USER_PROFILES_COLUMN_UPDATED_AT = "updated_at"
+	USER_PROFILES_COLUMN_ID         = "id"
 	USER_PROFILES_COLUMN_USER_ID    = "user_id"
 	USER_PROFILES_COLUMN_AVATAR     = "avatar"
 	USER_PROFILES_COLUMN_ADDRESS    = "address"
@@ -23,16 +23,16 @@ type UserProfile struct {
 
 func (do UserProfile) TableName() string { return "user_profiles" }
 
-func (do UserProfile) GetId() uint64           { return do.Id }
 func (do UserProfile) GetCreatedAt() time.Time { return do.CreatedAt }
 func (do UserProfile) GetUpdatedAt() time.Time { return do.UpdatedAt }
+func (do UserProfile) GetId() uint64           { return do.Id }
 func (do UserProfile) GetUserId() uint64       { return do.UserId }
 func (do UserProfile) GetAvatar() string       { return do.Avatar }
 func (do UserProfile) GetAddress() string      { return do.Address }
 
-func (do *UserProfile) SetId(v uint64)           { do.Id = v }
 func (do *UserProfile) SetCreatedAt(v time.Time) { do.CreatedAt = v }
 func (do *UserProfile) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+func (do *UserProfile) SetId(v uint64)           { do.Id = v }
 func (do *UserProfile) SetUserId(v uint64)       { do.UserId = v }
 func (do *UserProfile) SetAvatar(v string)       { do.Avatar = v }
 func (do *UserProfile) SetAddress(v string)      { do.Address = v }

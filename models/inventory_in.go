@@ -6,9 +6,9 @@ import "github.com/civet148/sqlca/v3"
 const TableNameInventoryIn = "inventory_in" //
 
 const (
-	INVENTORY_IN_COLUMN_ID          = "id"
 	INVENTORY_IN_COLUMN_CREATED_AT  = "created_at"
 	INVENTORY_IN_COLUMN_UPDATED_AT  = "updated_at"
+	INVENTORY_IN_COLUMN_ID          = "id"
 	INVENTORY_IN_COLUMN_IS_DELETED  = "is_deleted"
 	INVENTORY_IN_COLUMN_DELETE_TIME = "delete_time"
 	INVENTORY_IN_COLUMN_PRODUCT_ID  = "product_id"
@@ -44,9 +44,9 @@ type InventoryIn struct {
 
 func (do InventoryIn) TableName() string { return "inventory_in" }
 
-func (do InventoryIn) GetId() uint64              { return do.Id }
 func (do InventoryIn) GetCreatedAt() time.Time    { return do.CreatedAt }
 func (do InventoryIn) GetUpdatedAt() time.Time    { return do.UpdatedAt }
+func (do InventoryIn) GetId() uint64              { return do.Id }
 func (do InventoryIn) GetIsDeleted() int8         { return do.IsDeleted }
 func (do InventoryIn) GetDeleteTime() *time.Time  { return do.DeleteTime }
 func (do InventoryIn) GetProductId() uint64       { return do.ProductId }
@@ -61,9 +61,9 @@ func (do InventoryIn) GetCreateName() string      { return do.CreateName }
 func (do InventoryIn) GetUpdateId() uint64        { return do.UpdateId }
 func (do InventoryIn) GetUpdateName() string      { return do.UpdateName }
 
-func (do *InventoryIn) SetId(v uint64)              { do.Id = v }
 func (do *InventoryIn) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
 func (do *InventoryIn) SetUpdatedAt(v time.Time)    { do.UpdatedAt = v }
+func (do *InventoryIn) SetId(v uint64)              { do.Id = v }
 func (do *InventoryIn) SetIsDeleted(v int8)         { do.IsDeleted = v }
 func (do *InventoryIn) SetDeleteTime(v *time.Time)  { do.DeleteTime = v }
 func (do *InventoryIn) SetProductId(v uint64)       { do.ProductId = v }
