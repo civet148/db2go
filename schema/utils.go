@@ -22,7 +22,6 @@ const (
 
 func writeToFile(strOutputPath, strBody string) (err error) {
 	var file *os.File
-	strBody += fmt.Sprintf("\n\n%s\n\n", CustomizeCodeTip)
 	defer func() {
 		defer file.Close()
 		_ = command(false, "gofmt", "-w", strOutputPath) //格式化本地文件

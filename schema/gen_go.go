@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	TableNamePrefix  = "TableName"
-	CustomizeCodeTip = "////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////"
+	TableNamePrefix = "TableName"
 )
 
 func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
