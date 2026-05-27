@@ -29,7 +29,7 @@ PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProf
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
-### 检查 db2go 是否已安装
+## 检查 db2go 是否已安装
 #if ! which db2go >/dev/null 2>&1; then
 #    # 安装最新版 db2go
 #    go install github.com/civet148/db2go@latest
@@ -43,7 +43,7 @@ DDL_FILE="deploy/test.sql"
 #    fi
 #fi
 
-./db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
+make && ./db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
  --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --dao dao --tinyint-as-bool "${TINYINT_TO_BOOL}" \
  --tag "${TAGS}" --import-models ${IMPORT_MODELS} --base-model "${BASE_MODEL}" --ddl "${DDL_FILE}" --preload-model "${PRELOAD_MODEL}"
 
