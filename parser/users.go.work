@@ -1,0 +1,41 @@
+package models
+
+import (
+    "time"
+    github_com_civet148_sqlca_v3 "github.com/civet148/sqlca/v3"
+)
+
+const TableNameUsers = "users" //
+
+const (
+	USERS_COLUMN_ID         = "id"
+	USERS_COLUMN_USER_NAME  = "user_name"
+	USERS_COLUMN_EMAIL      = "email"
+)
+
+type User struct {
+	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             // 数据ID(uint64)
+	UserName string      `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` // 用户名
+	Email    string      `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 // 邮箱地址
+	Location  *github_com_civet148_sqlca_v3.Point    `json:"location" db:"location" gorm:"column:location;default:null;"` // 定位信息
+	Roles    []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"`     // 角色数组
+	Profile  UserProfile `json:"profile" db:"-" gorm:"foreignKey:UserId;"`     // 用户配置
+}
+
+func (do User) TableName() string { return "users" }
+
+func (do User) GetId() uint64           { return do.Id }
+func (do User) GetUserName() string     { return do.UserName }
+func (do User) GetEmail() string        { return do.Email }
+func (do User) GetLocation() github_com_civet148_sqlca_v3.Point        { return do.Location }
+
+func (do *User) SetId(v uint64)           { do.Id = v }
+func (do *User) SetUserName(v string)     { do.UserName = v }
+func (do *User) SetEmail(v string)        { do.Email = v }
+func (do *User) SetLocation(v *github_com_civet148_sqlca_v3.Point)         { do.Location = v}
+
+func GetUserList(ctx context.Context) (dos []*User, err error) {
+    // TODO 查询用户列表
+    return dos, nil
+}
+

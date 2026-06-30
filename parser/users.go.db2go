@@ -1,0 +1,50 @@
+package models
+
+import (
+    "time"
+    "context"
+)
+
+const TableNameUsers = "users" //用户信息表
+var (
+    a = 1 /*A相*/
+    b = 2 /* B相 */
+)
+const (
+	USERS_COLUMN_ID         = "id"         // ID
+	USERS_COLUMN_USER_NAME  = "user_name"  // 用户名
+	USERS_COLUMN_EMAIL      = "email"      // 邮箱
+	USERS_COLUMN_CREATED_AT = "created_at" // 创建时间
+	USERS_COLUMN_UPDATED_AT = "updated_at" // 更新时间
+)
+
+var c = 3
+var _ = 1
+
+type User struct {
+	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //数据ID
+	UserName string      `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` //用户名
+	Email    string      `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 //邮箱地址
+	Roles    []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"` // 角色数组
+	Profile  UserProfile `json:"profile" db:"-" gorm:"foreignKey:UserId;"` // 用户配置
+}
+
+func (do User) TableName() string { return "users" }
+
+func (do User) GetId() uint64           { return do.Id }
+func (do User) GetUserName() string     { return do.UserName }
+func (do User) GetEmail() string        { return do.Email }
+func (do User) GetCreatedAt() time.Time { return do.CreatedAt }
+func (do User) GetUpdatedAt() time.Time { return do.UpdatedAt }
+
+func (do *User) SetId(v uint64)           { do.Id = v }
+func (do *User) SetUserName(v string)     { do.UserName = v }
+func (do *User) SetEmail(v string)        { do.Email = v }
+func (do *User) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+func (do *User) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+
+func GetUserById(ctx context.Context, id uint64) (user *User, err error) {
+    //TODO: 查询指定用户信息
+    user := &User{}
+    return user, nil
+}
