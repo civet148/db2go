@@ -2,6 +2,7 @@ package parser
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -176,6 +177,18 @@ func (cb CodeBlock) GetCode() string {
 	return code
 }
 
+func (cb CodeBlock) GetFirstKey() string {
+	for _, lb := range cb.Lines {
+		if lb.Disabled {
+			continue
+		}
+		if lb.Key != "" {
+			return lb.Key
+		}
+	}
+	return ""
+}
+
 // TypeInfo 单个type定义存储结构
 type TypeInfo struct {
 	StartLine int          // type起始行
@@ -183,14 +196,27 @@ type TypeInfo struct {
 	Methods   []*CodeBlock // 该类型的方法列表
 }
 
+func (ti *TypeInfo) InsertField(field *CodeLine) {
+	ti.Lines = insertBeforeLast(ti.Lines, field)
+}
+
+func (ti *TypeInfo) InsertMethod(method *CodeBlock) {
+	ti.Methods = insertBeforeLast(ti.Methods, method)
+}
+
+func (ti *TypeInfo) String() string {
+	data, _ := json.MarshalIndent(ti, "", "  ")
+	return string(data)
+}
+
 // GoFileParseResult 文件完整解析结果，用于代码合并对比
 type GoFileParseResult struct {
-	PackageName string              // 包名
-	Imports     []*CodeBlock        // import块列表
-	Vars        []*CodeBlock        // 顶层var块
-	Consts      []*CodeBlock        // 顶层const块
-	Functions   []*CodeBlock        // 顶层函数块（不含方法）
-	Types       map[string]TypeInfo // key=类型名，value=类型详情
+	PackageName string               // 包名
+	Imports     []*CodeBlock         // import块列表
+	Vars        []*CodeBlock         // 顶层var块
+	Consts      []*CodeBlock         // 顶层const块
+	Functions   []*CodeBlock         // 顶层函数块（不含方法）
+	Types       map[string]*TypeInfo // key=类型名，value=类型详情
 }
 
 // extractKey 提取单行key
@@ -346,7 +372,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 
 	res := &GoFileParseResult{
 		PackageName: node.Name.Name,
-		Types:       make(map[string]TypeInfo),
+		Types:       make(map[string]*TypeInfo),
 	}
 
 	getLineNum := func(pos token.Pos) int {
@@ -365,7 +391,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					}
 					tName := typeSpec.Name.Name
 					if _, exists := res.Types[tName]; !exists {
-						res.Types[tName] = TypeInfo{
+						res.Types[tName] = &TypeInfo{
 							StartLine: 0,
 							Lines:     []*CodeLine{},
 							Methods:   []*CodeBlock{},
@@ -511,7 +537,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 						info.Lines = typeLines
 						res.Types[tName] = info
 					} else {
-						res.Types[tName] = TypeInfo{
+						res.Types[tName] = &TypeInfo{
 							StartLine: tStart,
 							Lines:     typeLines,
 							Methods:   []*CodeBlock{},
@@ -560,7 +586,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 				} else {
 					// 如果类型不存在（可能是未定义的类型或接口），但为了安全，我们仍然创建
 					// 这种情况通常不会发生，因为类型应该已经定义
-					res.Types[receiverType] = TypeInfo{
+					res.Types[receiverType] = &TypeInfo{
 						StartLine: 0,
 						Lines:     []*CodeLine{},
 						Methods:   []*CodeBlock{methodBlock},
@@ -647,4 +673,24 @@ func CodeHash(code string) string {
 	}
 	hash := md5.Sum([]byte(code))
 	return fmt.Sprintf("%x", hash)
+}
+
+// insertBeforeLast 在切片最后一个元素前面插入元素
+// T any 支持所有类型：基础类型、结构体、自定义类型
+func insertBeforeLast[T any](s []T, elems ...T) []T {
+	// 空切片直接返回带插入元素的切片
+	if len(s) == 0 {
+		return elems
+	}
+	// 最后一个元素下标
+	lastIdx := len(s) - 1
+	// 预分配容量，减少扩容
+	newSlice := make([]T, 0, len(s)+1)
+	// 前半段：0 ~ lastIdx（不包含最后一个元素）
+	newSlice = append(newSlice, s[:lastIdx]...)
+	// 插入新元素
+	newSlice = append(newSlice, elems...)
+	// 拼接原来最后的元素，保证它永远在末尾
+	newSlice = append(newSlice, s[lastIdx:]...)
+	return newSlice
 }

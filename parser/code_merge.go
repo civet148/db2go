@@ -53,6 +53,10 @@ func MergeCode(base, work *GoFileParseResult) (merge string, err error) {
 		fmt.Printf("%v\n", code.GetRaw())
 	}
 	log.Printf("------------------------struct--------------------------------")
+	var typesCodes = mergeTypes(base, work)
+	for _, code := range typesCodes {
+		fmt.Printf("%s\n", code)
+	}
 	return merge, nil
 }
 
@@ -154,15 +158,42 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 	return codes
 }
 
-func mergeTypes(base, work *GoFileParseResult) (codes []*TypeInfo) {
-	var codeHashMap = make(map[string]string)
-	for _, tb := range base.Types {
-		codeHashMap[CodeHash(tb.Lines[0].Code)] = tb.Lines[0].Code
+func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
+	var codeFieldMap = make(map[string]string)
+	var codeMethodMap = make(map[string]string)
+	for _, bt := range base.Types {
+		for _, line := range bt.Lines {
+			if line.IsTypeStart() || line.IsTypeEnd() {
+				continue
+			}
+			codeFieldMap[line.Key] = line.Code
+		}
+		for _, method := range bt.Methods {
+			codeMethodMap[method.GetFirstKey()] = method.GetCode()
+		}
 	}
-	return
+	for k, wt := range work.Types {
+		for _, line := range wt.Lines {
+			if _, ok := codeFieldMap[line.Key]; !ok {
+				var bt *TypeInfo
+				if bt, ok = base.Types[k]; ok {
+					bt.InsertField(line)
+				}
+			}
+		}
+		for _, method := range wt.Methods {
+			if _, ok := codeMethodMap[method.GetFirstKey()]; !ok {
+				var bt *TypeInfo
+				if bt, ok = base.Types[k]; ok {
+					bt.InsertMethod(method)
+				}
+			}
+		}
+	}
+	return base.Types
 }
 
-func mergeFuncs(base, work *GoFileParseResult) (codes []*CodeLine) {
+func mergeFuncs(base, work *GoFileParseResult) (funcs []*CodeLine) {
 
-	return
+	return funcs
 }
