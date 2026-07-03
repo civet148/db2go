@@ -94,6 +94,10 @@ func (cl CodeLine) GetKey() string {
 	return cl.Key
 }
 
+func (cl CodeLine) String() string {
+	return cl.Raw
+}
+
 func (cl CodeLine) IsTypeStart() bool {
 	code := strings.TrimSpace(cl.Code)
 	if strings.HasPrefix(code, typeDeclarePrefix) && strings.HasSuffix(code, "{") {
@@ -166,6 +170,17 @@ func (cb CodeBlock) GetRaw() string {
 	return code
 }
 
+func (cb CodeBlock) String() string {
+	var code string
+	for _, lb := range cb.Lines {
+		if lb.Disabled {
+			continue
+		}
+		code += lb.Raw + "\n"
+	}
+	return code
+}
+
 func (cb CodeBlock) GetCode() string {
 	var code string
 	for _, lb := range cb.Lines {
@@ -177,7 +192,7 @@ func (cb CodeBlock) GetCode() string {
 	return code
 }
 
-func (cb CodeBlock) GetFirstKey() string {
+func (cb CodeBlock) GetKey() string {
 	for _, lb := range cb.Lines {
 		if lb.Disabled {
 			continue

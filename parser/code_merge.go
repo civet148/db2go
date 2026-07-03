@@ -57,6 +57,11 @@ func MergeCode(base, work *GoFileParseResult) (merge string, err error) {
 	for _, code := range typesCodes {
 		fmt.Printf("%s\n", code)
 	}
+	log.Printf("------------------------function--------------------------------")
+	var funcCodes = mergeFuncs(base, work)
+	for _, code := range funcCodes {
+		fmt.Printf("%s\n", code)
+	}
 	return merge, nil
 }
 
@@ -163,17 +168,20 @@ func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
 	var codeMethodMap = make(map[string]string)
 	for _, bt := range base.Types {
 		for _, line := range bt.Lines {
-			if line.IsTypeStart() || line.IsTypeEnd() {
+			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
 				continue
 			}
 			codeFieldMap[line.Key] = line.Code
 		}
 		for _, method := range bt.Methods {
-			codeMethodMap[method.GetFirstKey()] = method.GetCode()
+			codeMethodMap[method.GetKey()] = method.GetCode()
 		}
 	}
 	for k, wt := range work.Types {
 		for _, line := range wt.Lines {
+			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
+				continue
+			}
 			if _, ok := codeFieldMap[line.Key]; !ok {
 				var bt *TypeInfo
 				if bt, ok = base.Types[k]; ok {
@@ -182,7 +190,7 @@ func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
 			}
 		}
 		for _, method := range wt.Methods {
-			if _, ok := codeMethodMap[method.GetFirstKey()]; !ok {
+			if _, ok := codeMethodMap[method.GetKey()]; !ok {
 				var bt *TypeInfo
 				if bt, ok = base.Types[k]; ok {
 					bt.InsertMethod(method)
@@ -193,7 +201,15 @@ func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
 	return base.Types
 }
 
-func mergeFuncs(base, work *GoFileParseResult) (funcs []*CodeLine) {
-
-	return funcs
+func mergeFuncs(base, work *GoFileParseResult) []*CodeBlock {
+	var codeFuncMap = make(map[string]string)
+	for _, bf := range base.Functions {
+		codeFuncMap[bf.GetKey()] = bf.GetCode()
+	}
+	for _, wf := range work.Functions {
+		if _, ok := codeFuncMap[wf.GetKey()]; !ok {
+			base.Functions = insertBeforeLast(base.Functions, wf)
+		}
+	}
+	return base.Functions
 }
