@@ -5,21 +5,17 @@ import (
     "context"
 )
 
+import "os"
+
 const TableNameUsers = "users" //用户信息表
-var (
-    a = 1 /*A相*/
-    b = 2 /* B相 */
-)
+
 const (
-	USERS_COLUMN_ID         = "id"         // ID
+    USERS_COLUMN_ID         = "id"         // ID
 	USERS_COLUMN_USER_NAME  = "user_name"  // 用户名
 	USERS_COLUMN_EMAIL      = "email"      // 邮箱
-	USERS_COLUMN_CREATED_AT = "created_at" // 创建时间
+    USERS_COLUMN_CREATED_AT = "created_at" // 创建时间
 	USERS_COLUMN_UPDATED_AT = "updated_at" // 更新时间
 )
-
-var c = 3
-var _ = 1
 
 type User struct {
 	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //数据ID

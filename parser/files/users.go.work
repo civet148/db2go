@@ -2,10 +2,26 @@ package models
 
 import (
     "time"
-    github_com_civet148_sqlca_v3 "github.com/civet148/sqlca/v3"
+    sqlca_v3 "github.com/civet148/sqlca/v3"
 )
 
+import (
+     "context"
+)
+
+import "os"
+
+type UserApi interface{
+  GetUserList(ctx context.Context) (dos []*User, err error)
+  GetUserById(ctx context.Context, id uint64) (do *User, err error)
+}
+
 const TableNameUsers = "users" //
+
+var (
+    a = 1 /*A相*/
+    b = 2 /* B相 */
+)
 
 const (
 	USERS_COLUMN_ID         = "id"
@@ -13,11 +29,29 @@ const (
 	USERS_COLUMN_EMAIL      = "email"
 )
 
+const (
+    USER_TYPE_ADMIN    = 1 // 管理员
+    USER_TYPE_OPERATOR = 2 // 运营人员
+)
+
+var c = 3
+var _ = 1
+var user = &User{
+    Id: 1,
+    UserName: "john",
+}
+
+type RoleType int // 角色类型
+const (
+     RoleType_Admin RoleType = iota
+     RoleType_Operator
+)
+
 type User struct {
 	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             // 数据ID(uint64)
 	UserName string      `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` // 用户名
 	Email    string      `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 // 邮箱地址
-	Location  *github_com_civet148_sqlca_v3.Point    `json:"location" db:"location" gorm:"column:location;default:null;"` // 定位信息
+	Location  *sqlca_v3.Point    `json:"location" db:"location" gorm:"column:location;default:null;"` // 定位信息
 	Roles    []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"`     // 角色数组
 	Profile  UserProfile `json:"profile" db:"-" gorm:"foreignKey:UserId;"`     // 用户配置
 }
@@ -27,13 +61,17 @@ func (do User) TableName() string { return "users" }
 func (do User) GetId() uint64           { return do.Id }
 func (do User) GetUserName() string     { return do.UserName }
 func (do User) GetEmail() string        { return do.Email }
-func (do User) GetLocation() github_com_civet148_sqlca_v3.Point        { return do.Location }
+func (do User) GetLocation() sqlca_v3.Point        { return do.Location }
 
 func (do *User) SetId(v uint64)           { do.Id = v }
 func (do *User) SetUserName(v string)     { do.UserName = v }
 func (do *User) SetEmail(v string)        { do.Email = v }
-func (do *User) SetLocation(v *github_com_civet148_sqlca_v3.Point)         { do.Location = v}
+func (do *User) SetLocation(v *sqlca_v3.Point)         { do.Location = v}
 
+/*
+ GetUserList 查询用户列表
+ @param ctx 上下文
+*/
 func GetUserList(ctx context.Context) (dos []*User, err error) {
     // TODO 查询用户列表
     return dos, nil

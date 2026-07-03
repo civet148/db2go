@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"crypto/md5"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -65,32 +66,130 @@ func SplitCodeAndComment(raw string) (code string, comment string) {
 
 // CodeLine 单行拆分结构：代码、注释完全分离
 type CodeLine struct {
-	Raw     string // 原始完整行（输出文件还原格式）
-	Code    string // 去注释纯代码，差异对比专用
-	Comment string // 该行全部注释，对比忽略
-	Key     string // 代码行对应的key，用于标识具体元素
+	Raw      string // 原始完整行（输出文件还原格式）
+	Code     string // 去注释纯代码，差异对比专用
+	Comment  string // 该行全部注释，对比忽略
+	Key      string // 代码行对应的key，用于标识具体元素
+	Disabled bool   // 已禁用(生成合并代码时忽略)
 }
 
-// LineBlock 通用代码块：import/var/const/func 统一结构
-type LineBlock struct {
-	StartLine int        // 代码块起始行号
-	Lines     []CodeLine // 块内分行数据
+func (cl CodeLine) GetHash() string {
+	return CodeHash(cl.Code)
+}
+
+func (cl CodeLine) GetRaw() string {
+	return cl.Raw
+}
+
+func (cl CodeLine) GetCode() string {
+	return cl.Code
+}
+
+func (cl CodeLine) GetComment() string {
+	return cl.Comment
+}
+
+func (cl CodeLine) GetKey() string {
+	return cl.Key
+}
+
+func (cl CodeLine) IsTypeStart() bool {
+	code := strings.TrimSpace(cl.Code)
+	if strings.HasPrefix(code, typeDeclarePrefix) && strings.HasSuffix(code, "{") {
+		return true
+	}
+	return false
+}
+
+func (cl CodeLine) IsTypeEnd() bool {
+	code := strings.TrimSpace(cl.Code)
+	if code == "}" {
+		return true
+	}
+	return false
+}
+
+// CodeBlock 通用代码块：import/var/const/func 统一结构
+type CodeBlock struct {
+	StartLine int         // 代码块起始行号
+	Lines     []*CodeLine // 块内分行数据
+}
+
+func (cb CodeBlock) GetHash() string {
+	return CodeHash(cb.GetCode())
+}
+
+func (cb CodeBlock) IsEmpty() bool {
+	var count int
+	for _, l := range cb.Lines {
+		if !l.Disabled {
+			count++
+		}
+	}
+	if count == 0 {
+		return true
+	}
+	hash := cb.Lines[0].GetHash()
+	if count == 1 {
+		if hash == CodeHash(importPkgPrefix) {
+			return true
+		}
+		if hash == CodeHash(constDeclarePrefix) {
+			return true
+		}
+		if hash == CodeHash(varDeclarePrefix) {
+			return true
+		}
+	} else if count == 2 {
+		if hash == CodeHash(importPkgMultiPrefix) {
+			return true
+		}
+		if hash == CodeHash(constDeclareMultiPrefix) {
+			return true
+		}
+		if hash == CodeHash(varDeclareMultiPrefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func (cb CodeBlock) GetRaw() string {
+	var code string
+	for _, lb := range cb.Lines {
+		if lb.Disabled {
+			continue
+		}
+		code += lb.Raw + "\n"
+	}
+	return code
+}
+
+func (cb CodeBlock) GetCode() string {
+	var code string
+	for _, lb := range cb.Lines {
+		if lb.Disabled {
+			continue
+		}
+		code += lb.Code + "\n"
+	}
+	return code
 }
 
 // TypeInfo 单个type定义存储结构
 type TypeInfo struct {
-	StartLine int         // type起始行
-	Lines     []CodeLine  // 类型完整分行代码
-	Methods   []LineBlock // 该类型的方法列表
+	StartLine int          // type起始行
+	Lines     []*CodeLine  // 类型完整分行代码
+	Methods   []*CodeBlock // 该类型的方法列表
 }
 
 // GoFileParseResult 文件完整解析结果，用于代码合并对比
 type GoFileParseResult struct {
 	PackageName string              // 包名
-	Imports     []LineBlock         // import块列表
-	Vars        []LineBlock         // 顶层var块
-	Consts      []LineBlock         // 顶层const块
-	Functions   []LineBlock         // 顶层函数块（不含方法）
+	Imports     []*CodeBlock        // import块列表
+	Vars        []*CodeBlock        // 顶层var块
+	Consts      []*CodeBlock        // 顶层const块
+	Functions   []*CodeBlock        // 顶层函数块（不含方法）
 	Types       map[string]TypeInfo // key=类型名，value=类型详情
 }
 
@@ -268,8 +367,8 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					if _, exists := res.Types[tName]; !exists {
 						res.Types[tName] = TypeInfo{
 							StartLine: 0,
-							Lines:     []CodeLine{},
-							Methods:   []LineBlock{},
+							Lines:     []*CodeLine{},
+							Methods:   []*CodeBlock{},
 						}
 					}
 				}
@@ -283,7 +382,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 		case *ast.GenDecl:
 			startL := getLineNum(d.Pos())
 			endL := getLineNum(d.End())
-			var codeLines []CodeLine
+			var codeLines []*CodeLine
 
 			// 根据不同的声明类型处理
 			switch d.Tok {
@@ -296,14 +395,14 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					raw := srcRawLines[i]
 					c, cm := SplitCodeAndComment(raw)
 					key := extractKey(c, "import", "")
-					codeLines = append(codeLines, CodeLine{
+					codeLines = append(codeLines, &CodeLine{
 						Raw:     raw,
 						Code:    c,
 						Comment: cm,
 						Key:     key,
 					})
 				}
-				res.Imports = append(res.Imports, LineBlock{
+				res.Imports = append(res.Imports, &CodeBlock{
 					StartLine: startL,
 					Lines:     codeLines,
 				})
@@ -317,14 +416,14 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					raw := srcRawLines[i]
 					c, cm := SplitCodeAndComment(raw)
 					key := extractKey(c, "var", "")
-					codeLines = append(codeLines, CodeLine{
+					codeLines = append(codeLines, &CodeLine{
 						Raw:     raw,
 						Code:    c,
 						Comment: cm,
 						Key:     key,
 					})
 				}
-				res.Vars = append(res.Vars, LineBlock{
+				res.Vars = append(res.Vars, &CodeBlock{
 					StartLine: startL,
 					Lines:     codeLines,
 				})
@@ -338,14 +437,14 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					raw := srcRawLines[i]
 					c, cm := SplitCodeAndComment(raw)
 					key := extractKey(c, "const", "")
-					codeLines = append(codeLines, CodeLine{
+					codeLines = append(codeLines, &CodeLine{
 						Raw:     raw,
 						Code:    c,
 						Comment: cm,
 						Key:     key,
 					})
 				}
-				res.Consts = append(res.Consts, LineBlock{
+				res.Consts = append(res.Consts, &CodeBlock{
 					StartLine: startL,
 					Lines:     codeLines,
 				})
@@ -361,7 +460,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					tStart := getLineNum(spec.Pos())
 					tEnd := getLineNum(spec.End())
 
-					var typeLines []CodeLine
+					var typeLines []*CodeLine
 
 					// 先处理 type 声明行
 					for i := tStart - 1; i < tEnd; i++ {
@@ -372,7 +471,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 						c, cm := SplitCodeAndComment(raw)
 						// 第一行可能是 type xxx struct/interface
 						key := extractKey(c, "type", tName)
-						typeLines = append(typeLines, CodeLine{
+						typeLines = append(typeLines, &CodeLine{
 							Raw:     raw,
 							Code:    c,
 							Comment: cm,
@@ -415,7 +514,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 						res.Types[tName] = TypeInfo{
 							StartLine: tStart,
 							Lines:     typeLines,
-							Methods:   []LineBlock{},
+							Methods:   []*CodeBlock{},
 						}
 					}
 				}
@@ -430,7 +529,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 			receiverType := extractReceiverType(d)
 			startL := getLineNum(d.Pos())
 			endL := getLineNum(d.End())
-			var codeLines []CodeLine
+			var codeLines []*CodeLine
 
 			// 处理函数声明
 			for i := startL - 1; i < endL; i++ {
@@ -440,7 +539,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 				raw := srcRawLines[i]
 				c, cm := SplitCodeAndComment(raw)
 				key := extractKey(c, "func", "")
-				codeLines = append(codeLines, CodeLine{
+				codeLines = append(codeLines, &CodeLine{
 					Raw:     raw,
 					Code:    c,
 					Comment: cm,
@@ -448,7 +547,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 				})
 			}
 
-			methodBlock := LineBlock{
+			methodBlock := &CodeBlock{
 				StartLine: startL,
 				Lines:     codeLines,
 			}
@@ -463,8 +562,8 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					// 这种情况通常不会发生，因为类型应该已经定义
 					res.Types[receiverType] = TypeInfo{
 						StartLine: 0,
-						Lines:     []CodeLine{},
-						Methods:   []LineBlock{methodBlock},
+						Lines:     []*CodeLine{},
+						Methods:   []*CodeBlock{methodBlock},
 					}
 				}
 			} else {
@@ -540,4 +639,12 @@ func PrintResult(r *GoFileParseResult) {
 // DiffCodeLine 对比两行逻辑代码，注释不参与差异判断
 func DiffCodeLine(a, b CodeLine) bool {
 	return a.Code != b.Code
+}
+
+func CodeHash(code string) string {
+	for k, v := range replaceChars {
+		code = strings.Replace(code, k, v, -1)
+	}
+	hash := md5.Sum([]byte(code))
+	return fmt.Sprintf("%x", hash)
 }
