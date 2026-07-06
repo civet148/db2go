@@ -18,9 +18,9 @@ const (
 )
 
 type User struct {
-	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //数据ID
-	UserName string      `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` //用户名
-	Email    string      `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 //邮箱地址
+	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             // 数据ID
+	UserName string      `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` // 用户名
+	Email    string      `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 // 邮箱地址
 	CreatedAt time.Time  `json:"created_at,omitempty" db:"created_at" gorm:"column:created_at;type:datetime;"` // 创建时间
 	UpdatedAt time.Time  `json:"updated_at,omitempty" db:"updated_at" gorm:"column:updated_at;type:datetime;"` // 更新时间
 	Roles    []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"` // 角色数组
@@ -43,6 +43,8 @@ func (do *User) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
 
 func GetUserById(ctx context.Context, id uint64) (user *User, err error) {
     //TODO: 查询指定用户信息
-    user := &User{}
+    if os.Getenv("ENV_DEBUG_DB") == "true" {
+       //TODO: 开启数据库调试模式
+    }
     return user, nil
 }

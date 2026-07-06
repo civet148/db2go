@@ -2,8 +2,8 @@ package parser
 
 import (
 	"errors"
-	"fmt"
-	"log"
+	"go/format"
+	"os"
 	"strings"
 )
 
@@ -33,39 +33,38 @@ var replaceChars = map[string]string{
 // base: 基础代码
 // work: 工作代码
 // return: merge合并后的代码内容
-func MergeCode(base, work *GoFileParseResult) (merge string, err error) {
+func MergeCode(base, work *GoFileParseResult) (string, error) {
+	var merge string
+
 	if base == nil || work == nil {
 		return merge, errors.New("base or work code parse result is nil")
 	}
+	merge += "package " + base.PackageName + "\n\n"
+
 	var importCodes = mergeImportPackages(base, work)
-	log.Printf("------------------------import-------------------------------")
 	for _, code := range importCodes {
-		fmt.Printf("%v\n", code.String())
 		merge = merge + code.String()
 	}
-	log.Printf("------------------------var----------------------------------")
+	merge += "\n"
 	var varCodes = mergeVars(base, work)
 	for _, code := range varCodes {
-		fmt.Printf("%v\n", code.String())
 		merge = merge + code.String()
 	}
-	log.Printf("------------------------const--------------------------------")
+	merge += "\n"
 	var constCodes = mergeConsts(base, work)
 	for _, code := range constCodes {
-		fmt.Printf("%v\n", code.String())
 		merge = merge + code.String()
 	}
-	log.Printf("------------------------struct--------------------------------")
+	merge += "\n"
 	var typesCodes = mergeTypes(base, work)
 	for _, code := range typesCodes {
-		fmt.Printf("%s\n", code.String())
 		merge = merge + code.String()
+		merge += "\n"
 	}
-	log.Printf("------------------------function--------------------------------")
 	var funcCodes = mergeFuncs(base, work)
 	for _, code := range funcCodes {
-		fmt.Printf("%s\n", code.String())
 		merge = merge + code.String()
+		merge += "\n"
 	}
 	return merge, nil
 }
@@ -181,7 +180,6 @@ func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 		for _, method := range bt.Methods {
 			codeMethodMap[method.GetKey()] = method.GetCode()
 		}
-		types = append(types, bt)
 	}
 	for k, wt := range work.Types {
 		if _, ok := base.Types[k]; !ok {
@@ -208,6 +206,9 @@ func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 			}
 		}
 	}
+	for _, bt := range base.Types {
+		types = append(types, bt)
+	}
 	return types
 }
 
@@ -222,4 +223,12 @@ func mergeFuncs(base, work *GoFileParseResult) []*CodeBlock {
 		}
 	}
 	return base.Functions
+}
+
+func SaveFileWithFormat(code, output string) (err error) {
+	data, err := format.Source([]byte(code))
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(output, data, 0644)
 }

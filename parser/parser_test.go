@@ -33,5 +33,7 @@ func TestParseGoFile(t *testing.T) {
 
 	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
-	MergeCode(ret1, ret2)
+	var merge string
+	merge, err = MergeCode(ret1, ret2)
+	fmt.Println(merge)
 }

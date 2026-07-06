@@ -94,7 +94,7 @@ func (cl CodeLine) GetKey() string {
 }
 
 func (cl CodeLine) String() string {
-	return cl.Raw
+	return cl.Raw + "\n"
 }
 
 func (cl CodeLine) IsTypeStart() bool {
@@ -382,13 +382,45 @@ func extractReceiverType(funcDecl *ast.FuncDecl) string {
 func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 	srcBytes, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("read file err: %w", err)
+		return nil, err
 	}
-	fullSrc := string(srcBytes)
-	srcRawLines := strings.Split(fullSrc, "\n")
 
+	fullSrc := string(srcBytes)
+
+	// 将顶层短变量声明转换为 var 声明
+	// 匹配: identifier := expression
+	re := regexp.MustCompile(`^(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:=\s*(.+)$`)
+	lines := strings.Split(fullSrc, "\n")
+	var fixedLines []string
+
+	// 简单处理：只转换顶层（非缩进的）短声明
+	inBlock := false
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		// 检测是否进入了代码块（函数体内）
+		if strings.Contains(trimmed, "func ") || strings.Contains(trimmed, "func(") {
+			inBlock = true
+		}
+		if inBlock && strings.Contains(trimmed, "}") {
+			inBlock = false
+		}
+
+		// 如果不在块内（顶层），尝试转换
+		if !inBlock && re.MatchString(line) {
+			// 替换为 var 声明
+			fixedLine := re.ReplaceAllString(line, `${1}var ${2} = ${3}`)
+			fixedLines = append(fixedLines, fixedLine)
+		} else {
+			fixedLines = append(fixedLines, line)
+		}
+	}
+
+	fixedContent := strings.Join(fixedLines, "\n")
+
+	// 使用修复后的内容解析
 	fset := token.NewFileSet()
-	node, err := parser.ParseFile(fset, filePath, srcBytes, parser.AllErrors|parser.ParseComments)
+	node, err := parser.ParseFile(fset, filePath, fixedContent, parser.AllErrors|parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("ast parse err: %w", err)
 	}
@@ -438,10 +470,10 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 			case token.IMPORT:
 				// 处理 import
 				for i := startL - 1; i < endL; i++ {
-					if i < 0 || i >= len(srcRawLines) {
+					if i < 0 || i >= len(fixedLines) {
 						continue
 					}
-					raw := srcRawLines[i]
+					raw := fixedLines[i]
 					c, cm := SplitCodeAndComment(raw)
 					key := extractKey(c, "import", "")
 					codeLines = append(codeLines, &CodeLine{
@@ -459,10 +491,10 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 			case token.VAR:
 				// 处理 var 块，逐行提取 key
 				for i := startL - 1; i < endL; i++ {
-					if i < 0 || i >= len(srcRawLines) {
+					if i < 0 || i >= len(fixedLines) {
 						continue
 					}
-					raw := srcRawLines[i]
+					raw := fixedLines[i]
 					c, cm := SplitCodeAndComment(raw)
 					key := extractKey(c, "var", "")
 					codeLines = append(codeLines, &CodeLine{
@@ -480,10 +512,10 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 			case token.CONST:
 				// 处理 const 块，逐行提取 key
 				for i := startL - 1; i < endL; i++ {
-					if i < 0 || i >= len(srcRawLines) {
+					if i < 0 || i >= len(fixedLines) {
 						continue
 					}
-					raw := srcRawLines[i]
+					raw := fixedLines[i]
 					c, cm := SplitCodeAndComment(raw)
 					key := extractKey(c, "const", "")
 					codeLines = append(codeLines, &CodeLine{
@@ -513,10 +545,10 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 
 					// 先处理 type 声明行
 					for i := tStart - 1; i < tEnd; i++ {
-						if i < 0 || i >= len(srcRawLines) {
+						if i < 0 || i >= len(fixedLines) {
 							continue
 						}
-						raw := srcRawLines[i]
+						raw := fixedLines[i]
 						c, cm := SplitCodeAndComment(raw)
 						// 第一行可能是 type xxx struct/interface
 						key := extractKey(c, "type", tName)
@@ -536,10 +568,10 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 
 						// 创建字段行到typeLines的映射
 						for i := fieldStart - 1; i < fieldEnd; i++ {
-							if i < 0 || i >= len(srcRawLines) {
+							if i < 0 || i >= len(fixedLines) {
 								continue
 							}
-							raw := srcRawLines[i]
+							raw := fixedLines[i]
 							c, _ := SplitCodeAndComment(raw)
 							key := extractKey(c, "type_field", tName)
 							if key != "" {
@@ -582,10 +614,10 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 
 			// 处理函数声明
 			for i := startL - 1; i < endL; i++ {
-				if i < 0 || i >= len(srcRawLines) {
+				if i < 0 || i >= len(fixedLines) {
 					continue
 				}
-				raw := srcRawLines[i]
+				raw := fixedLines[i]
 				c, cm := SplitCodeAndComment(raw)
 				key := extractKey(c, "func", "")
 				codeLines = append(codeLines, &CodeLine{

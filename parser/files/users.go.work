@@ -41,6 +41,8 @@ var user = &User{
     UserName: "john",
 }
 
+user2 := user
+
 type RoleType int // 角色类型
 const (
      RoleType_Admin RoleType = iota
@@ -61,7 +63,7 @@ func (do User) TableName() string { return "users" }
 func (do User) GetId() uint64           { return do.Id }
 func (do User) GetUserName() string     { return do.UserName }
 func (do User) GetEmail() string        { return do.Email }
-func (do User) GetLocation() sqlca_v3.Point        { return do.Location }
+func (do User) GetLocation() *sqlca_v3.Point        { return do.Location }
 
 func (do *User) SetId(v uint64)           { do.Id = v }
 func (do *User) SetUserName(v string)     { do.UserName = v }
