@@ -66,7 +66,9 @@ func (do User) GetLocation() sqlca_v3.Point        { return do.Location }
 func (do *User) SetId(v uint64)           { do.Id = v }
 func (do *User) SetUserName(v string)     { do.UserName = v }
 func (do *User) SetEmail(v string)        { do.Email = v }
-func (do *User) SetLocation(v *sqlca_v3.Point)         { do.Location = v}
+func (do *User) SetLocation(v *sqlca_v3.Point)         {
+    do.Location = v
+}
 
 /*
  GetUserList 查询用户列表

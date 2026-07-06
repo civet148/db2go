@@ -40,27 +40,32 @@ func MergeCode(base, work *GoFileParseResult) (merge string, err error) {
 	var importCodes = mergeImportPackages(base, work)
 	log.Printf("------------------------import-------------------------------")
 	for _, code := range importCodes {
-		fmt.Printf("%v\n", code.GetRaw())
+		fmt.Printf("%v\n", code.String())
+		merge = merge + code.String()
 	}
 	log.Printf("------------------------var----------------------------------")
 	var varCodes = mergeVars(base, work)
 	for _, code := range varCodes {
-		fmt.Printf("%v\n", code.GetRaw())
+		fmt.Printf("%v\n", code.String())
+		merge = merge + code.String()
 	}
 	log.Printf("------------------------const--------------------------------")
 	var constCodes = mergeConsts(base, work)
 	for _, code := range constCodes {
-		fmt.Printf("%v\n", code.GetRaw())
+		fmt.Printf("%v\n", code.String())
+		merge = merge + code.String()
 	}
 	log.Printf("------------------------struct--------------------------------")
 	var typesCodes = mergeTypes(base, work)
 	for _, code := range typesCodes {
-		fmt.Printf("%s\n", code)
+		fmt.Printf("%s\n", code.String())
+		merge = merge + code.String()
 	}
 	log.Printf("------------------------function--------------------------------")
 	var funcCodes = mergeFuncs(base, work)
 	for _, code := range funcCodes {
-		fmt.Printf("%s\n", code)
+		fmt.Printf("%s\n", code.String())
+		merge = merge + code.String()
 	}
 	return merge, nil
 }
@@ -163,7 +168,7 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 	return codes
 }
 
-func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
+func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 	var codeFieldMap = make(map[string]string)
 	var codeMethodMap = make(map[string]string)
 	for _, bt := range base.Types {
@@ -176,8 +181,13 @@ func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
 		for _, method := range bt.Methods {
 			codeMethodMap[method.GetKey()] = method.GetCode()
 		}
+		types = append(types, bt)
 	}
 	for k, wt := range work.Types {
+		if _, ok := base.Types[k]; !ok {
+			types = append(types, wt)
+			continue
+		}
 		for _, line := range wt.Lines {
 			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
 				continue
@@ -198,7 +208,7 @@ func mergeTypes(base, work *GoFileParseResult) map[string]*TypeInfo {
 			}
 		}
 	}
-	return base.Types
+	return types
 }
 
 func mergeFuncs(base, work *GoFileParseResult) []*CodeBlock {

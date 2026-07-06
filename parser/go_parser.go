@@ -2,7 +2,6 @@ package parser
 
 import (
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -220,8 +219,17 @@ func (ti *TypeInfo) InsertMethod(method *CodeBlock) {
 }
 
 func (ti *TypeInfo) String() string {
-	data, _ := json.MarshalIndent(ti, "", "  ")
-	return string(data)
+	var code string
+	for _, l := range ti.Lines {
+		if l.Disabled {
+			continue
+		}
+		code += l.Raw + "\n"
+	}
+	for _, m := range ti.Methods {
+		code += m.String() + "\n"
+	}
+	return code
 }
 
 // GoFileParseResult 文件完整解析结果，用于代码合并对比
