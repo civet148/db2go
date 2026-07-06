@@ -46,21 +46,25 @@ func MergeCode(base, work *GoFileParseResult) (string, error) {
 		merge = merge + code.String()
 	}
 	merge += "\n"
-	var varCodes = mergeVars(base, work)
-	for _, code := range varCodes {
-		merge = merge + code.String()
-	}
-	merge += "\n"
+
 	var constCodes = mergeConsts(base, work)
 	for _, code := range constCodes {
 		merge = merge + code.String()
 	}
 	merge += "\n"
+
+	var varCodes = mergeVars(base, work)
+	for _, code := range varCodes {
+		merge = merge + code.String()
+	}
+	merge += "\n"
+
 	var typesCodes = mergeTypes(base, work)
 	for _, code := range typesCodes {
 		merge = merge + code.String()
 		merge += "\n"
 	}
+
 	var funcCodes = mergeFuncs(base, work)
 	for _, code := range funcCodes {
 		merge = merge + code.String()
