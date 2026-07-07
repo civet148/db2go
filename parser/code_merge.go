@@ -50,8 +50,8 @@ func MergeCode(base, work *GoFileParseResult) (string, error) {
 	var constCodes = mergeConsts(base, work)
 	for _, code := range constCodes {
 		merge = merge + code.String()
+		merge += "\n"
 	}
-	merge += "\n"
 
 	var varCodes = mergeVars(base, work)
 	for _, code := range varCodes {
