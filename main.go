@@ -18,12 +18,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "3.6.3"
+	Version     = "v3.7.0"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-05-14"
+	BuildTime = "2026-07-08"
 	GitCommit = "<N/A>"
 )
 
@@ -90,7 +90,7 @@ func main() {
 	app := &cli.App{
 		Name:    ProgramName,
 		Usage:   "db2go [options] --url <DSN>",
-		Version: fmt.Sprintf("v%s %s commit %s", Version, BuildTime, GitCommit),
+		Version: fmt.Sprintf("%s %s commit %s", Version, BuildTime, GitCommit),
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     CmdFlag_Url,
