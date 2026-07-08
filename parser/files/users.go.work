@@ -10,6 +10,7 @@ import (
 )
 
 import "os"
+import ()
 
 type UserApi interface{
   GetUserList(ctx context.Context) (dos []*User, err error)
@@ -40,6 +41,9 @@ var user = &User{
     Id: 1,
     UserName: "john",
 }
+
+const ()
+var ()
 
 user2 := user
 

@@ -135,13 +135,13 @@ func (cb CodeBlock) IsEmpty() bool {
 	}
 	hash := cb.Lines[0].GetHash()
 	if count == 1 {
-		if hash == CodeHash(importPkgPrefix) {
+		if hash == CodeHash(importPkgPrefix) || hash == CodeHash(importEmptyDeclare) {
 			return true
 		}
-		if hash == CodeHash(constDeclarePrefix) {
+		if hash == CodeHash(constDeclarePrefix) || hash == CodeHash(constEmptyDeclare) {
 			return true
 		}
-		if hash == CodeHash(varDeclarePrefix) {
+		if hash == CodeHash(varDeclarePrefix) || hash == CodeHash(varEmptyDeclare) {
 			return true
 		}
 	} else if count == 2 {

@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/civet148/sqlca/v3"
 	"time"
+
+	"github.com/civet148/sqlca/v3"
 )
 
 const TableNameInventoryOut = "inventory_out" //
@@ -25,8 +26,6 @@ const (
 	INVENTORY_OUT_COLUMN_UPDATE_ID   = "update_id"
 	INVENTORY_OUT_COLUMN_UPDATE_NAME = "update_name"
 )
-
-var ()
 
 type InventoryOut struct {
 	BaseModel

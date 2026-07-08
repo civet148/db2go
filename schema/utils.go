@@ -84,7 +84,7 @@ func writeFileContext(output, content string) (err error) {
 }
 
 func extractFileName(path string) string {
-	return filepath.Base(path) + "." + filepath.Ext(path)
+	return filepath.Base(path)
 }
 
 // command 执行一个命令并处理其输出和错误

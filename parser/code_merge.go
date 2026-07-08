@@ -21,8 +21,9 @@ const (
 	constDeclareMultiPrefix = "const ("
 	constDeclareMultiSuffix = ")"
 	typeDeclarePrefix       = "type"
-	typeDeclareStruct       = "struct"
-	typeDeclareInterface    = "interface"
+	importEmptyDeclare      = "import ()"
+	varEmptyDeclare         = "var ()"
+	constEmptyDeclare       = "import()"
 )
 
 var replaceChars = map[string]string{
@@ -148,6 +149,9 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 		Code: multiPrefix,
 	})
 	for _, lb := range baseLineBlocks {
+		if lb.IsEmpty() {
+			continue
+		}
 		for _, lc := range lb.Lines {
 			var code string
 			if lc.Key != "" { //单独声明
@@ -167,6 +171,9 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 		}
 	}
 	for _, lb := range workLineBlocks {
+		if lb.IsEmpty() {
+			continue
+		}
 		for _, lc := range lb.Lines {
 			var code string
 			if lc.Key != "" { //单独声明
@@ -186,6 +193,7 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 			}
 		}
 	}
+
 	codes = append(codes, &CodeLine{
 		Raw:  multiSuffix,
 		Code: multiSuffix,

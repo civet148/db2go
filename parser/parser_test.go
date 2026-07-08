@@ -12,28 +12,24 @@ func TestParseGoFile(t *testing.T) {
 		fmt.Printf("parse error: %v\n", err)
 		return
 	}
+	fmt.Println("--------------------------------- base ---------------------------------")
 	PrintResult(ret1)
+
 	file2 := "files/users.go.work"
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 	ret2, err := ParseGoFile(file2)
 	if err != nil {
 		fmt.Printf("parse error: %v\n", err)
 		return
 	}
+	fmt.Println("--------------------------------- work ---------------------------------")
 	PrintResult(ret2)
 
-	code1 := "func (do *User) SetId(v uint64)           { do.Id = v }"
-	code2 := `func (do *User) SetId(v uint64) {
-		do.Id = v 
-	}`
-	hash1 := CodeHash(code1)
-	hash2 := CodeHash(code2)
-	fmt.Println("hash1:", hash1)
-	fmt.Println("hash2:", hash2)
-
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
 	var merge string
-	merge, err = MergeCode(ret1, ret2)
+	merge, err = MergeCode(ret1, ret2, true)
+	if err != nil {
+		fmt.Printf("merge error: %v\n", err)
+		return
+	}
+	fmt.Println("--------------------------------- merge ---------------------------------")
 	fmt.Println(merge)
 }

@@ -13,8 +13,6 @@ const (
 	USER_ROLES_COLUMN_UPDATED_AT = "updated_at"
 )
 
-var ()
-
 type UserRole struct {
 	BaseModel
 	UserId uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;;"`                          //

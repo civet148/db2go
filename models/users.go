@@ -14,8 +14,6 @@ const (
 	USERS_COLUMN_EMAIL      = "email"
 )
 
-var ()
-
 type User struct {
 	BaseModel
 	Id       uint64      `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //

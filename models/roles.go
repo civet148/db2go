@@ -13,8 +13,6 @@ const (
 	ROLES_COLUMN_NAME       = "name"
 )
 
-var ()
-
 type Role struct {
 	BaseModel
 	Id   uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                         //

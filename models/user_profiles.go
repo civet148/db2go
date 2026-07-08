@@ -15,8 +15,6 @@ const (
 	USER_PROFILES_COLUMN_ADDRESS    = "address"
 )
 
-var ()
-
 type UserProfile struct {
 	BaseModel
 	Id      uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                 //
