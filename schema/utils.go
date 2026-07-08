@@ -35,7 +35,7 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 			return log.Errorf("读取代码文件[%v]失败：%v", strOutputPath, err.Error())
 		}
 		if _, err = format.Source(oldCode); err != nil {
-			return log.Errorf("格式化代码文件[%v]失败，请检查代码再重试!", strOutputPath, err.Error())
+			return log.Errorf("格式化代码文件[%v]失败，请检查代码再重试! 错误：%v", strOutputPath, err.Error())
 		}
 
 		var tempDir string
@@ -48,6 +48,9 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 		tempFilePath := filepath.Join(tempDir, extractFileName(strOutputPath))
 		if err = writeFileContext(tempFilePath, strBody); err != nil {
 			return log.Errorf("生成文件[%v]失败，错误：%v", strOutputPath, err.Error())
+		}
+		if _, err = format.Source([]byte(strBody)); err != nil {
+			return log.Errorf("格式化新导出代码文件内容失败，请检查db2go导出逻辑! 错误：%v", err.Error())
 		}
 		log.Infof("生成代码文件[%v]成功", tempFilePath)
 	}
