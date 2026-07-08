@@ -2,6 +2,8 @@ package schema
 
 import (
 	"fmt"
+	"go/format"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,9 +26,18 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 	// 文件不存在，以创建并覆盖方式生成新的文件
 	if direct || !isFileExist(strOutputPath) {
 		if err = writeFileContext(strOutputPath, strBody); err != nil {
-			return log.Errorf("生成文件[%v]失败，错误：%v", strOutputPath, err.Error())
+			return log.Errorf("生成文件[%v]失败：%v", strOutputPath, err.Error())
 		}
 	} else {
+		var oldCode []byte
+		oldCode, err = ioutil.ReadFile(strOutputPath)
+		if err != nil {
+			return log.Errorf("读取代码文件[%v]失败：%v", strOutputPath, err.Error())
+		}
+		if _, err = format.Source(oldCode); err != nil {
+			return log.Errorf("格式化代码文件[%v]失败，请检查代码再重试!", strOutputPath, err.Error())
+		}
+
 		var tempDir string
 		tempDir, err = os.MkdirTemp("", "db2go")
 		if err != nil {

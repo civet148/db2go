@@ -386,18 +386,16 @@ func Option(strSSH string) *sqlca.Options {
 func export(cmd *schema.CmdFlags, e *sqlca.Engine) (err error) {
 	exporter := schema.NewExporter(cmd, e)
 	if exporter == nil {
-		err = fmt.Errorf("new exporter error, nil object")
-		log.Error(err.Error())
-		return err
+		return log.Errorf("不支持的导出类型: %v", err.Error())
 	}
 	if cmd.Protobuf {
-		log.Infof("generate protobuf files...")
+		log.Infof("开始生成protobuf文件...")
 		if err = exporter.ExportProto(); err != nil {
 			log.Errorf("export [%v] to protobuf file error [%v]", cmd.Scheme, err.Error())
 			return err
 		}
 	} else {
-		log.Infof("generate golang files...")
+		log.Infof("开始生成golang文件...")
 		if err := exporter.ExportGo(); err != nil {
 			return err
 		}
