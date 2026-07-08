@@ -144,6 +144,9 @@ func mergeConsts(base, work *GoFileParseResult) (codes []*CodeBlock) {
 
 func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePrefix, multiPrefix, multiSuffix string) (codes []*CodeLine) {
 	var codeHashMap = make(map[string]string)
+	if len(baseLineBlocks) == 0 && len(workLineBlocks) == 0 {
+		return nil
+	}
 	codes = append(codes, &CodeLine{
 		Raw:  multiPrefix,
 		Code: multiPrefix,
