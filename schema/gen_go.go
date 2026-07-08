@@ -153,7 +153,7 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 	strContent += makeObjectMethods(cmd, table)
 	//strContent += makeTableCreateSQL(cmd, table)
 
-	return writeToFile(table.OutFilePath, strHead+strContent)
+	return writeToFile(table.OutFilePath, strHead+strContent, false)
 }
 
 func getImportSpecTypes(cmd *CmdFlags, table *TableSchema) (specTypes []*SpecType) {
@@ -214,7 +214,7 @@ func exportDAO(cmd *CmdFlags, table *TableSchema) (err error) {
 	strContent += makeNewMethod(cmd, table)
 	strContent += makeOrmMethods(cmd, table)
 
-	if err = writeToFile(strOutputFilePath, strContent); err != nil {
+	if err = writeToFile(strOutputFilePath, strContent, true); err != nil {
 		return log.Errorf("export dao for table [%v] to file [%v] error [%s]", table.TableName, strOutputFilePath, err.Error())
 	}
 

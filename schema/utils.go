@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/civet148/log"
@@ -20,37 +20,43 @@ const (
 	FieldStyle_BigCamel                     // 大驼峰
 )
 
-func writeToFile(strOutputPath, strBody string) (err error) {
-	var file *os.File
-	defer func() {
-		defer file.Close()
-		_ = command(false, "gofmt", "-w", strOutputPath) //格式化本地文件
-	}()
+func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
+	// 文件不存在，以创建并覆盖方式生成新的文件
+	if direct || !isFileExist(strOutputPath) {
+		if err = writeFileContext(strOutputPath, strBody); err != nil {
+			return log.Errorf("生成文件[%v]失败，错误：%v", strOutputPath, err.Error())
+		}
+	} else {
+		var tempDir string
+		tempDir, err = os.MkdirTemp("", "db2go")
+		if err != nil {
+			return log.Errorf("创建临时目录失败：%v", err.Error())
+		}
+		defer os.RemoveAll(tempDir)
 
-	// 文件不存在或本地没有git，以创建并覆盖方式生成新的文件
-	file, err = os.OpenFile(strOutputPath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
-	if err != nil {
-		return log.Errorf(err.Error())
+		tempFilePath := filepath.Join(tempDir, extractFileName(strOutputPath))
+		if err = writeFileContext(tempFilePath, strBody); err != nil {
+			return log.Errorf("生成文件[%v]失败，错误：%v", strOutputPath, err.Error())
+		}
+		log.Infof("生成代码文件[%v]成功", tempFilePath)
 	}
-	_, err = file.WriteString(strBody)
-	if err != nil {
-		return log.Errorf("write file [%v] error (%v)", strOutputPath, err.Error())
-	}
-	log.Infof("write file [%v] ok", strOutputPath)
 	return nil
 }
 
-// hasGit 检查系统是否安装git并且本地存在git仓库
-func hasGit() bool {
-	_, err := exec.LookPath("git")
+func writeFileContext(output, content string) (err error) {
+	file, err := os.OpenFile(output, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	if err != nil {
-		return false
+		return err
 	}
-	err = command(true, "git", "status")
+	_, err = file.WriteString(content)
 	if err != nil {
-		return false
+		return err
 	}
-	return true
+	return nil
+}
+
+func extractFileName(path string) string {
+	return filepath.Base(path) + "." + filepath.Ext(path)
 }
 
 // command 执行一个命令并处理其输出和错误
@@ -92,68 +98,6 @@ func command(debug bool, name string, args ...string) (err error) {
 	}
 	return nil
 	// 执行成功，返回nil
-}
-
-func gitCheckout() (err error) {
-	_ = command(true, "sh", "-c", "git branch -D db2go 2>/dev/null")
-	err = command(true, "sh", "-c", "git checkout -b db2go 2>/dev/null || git checkout db2go")
-	if err != nil {
-		return log.Errorf("git checkout db2go branch error: %v", err.Error())
-	}
-	return nil
-}
-
-func gitCommit() (err error) {
-	var now = time.Now().Format(time.DateTime)
-	var commitMsg = fmt.Sprintf("db2go export database models at %s", now)
-	_ = command(true, "sh", "-c", fmt.Sprintf("git add -A && git commit -am '%s' 2>/dev/null", commitMsg))
-	return nil
-}
-
-func gitCheckoutBack() (err error) {
-	return command(true, "git", "checkout", "-")
-}
-
-func gitMerge() (err error) {
-	return command(true, "git", "merge", "db2go")
-}
-
-func gitReset() (err error) {
-	return command(true, "git", "reset", "--hard", "HEAD")
-}
-
-func gitCommitAndMerge() (err error) {
-	if err = gitCommit(); err != nil {
-		_ = gitReset()        //回滚本地代码
-		_ = gitCheckoutBack() //切换到上个分支
-		return err
-	}
-	if err = gitCheckoutBack(); err != nil {
-		return err
-	}
-	if err = gitMerge(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// hasUnstagedChanges 检测执行git status命令行是否存在未暂存的代码变更
-// 如果没有git或不在git仓库中，直接返回false
-func hasUnstagedChanges() (ok bool, err error) {
-	cmd := exec.Command("git", "status", "--porcelain")
-	output, err := cmd.Output()
-	if err != nil {
-		// 如果命令执行失败（例如没有安装git或不在git仓库中），返回false
-		return false, err
-	}
-
-	// 解析输出，如果存在非空输出，说明有未暂存的变更
-	statusOutput := string(output)
-	if strings.TrimSpace(statusOutput) == "" {
-		return false, nil
-	}
-
-	return true, nil
 }
 
 func isFileExist(strFilePath string) bool {
