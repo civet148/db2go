@@ -11,6 +11,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/civet148/db2go/parser"
 	"github.com/civet148/log"
 )
 
@@ -35,7 +36,7 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 			return log.Errorf("读取代码文件[%v]失败：%v", strOutputPath, err.Error())
 		}
 		if _, err = format.Source(oldCode); err != nil {
-			return log.Errorf("格式化代码文件[%v]失败，请检查代码再重试! 错误：%v", strOutputPath, err.Error())
+			return log.Errorf("格式化旧代码文件[%v]失败，请检查代码再重试! 错误：%v", strOutputPath, err.Error())
 		}
 
 		var tempDir string
@@ -43,16 +44,29 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 		if err != nil {
 			return log.Errorf("创建临时目录失败：%v", err.Error())
 		}
-		defer os.RemoveAll(tempDir)
+		defer func() {
+			if err != nil {
+				_ = os.RemoveAll(tempDir)
+			}
+		}()
 
 		tempFilePath := filepath.Join(tempDir, extractFileName(strOutputPath))
-		if err = writeFileContext(tempFilePath, strBody); err != nil {
-			return log.Errorf("生成文件[%v]失败，错误：%v", strOutputPath, err.Error())
-		}
-		if _, err = format.Source([]byte(strBody)); err != nil {
+		var newCode []byte
+		if newCode, err = format.Source([]byte(strBody)); err != nil {
 			return log.Errorf("格式化新导出代码文件内容失败，请检查db2go导出逻辑! 错误：%v", err.Error())
 		}
-		log.Infof("生成代码文件[%v]成功", tempFilePath)
+		if err = writeFileContext(tempFilePath, string(newCode)); err != nil {
+			return log.Errorf("生成临时代码文件[%v]失败，错误：%v", tempFilePath, err.Error())
+		}
+		var mergeCode string
+		mergeCode, err = parser.MergeFiles(tempFilePath, strOutputPath)
+		if err != nil {
+			return log.Errorf("合并代码文件[%v]和[%v]失败，%v", tempFilePath, strOutputPath, err.Error())
+		}
+		if err = writeToFile(strOutputPath, mergeCode, true); err != nil {
+			return log.Errorf("写入代码文件[%v]失败，%v", strOutputPath, err.Error())
+		}
+		log.Infof("写入代码文件[%v]成功", strOutputPath)
 	}
 	return nil
 }

@@ -1,7 +1,9 @@
 package models
 
-import "time"
-import "github.com/civet148/sqlca/v3"
+import (
+	"github.com/civet148/sqlca/v3"
+	"time"
+)
 
 const TableNameInventoryOut = "inventory_out" //
 
@@ -24,6 +26,8 @@ const (
 	INVENTORY_OUT_COLUMN_UPDATE_NAME = "update_name"
 )
 
+var ()
+
 type InventoryOut struct {
 	BaseModel
 	Id         uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                            //
@@ -44,36 +48,66 @@ type InventoryOut struct {
 
 func (do InventoryOut) TableName() string { return "inventory_out" }
 
-func (do InventoryOut) GetId() uint64              { return do.Id }
-func (do InventoryOut) GetCreatedAt() time.Time    { return do.CreatedAt }
-func (do InventoryOut) GetUpdatedAt() time.Time    { return do.UpdatedAt }
-func (do InventoryOut) GetIsDeleted() int8         { return do.IsDeleted }
-func (do InventoryOut) GetDeleteTime() *time.Time  { return do.DeleteTime }
-func (do InventoryOut) GetProductId() uint64       { return do.ProductId }
-func (do InventoryOut) GetOrderNo() string         { return do.OrderNo }
-func (do InventoryOut) GetUserId() uint64          { return do.UserId }
-func (do InventoryOut) GetUserName() string        { return do.UserName }
-func (do InventoryOut) GetQuantity() sqlca.Decimal { return do.Quantity }
-func (do InventoryOut) GetWeight() sqlca.Decimal   { return do.Weight }
-func (do InventoryOut) GetRemark() string          { return do.Remark }
-func (do InventoryOut) GetCreateId() uint64        { return do.CreateId }
-func (do InventoryOut) GetCreateName() string      { return do.CreateName }
-func (do InventoryOut) GetUpdateId() uint64        { return do.UpdateId }
-func (do InventoryOut) GetUpdateName() string      { return do.UpdateName }
+func (do InventoryOut) GetId() uint64 { return do.Id }
 
-func (do *InventoryOut) SetId(v uint64)              { do.Id = v }
-func (do *InventoryOut) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
-func (do *InventoryOut) SetUpdatedAt(v time.Time)    { do.UpdatedAt = v }
-func (do *InventoryOut) SetIsDeleted(v int8)         { do.IsDeleted = v }
-func (do *InventoryOut) SetDeleteTime(v *time.Time)  { do.DeleteTime = v }
-func (do *InventoryOut) SetProductId(v uint64)       { do.ProductId = v }
-func (do *InventoryOut) SetOrderNo(v string)         { do.OrderNo = v }
-func (do *InventoryOut) SetUserId(v uint64)          { do.UserId = v }
-func (do *InventoryOut) SetUserName(v string)        { do.UserName = v }
+func (do InventoryOut) GetCreatedAt() time.Time { return do.CreatedAt }
+
+func (do InventoryOut) GetUpdatedAt() time.Time { return do.UpdatedAt }
+
+func (do InventoryOut) GetIsDeleted() int8 { return do.IsDeleted }
+
+func (do InventoryOut) GetDeleteTime() *time.Time { return do.DeleteTime }
+
+func (do InventoryOut) GetProductId() uint64 { return do.ProductId }
+
+func (do InventoryOut) GetOrderNo() string { return do.OrderNo }
+
+func (do InventoryOut) GetUserId() uint64 { return do.UserId }
+
+func (do InventoryOut) GetUserName() string { return do.UserName }
+
+func (do InventoryOut) GetQuantity() sqlca.Decimal { return do.Quantity }
+
+func (do InventoryOut) GetWeight() sqlca.Decimal { return do.Weight }
+
+func (do InventoryOut) GetRemark() string { return do.Remark }
+
+func (do InventoryOut) GetCreateId() uint64 { return do.CreateId }
+
+func (do InventoryOut) GetCreateName() string { return do.CreateName }
+
+func (do InventoryOut) GetUpdateId() uint64 { return do.UpdateId }
+
+func (do InventoryOut) GetUpdateName() string { return do.UpdateName }
+
+func (do *InventoryOut) SetId(v uint64) { do.Id = v }
+
+func (do *InventoryOut) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+
+func (do *InventoryOut) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+
+func (do *InventoryOut) SetIsDeleted(v int8) { do.IsDeleted = v }
+
+func (do *InventoryOut) SetDeleteTime(v *time.Time) { do.DeleteTime = v }
+
+func (do *InventoryOut) SetProductId(v uint64) { do.ProductId = v }
+
+func (do *InventoryOut) SetOrderNo(v string) { do.OrderNo = v }
+
+func (do *InventoryOut) SetUserId(v uint64) { do.UserId = v }
+
+func (do *InventoryOut) SetUserName(v string) { do.UserName = v }
+
 func (do *InventoryOut) SetQuantity(v sqlca.Decimal) { do.Quantity = v }
-func (do *InventoryOut) SetWeight(v sqlca.Decimal)   { do.Weight = v }
-func (do *InventoryOut) SetRemark(v string)          { do.Remark = v }
-func (do *InventoryOut) SetCreateId(v uint64)        { do.CreateId = v }
-func (do *InventoryOut) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryOut) SetUpdateId(v uint64)        { do.UpdateId = v }
-func (do *InventoryOut) SetUpdateName(v string)      { do.UpdateName = v }
+
+func (do *InventoryOut) SetWeight(v sqlca.Decimal) { do.Weight = v }
+
+func (do *InventoryOut) SetRemark(v string) { do.Remark = v }
+
+func (do *InventoryOut) SetCreateId(v uint64) { do.CreateId = v }
+
+func (do *InventoryOut) SetCreateName(v string) { do.CreateName = v }
+
+func (do *InventoryOut) SetUpdateId(v uint64) { do.UpdateId = v }
+
+func (do *InventoryOut) SetUpdateName(v string) { do.UpdateName = v }

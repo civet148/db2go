@@ -1,7 +1,9 @@
 package models
 
-import "time"
-import "github.com/civet148/sqlca/v3"
+import (
+	"github.com/civet148/sqlca/v3"
+	"time"
+)
 
 const TableNameInventoryData = "inventory_data" //
 
@@ -22,6 +24,8 @@ const (
 	INVENTORY_DATA_COLUMN_UPDATE_NAME   = "update_name"
 )
 
+var ()
+
 type InventoryData struct {
 	BaseModel
 	Id           uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //
@@ -40,32 +44,58 @@ type InventoryData struct {
 
 func (do InventoryData) TableName() string { return "inventory_data" }
 
-func (do InventoryData) GetId() uint64              { return do.Id }
-func (do InventoryData) GetCreatedAt() time.Time    { return do.CreatedAt }
-func (do InventoryData) GetUpdatedAt() time.Time    { return do.UpdatedAt }
-func (do InventoryData) GetIsFrozen() int8          { return do.IsFrozen }
-func (do InventoryData) GetName() string            { return do.Name }
-func (do InventoryData) GetSerialNo() string        { return do.SerialNo }
-func (do InventoryData) GetQuantity() sqlca.Decimal { return do.Quantity }
-func (do InventoryData) GetPrice() sqlca.Decimal    { return do.Price }
-func (do InventoryData) GetLocation() sqlca.Point   { return do.Location }
-func (do InventoryData) GetProductExtra() struct{}  { return do.ProductExtra }
-func (do InventoryData) GetCreateId() uint64        { return do.CreateId }
-func (do InventoryData) GetCreateName() string      { return do.CreateName }
-func (do InventoryData) GetUpdateId() uint64        { return do.UpdateId }
-func (do InventoryData) GetUpdateName() string      { return do.UpdateName }
+func (do InventoryData) GetId() uint64 { return do.Id }
 
-func (do *InventoryData) SetId(v uint64)              { do.Id = v }
-func (do *InventoryData) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
-func (do *InventoryData) SetUpdatedAt(v time.Time)    { do.UpdatedAt = v }
-func (do *InventoryData) SetIsFrozen(v int8)          { do.IsFrozen = v }
-func (do *InventoryData) SetName(v string)            { do.Name = v }
-func (do *InventoryData) SetSerialNo(v string)        { do.SerialNo = v }
+func (do InventoryData) GetCreatedAt() time.Time { return do.CreatedAt }
+
+func (do InventoryData) GetUpdatedAt() time.Time { return do.UpdatedAt }
+
+func (do InventoryData) GetIsFrozen() int8 { return do.IsFrozen }
+
+func (do InventoryData) GetName() string { return do.Name }
+
+func (do InventoryData) GetSerialNo() string { return do.SerialNo }
+
+func (do InventoryData) GetQuantity() sqlca.Decimal { return do.Quantity }
+
+func (do InventoryData) GetPrice() sqlca.Decimal { return do.Price }
+
+func (do InventoryData) GetLocation() sqlca.Point { return do.Location }
+
+func (do InventoryData) GetProductExtra() struct{} { return do.ProductExtra }
+
+func (do InventoryData) GetCreateId() uint64 { return do.CreateId }
+
+func (do InventoryData) GetCreateName() string { return do.CreateName }
+
+func (do InventoryData) GetUpdateId() uint64 { return do.UpdateId }
+
+func (do InventoryData) GetUpdateName() string { return do.UpdateName }
+
+func (do *InventoryData) SetId(v uint64) { do.Id = v }
+
+func (do *InventoryData) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+
+func (do *InventoryData) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+
+func (do *InventoryData) SetIsFrozen(v int8) { do.IsFrozen = v }
+
+func (do *InventoryData) SetName(v string) { do.Name = v }
+
+func (do *InventoryData) SetSerialNo(v string) { do.SerialNo = v }
+
 func (do *InventoryData) SetQuantity(v sqlca.Decimal) { do.Quantity = v }
-func (do *InventoryData) SetPrice(v sqlca.Decimal)    { do.Price = v }
-func (do *InventoryData) SetLocation(v sqlca.Point)   { do.Location = v }
-func (do *InventoryData) SetProductExtra(v struct{})  { do.ProductExtra = v }
-func (do *InventoryData) SetCreateId(v uint64)        { do.CreateId = v }
-func (do *InventoryData) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryData) SetUpdateId(v uint64)        { do.UpdateId = v }
-func (do *InventoryData) SetUpdateName(v string)      { do.UpdateName = v }
+
+func (do *InventoryData) SetPrice(v sqlca.Decimal) { do.Price = v }
+
+func (do *InventoryData) SetLocation(v sqlca.Point) { do.Location = v }
+
+func (do *InventoryData) SetProductExtra(v struct{}) { do.ProductExtra = v }
+
+func (do *InventoryData) SetCreateId(v uint64) { do.CreateId = v }
+
+func (do *InventoryData) SetCreateName(v string) { do.CreateName = v }
+
+func (do *InventoryData) SetUpdateId(v uint64) { do.UpdateId = v }
+
+func (do *InventoryData) SetUpdateName(v string) { do.UpdateName = v }

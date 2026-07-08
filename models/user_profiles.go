@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 const TableNameUserProfiles = "user_profiles" //
 
@@ -13,6 +15,8 @@ const (
 	USER_PROFILES_COLUMN_ADDRESS    = "address"
 )
 
+var ()
+
 type UserProfile struct {
 	BaseModel
 	Id      uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                 //
@@ -23,16 +27,26 @@ type UserProfile struct {
 
 func (do UserProfile) TableName() string { return "user_profiles" }
 
-func (do UserProfile) GetId() uint64           { return do.Id }
-func (do UserProfile) GetCreatedAt() time.Time { return do.CreatedAt }
-func (do UserProfile) GetUpdatedAt() time.Time { return do.UpdatedAt }
-func (do UserProfile) GetUserId() uint64       { return do.UserId }
-func (do UserProfile) GetAvatar() string       { return do.Avatar }
-func (do UserProfile) GetAddress() string      { return do.Address }
+func (do UserProfile) GetId() uint64 { return do.Id }
 
-func (do *UserProfile) SetId(v uint64)           { do.Id = v }
+func (do UserProfile) GetCreatedAt() time.Time { return do.CreatedAt }
+
+func (do UserProfile) GetUpdatedAt() time.Time { return do.UpdatedAt }
+
+func (do UserProfile) GetUserId() uint64 { return do.UserId }
+
+func (do UserProfile) GetAvatar() string { return do.Avatar }
+
+func (do UserProfile) GetAddress() string { return do.Address }
+
+func (do *UserProfile) SetId(v uint64) { do.Id = v }
+
 func (do *UserProfile) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+
 func (do *UserProfile) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
-func (do *UserProfile) SetUserId(v uint64)       { do.UserId = v }
-func (do *UserProfile) SetAvatar(v string)       { do.Avatar = v }
-func (do *UserProfile) SetAddress(v string)      { do.Address = v }
+
+func (do *UserProfile) SetUserId(v uint64) { do.UserId = v }
+
+func (do *UserProfile) SetAvatar(v string) { do.Avatar = v }
+
+func (do *UserProfile) SetAddress(v string) { do.Address = v }

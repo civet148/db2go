@@ -2,9 +2,12 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"go/format"
 	"os"
 	"strings"
+
+	"github.com/civet148/log"
 )
 
 const (
@@ -29,11 +32,23 @@ var replaceChars = map[string]string{
 	"\r": "",
 }
 
+func MergeFiles(base, work string) (code string, err error) {
+	resBase, err := ParseGoFile(base)
+	if err != nil {
+		return "", log.Errorf("解析导出代码文件[%v]失败，错误：%v", base, err.Error())
+	}
+	resWork, err := ParseGoFile(work)
+	if err != nil {
+		return "", log.Errorf("解析工作代码文件[%v]失败，错误：%v", work, err.Error())
+	}
+	return MergeCode(resBase, resWork, true)
+}
+
 // MergeCode 合并两个差异代码
 // base: 基础代码
 // work: 工作代码
 // return: merge合并后的代码内容
-func MergeCode(base, work *GoFileParseResult) (string, error) {
+func MergeCode(base, work *GoFileParseResult, needFormat bool) (string, error) {
 	var merge string
 
 	if base == nil || work == nil {
@@ -69,6 +84,13 @@ func MergeCode(base, work *GoFileParseResult) (string, error) {
 	for _, code := range funcCodes {
 		merge = merge + code.String()
 		merge += "\n"
+	}
+	if needFormat {
+		fmtCode, err := format.Source([]byte(merge))
+		if err != nil {
+			return "", fmt.Errorf("格式化合并后的代码失败：%s", err.Error())
+		}
+		merge = string(fmtCode)
 	}
 	return merge, nil
 }
