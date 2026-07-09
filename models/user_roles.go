@@ -1,9 +1,5 @@
 package models
 
-import (
-	"time"
-)
-
 const TableNameUserRoles = "user_roles" //
 
 const (
@@ -14,9 +10,9 @@ const (
 )
 
 type UserRole struct {
-	BaseModel
 	UserId uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;;"`                          //
 	RoleId uint64 `json:"role_id,omitempty" db:"role_id" gorm:"column:role_id;type:bigint unsigned;index:fk_user_roles_role;;"` //
+	BaseModel
 }
 
 func (do UserRole) TableName() string { return "user_roles" }
@@ -25,14 +21,6 @@ func (do UserRole) GetUserId() uint64 { return do.UserId }
 
 func (do UserRole) GetRoleId() uint64 { return do.RoleId }
 
-func (do UserRole) GetCreatedAt() time.Time { return do.CreatedAt }
-
-func (do UserRole) GetUpdatedAt() time.Time { return do.UpdatedAt }
-
 func (do *UserRole) SetUserId(v uint64) { do.UserId = v }
 
 func (do *UserRole) SetRoleId(v uint64) { do.RoleId = v }
-
-func (do *UserRole) SetCreatedAt(v time.Time) { do.CreatedAt = v }
-
-func (do *UserRole) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }

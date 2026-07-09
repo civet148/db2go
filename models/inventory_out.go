@@ -28,7 +28,6 @@ const (
 )
 
 type InventoryOut struct {
-	BaseModel
 	Id         uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                            //
 	IsDeleted  int8          `json:"is_deleted,omitempty" db:"is_deleted" gorm:"column:is_deleted;type:tinyint(1);default:0;" sqlca:"isnull"`                                                    //
 	DeleteTime *time.Time    `json:"delete_time,omitempty" db:"delete_time" gorm:"column:delete_time;type:datetime;" sqlca:"isnull"`                                                             //
@@ -43,15 +42,12 @@ type InventoryOut struct {
 	CreateName string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);" sqlca:"isnull"`                                                          //
 	UpdateId   uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                                                  //
 	UpdateName string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);" sqlca:"isnull"`                                                          //
+	BaseModel
 }
 
 func (do InventoryOut) TableName() string { return "inventory_out" }
 
 func (do InventoryOut) GetId() uint64 { return do.Id }
-
-func (do InventoryOut) GetCreatedAt() time.Time { return do.CreatedAt }
-
-func (do InventoryOut) GetUpdatedAt() time.Time { return do.UpdatedAt }
 
 func (do InventoryOut) GetIsDeleted() int8 { return do.IsDeleted }
 
@@ -80,10 +76,6 @@ func (do InventoryOut) GetUpdateId() uint64 { return do.UpdateId }
 func (do InventoryOut) GetUpdateName() string { return do.UpdateName }
 
 func (do *InventoryOut) SetId(v uint64) { do.Id = v }
-
-func (do *InventoryOut) SetCreatedAt(v time.Time) { do.CreatedAt = v }
-
-func (do *InventoryOut) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
 
 func (do *InventoryOut) SetIsDeleted(v int8) { do.IsDeleted = v }
 

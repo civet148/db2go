@@ -6,10 +6,10 @@ OUT_DIR=.
 PACK_NAME="models"
 # 只读字段(不更新)
 READ_ONLY="created_at, updated_at"
+# 忽略字段名(逗号分隔)
+WITH_OUT="created_at, updated_at, deleted_at"
 # 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
 TABLE_NAME=""
-# 忽略字段名(逗号分隔)
-WITH_OUT=""
 # 添加标签
 TAGS="gorm"
 # TINYINT转换成bool
@@ -23,9 +23,9 @@ SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 # 导入models路径(仅生成DAO文件使用)
 IMPORT_MODELS="github.com/civet148/db2go/models"
 # 基础模型声明
-BASE_MODEL="BaseModel=created_at,updated_at"
+#BASE_MODEL="BaseModel=created_at,updated_at"
 # 预加载模型声明
-PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
+#PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
@@ -45,7 +45,7 @@ DDL_FILE="deploy/test.sql"
 
 make && ./db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
  --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --dao dao --tinyint-as-bool "${TINYINT_TO_BOOL}" \
- --tag "${TAGS}" --import-models ${IMPORT_MODELS} --base-model "${BASE_MODEL}" --ddl "${DDL_FILE}" --preload-model "${PRELOAD_MODEL}"
+ --tag "${TAGS}" --import-models ${IMPORT_MODELS} --ddl "${DDL_FILE}" #--base-model "${BASE_MODEL}"  --preload-model "${PRELOAD_MODEL}"
 
 echo "generate go file ok, formatting..."
 gofmt -w ${OUT_DIR}/${PACK_NAME}

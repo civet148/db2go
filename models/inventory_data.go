@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/civet148/sqlca/v3"
-	"time"
 )
 
 const TableNameInventoryData = "inventory_data" //
@@ -25,7 +24,6 @@ const (
 )
 
 type InventoryData struct {
-	BaseModel
 	Id           uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //
 	IsFrozen     int8          `json:"is_frozen,omitempty" db:"is_frozen" gorm:"column:is_frozen;type:tinyint(1);default:0;" sqlca:"isnull"`                        //
 	Name         string        `json:"name,omitempty" db:"name" gorm:"column:name;type:varchar(255);comment:产品：名称；不能为空;" sqlca:"isnull"`                            //产品：名称；不能为空
@@ -38,15 +36,12 @@ type InventoryData struct {
 	CreateName   string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);" sqlca:"isnull"`                           //
 	UpdateId     uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                   //
 	UpdateName   string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);" sqlca:"isnull"`                           //
+	BaseModel
 }
 
 func (do InventoryData) TableName() string { return "inventory_data" }
 
 func (do InventoryData) GetId() uint64 { return do.Id }
-
-func (do InventoryData) GetCreatedAt() time.Time { return do.CreatedAt }
-
-func (do InventoryData) GetUpdatedAt() time.Time { return do.UpdatedAt }
 
 func (do InventoryData) GetIsFrozen() int8 { return do.IsFrozen }
 
@@ -71,10 +66,6 @@ func (do InventoryData) GetUpdateId() uint64 { return do.UpdateId }
 func (do InventoryData) GetUpdateName() string { return do.UpdateName }
 
 func (do *InventoryData) SetId(v uint64) { do.Id = v }
-
-func (do *InventoryData) SetCreatedAt(v time.Time) { do.CreatedAt = v }
-
-func (do *InventoryData) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
 
 func (do *InventoryData) SetIsFrozen(v int8) { do.IsFrozen = v }
 
