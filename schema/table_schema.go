@@ -192,11 +192,11 @@ func MakeTableNameGetter(strStructName, strTableName string) (strGetter string) 
 }
 
 func MakeGetter(strStructName, strColName, strColType string) (strGetter string) {
-	return fmt.Sprintf("func (do %v) Get%v() %v { return do.%v } \n", strStructName, strColName, strColType, strColName)
+	return fmt.Sprintf("func (do %v) Get%v() %v { return do.%v } \n\n", strStructName, strColName, strColType, strColName)
 }
 
 func MakeSetter(strStructName, strColName, strColType string) (strSetter string) {
-	return fmt.Sprintf("func (do *%v) Set%v(v %v) { do.%v = v } \n", strStructName, strColName, strColType, strColName)
+	return fmt.Sprintf("func (do *%v) Set%v(v %v) { do.%v = v } \n\n", strStructName, strColName, strColType, strColName)
 }
 
 func ReplaceCRLF(strIn string) (strOut string) {
