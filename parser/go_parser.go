@@ -318,12 +318,37 @@ func extractKey(lineCode string, contextType string, typeName string) string {
 
 	// 处理 type 结构体字段
 	if contextType == "type_field" && typeName != "" {
-		// 匹配结构体字段名
+		// 1. 匹配普通结构体字段: FieldName Type
 		reField := regexp.MustCompile(`^([a-zA-Z_][a-zA-Z0-9_]*)\s+`)
 		matches := reField.FindStringSubmatch(trimmed)
 		if len(matches) > 1 && !strings.Contains(trimmed, "func") && !strings.Contains(trimmed, "interface") && !strings.Contains(trimmed, "struct") {
 			return typeName + "." + matches[1]
 		}
+
+		// 2. 匹配嵌入式结构体（无字段名，只有类型名）
+		// 例如: BaseModel 或 *BaseModel 或 BaseModel[T]
+		reEmbedded := regexp.MustCompile(`^(\*?)([a-zA-Z_][a-zA-Z0-9_]*)(?:\[[^\]]*\])?$`)
+		matchesEmbedded := reEmbedded.FindStringSubmatch(trimmed)
+		if len(matchesEmbedded) > 2 {
+			// 排除关键字：struct, interface, func 等
+			embeddedName := matchesEmbedded[2]
+			if embeddedName != "struct" && embeddedName != "interface" && embeddedName != "func" &&
+				!strings.HasPrefix(trimmed, "//") && !strings.HasPrefix(trimmed, "/*") {
+				return typeName + "." + embeddedName
+			}
+		}
+
+		// 3. 匹配带标签的嵌入式结构体
+		// 例如: BaseModel `json:"base"`
+		reEmbeddedTag := regexp.MustCompile(`^(\*?)([a-zA-Z_][a-zA-Z0-9_]*)(?:\[[^\]]*\])?\s+` + "`" + `[^` + "`" + `]*` + "`" + `$`)
+		matchesEmbeddedTag := reEmbeddedTag.FindStringSubmatch(trimmed)
+		if len(matchesEmbeddedTag) > 2 {
+			embeddedName := matchesEmbeddedTag[2]
+			if embeddedName != "struct" && embeddedName != "interface" && embeddedName != "func" {
+				return typeName + "." + embeddedName
+			}
+		}
+
 		return ""
 	}
 

@@ -8,9 +8,9 @@ const (
 )
 
 type RoleUser struct {
-	BaseModel
 	UserId uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;uniqueIndex:PRIMARY;"`                          //
 	RoleId uint64 `json:"role_id,omitempty" db:"role_id" gorm:"column:role_id;type:bigint unsigned;index:fk_role_users_role;uniqueIndex:PRIMARY;"` //
+	BaseModel
 }
 
 func (do RoleUser) TableName() string { return "role_users" }
