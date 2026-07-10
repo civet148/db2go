@@ -321,6 +321,22 @@ func (c *CmdFlags) GoString() string {
 	return c.String()
 }
 
+func (c *CmdFlags) IsIgnoreColumn(table, column string) bool {
+	for _, v := range c.Without {
+		if v == column || v == table+"."+column {
+			return true
+		}
+	}
+	if c.BaseModel != nil {
+		for _, v := range c.BaseModel.Columns {
+			if v == column {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (c *CmdFlags) IsBaseColumn(strColumnName string) bool {
 	if c.BaseModel == nil || len(c.BaseModel.Columns) == 0 {
 		return false

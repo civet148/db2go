@@ -50,7 +50,7 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		if IsInSlice(v.TableName, cmd.ExcludeTables) {
 			continue
 		}
-		v.InitGoColumnPackage()
+		v.InitPackage(cmd)
 
 		if err = MakeDir(cmd.OutDir); err != nil {
 			return err

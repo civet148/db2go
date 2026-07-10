@@ -55,12 +55,15 @@ func (t TableSchema) GetGormIndexes(column string) (index string, ok bool) {
 }
 
 // 初始化字段类型导入包名
-func (t *TableSchema) InitGoColumnPackage() {
+func (t *TableSchema) InitPackage(cmd *CmdFlags) {
 	if t.ImportPackages == nil {
 		t.ImportPackages = make(map[string]bool, 1)
 	}
 	for _, col := range t.Columns {
 		var ok bool
+		if cmd.IsIgnoreColumn(t.TableName, col.Name) {
+			continue
+		}
 		var strGoColType string
 		if strGoColType, ok = db2goTypes[col.DataType]; !ok {
 			continue

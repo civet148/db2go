@@ -16,7 +16,6 @@ type UserProfile struct {
 	UserId  uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;uniqueIndex:idx_user_profiles_user_id;" sqlca:"isnull"` //
 	Avatar  string `json:"avatar,omitempty" db:"avatar" gorm:"column:avatar;type:varchar(512);" sqlca:"isnull"`                                             //
 	Address string `json:"address,omitempty" db:"address" gorm:"column:address;type:varchar(128);" sqlca:"isnull"`                                          //
-	BaseModel
 }
 
 func (do UserProfile) TableName() string { return "user_profiles" }

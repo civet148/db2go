@@ -18,12 +18,12 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "v3.7.1"
+	Version     = "v3.7.2"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-07-08"
+	BuildTime = "2026-07-10"
 	GitCommit = "<N/A>"
 )
 

@@ -36,7 +36,6 @@ type InventoryData struct {
 	CreateName   string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);" sqlca:"isnull"`                           //
 	UpdateId     uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                   //
 	UpdateName   string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);" sqlca:"isnull"`                           //
-	BaseModel
 }
 
 func (do InventoryData) TableName() string { return "inventory_data" }

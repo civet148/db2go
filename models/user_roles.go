@@ -12,7 +12,6 @@ const (
 type UserRole struct {
 	UserId uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;;"`                          //
 	RoleId uint64 `json:"role_id,omitempty" db:"role_id" gorm:"column:role_id;type:bigint unsigned;index:fk_user_roles_role;;"` //
-	BaseModel
 }
 
 func (do UserRole) TableName() string { return "user_roles" }
