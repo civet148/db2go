@@ -11,9 +11,9 @@ const (
 )
 
 type User struct {
-	Id       uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                             //
-	UserName string `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;" sqlca:"isnull"` //
-	Email    string `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 //
+	Id       uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                          //
+	UserName string `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;default:null;" sqlca:"isnull"` //
+	Email    string `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;default:null;" sqlca:"isnull"`                 //
 	BaseModel
 	Roles   []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"`
 	Profile UserProfile `json:"profile" db:"-" gorm:"foreignKey:UserId;"`

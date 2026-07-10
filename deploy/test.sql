@@ -43,7 +43,8 @@ CREATE TABLE `inventory_in` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNIQ_ORDER_NO` (`order_no`),
   KEY `idx_inventory_in_created_at` (`created_at`),
-  KEY `idx_inventory_in_updated_at` (`updated_at`)
+  KEY `idx_inventory_in_updated_at` (`updated_at`),
+  KEY `idx_prod_create_id` (`product_id`,`create_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2069697204666241025 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (

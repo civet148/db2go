@@ -445,6 +445,8 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 					// 添加默认值
 					if col.ColumnDefault != "" {
 						tv += fmt.Sprintf("default:%s;", col.ColumnDefault)
+					} else {
+						tv += fmt.Sprintf("default:null;")
 					}
 					// 添加列注释
 					if col.Comment != "" {
