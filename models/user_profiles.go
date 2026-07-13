@@ -3,12 +3,12 @@ package models
 const TableNameUserProfiles = "user_profiles" //
 
 const (
-	USER_PROFILES_COLUMN_ID         = "id"
-	USER_PROFILES_COLUMN_CREATED_AT = "created_at"
-	USER_PROFILES_COLUMN_UPDATED_AT = "updated_at"
-	USER_PROFILES_COLUMN_USER_ID    = "user_id"
-	USER_PROFILES_COLUMN_AVATAR     = "avatar"
-	USER_PROFILES_COLUMN_ADDRESS    = "address"
+	UserProfilesColumn_Id        = "id"
+	UserProfilesColumn_CreatedAt = "created_at"
+	UserProfilesColumn_UpdatedAt = "updated_at"
+	UserProfilesColumn_UserId    = "user_id"
+	UserProfilesColumn_Avatar    = "avatar"
+	UserProfilesColumn_Address   = "address"
 )
 
 type UserProfile struct {

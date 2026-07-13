@@ -3,10 +3,10 @@ package models
 const TableNameUserRoles = "user_roles" //
 
 const (
-	USER_ROLES_COLUMN_USER_ID    = "user_id"
-	USER_ROLES_COLUMN_ROLE_ID    = "role_id"
-	USER_ROLES_COLUMN_CREATED_AT = "created_at"
-	USER_ROLES_COLUMN_UPDATED_AT = "updated_at"
+	UserRolesColumn_UserId    = "user_id"
+	UserRolesColumn_RoleId    = "role_id"
+	UserRolesColumn_CreatedAt = "created_at"
+	UserRolesColumn_UpdatedAt = "updated_at"
 )
 
 type UserRole struct {

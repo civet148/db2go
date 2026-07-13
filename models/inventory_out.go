@@ -1,29 +1,27 @@
 package models
 
-import (
-	"github.com/civet148/sqlca/v3"
-	"time"
-)
+import "time"
+import "github.com/civet148/sqlca/v3"
 
 const TableNameInventoryOut = "inventory_out" //
 
 const (
-	INVENTORY_OUT_COLUMN_ID          = "id"
-	INVENTORY_OUT_COLUMN_CREATED_AT  = "created_at"
-	INVENTORY_OUT_COLUMN_UPDATED_AT  = "updated_at"
-	INVENTORY_OUT_COLUMN_IS_DELETED  = "is_deleted"
-	INVENTORY_OUT_COLUMN_DELETE_TIME = "delete_time"
-	INVENTORY_OUT_COLUMN_PRODUCT_ID  = "product_id"
-	INVENTORY_OUT_COLUMN_ORDER_NO    = "order_no"
-	INVENTORY_OUT_COLUMN_USER_ID     = "user_id"
-	INVENTORY_OUT_COLUMN_USER_NAME   = "user_name"
-	INVENTORY_OUT_COLUMN_QUANTITY    = "quantity"
-	INVENTORY_OUT_COLUMN_WEIGHT      = "weight"
-	INVENTORY_OUT_COLUMN_REMARK      = "remark"
-	INVENTORY_OUT_COLUMN_CREATE_ID   = "create_id"
-	INVENTORY_OUT_COLUMN_CREATE_NAME = "create_name"
-	INVENTORY_OUT_COLUMN_UPDATE_ID   = "update_id"
-	INVENTORY_OUT_COLUMN_UPDATE_NAME = "update_name"
+	InventoryOutColumn_Id         = "id"
+	InventoryOutColumn_CreatedAt  = "created_at"
+	InventoryOutColumn_UpdatedAt  = "updated_at"
+	InventoryOutColumn_IsDeleted  = "is_deleted"
+	InventoryOutColumn_DeleteTime = "delete_time"
+	InventoryOutColumn_ProductId  = "product_id"
+	InventoryOutColumn_OrderNo    = "order_no"
+	InventoryOutColumn_UserId     = "user_id"
+	InventoryOutColumn_UserName   = "user_name"
+	InventoryOutColumn_Quantity   = "quantity"
+	InventoryOutColumn_Weight     = "weight"
+	InventoryOutColumn_Remark     = "remark"
+	InventoryOutColumn_CreateId   = "create_id"
+	InventoryOutColumn_CreateName = "create_name"
+	InventoryOutColumn_UpdateId   = "update_id"
+	InventoryOutColumn_UpdateName = "update_name"
 )
 
 type InventoryOut struct {

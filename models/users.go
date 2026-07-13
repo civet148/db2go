@@ -3,20 +3,17 @@ package models
 const TableNameUsers = "users" //
 
 const (
-	USERS_COLUMN_ID         = "id"
-	USERS_COLUMN_CREATED_AT = "created_at"
-	USERS_COLUMN_UPDATED_AT = "updated_at"
-	USERS_COLUMN_USER_NAME  = "user_name"
-	USERS_COLUMN_EMAIL      = "email"
+	UsersColumn_Id        = "id"
+	UsersColumn_CreatedAt = "created_at"
+	UsersColumn_UpdatedAt = "updated_at"
+	UsersColumn_UserName  = "user_name"
+	UsersColumn_Email     = "email"
 )
 
 type User struct {
-	Id       uint64 `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                          // 用户ID
-	UserName string `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;default:null;" sqlca:"isnull"` // 用户名
-	Email    string `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;default:null;" sqlca:"isnull"`                 // 邮箱地址
-	BaseModel
-	Roles   []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"`
-	Profile UserProfile `json:"profile" db:"-" gorm:"foreignKey:UserId;"`
+	Id       uint64 `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                          //
+	UserName string `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;default:null;" sqlca:"isnull"` //
+	Email    string `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;default:null;" sqlca:"isnull"`                 //
 }
 
 func (do User) TableName() string { return "users" }

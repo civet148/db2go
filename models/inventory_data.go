@@ -1,26 +1,24 @@
 package models
 
-import (
-	"github.com/civet148/sqlca/v3"
-)
+import "github.com/civet148/sqlca/v3"
 
 const TableNameInventoryData = "inventory_data" //
 
 const (
-	INVENTORY_DATA_COLUMN_ID            = "id"
-	INVENTORY_DATA_COLUMN_CREATED_AT    = "created_at"
-	INVENTORY_DATA_COLUMN_UPDATED_AT    = "updated_at"
-	INVENTORY_DATA_COLUMN_IS_FROZEN     = "is_frozen"
-	INVENTORY_DATA_COLUMN_NAME          = "name"
-	INVENTORY_DATA_COLUMN_SERIAL_NO     = "serial_no"
-	INVENTORY_DATA_COLUMN_QUANTITY      = "quantity"
-	INVENTORY_DATA_COLUMN_PRICE         = "price"
-	INVENTORY_DATA_COLUMN_LOCATION      = "location"
-	INVENTORY_DATA_COLUMN_PRODUCT_EXTRA = "product_extra"
-	INVENTORY_DATA_COLUMN_CREATE_ID     = "create_id"
-	INVENTORY_DATA_COLUMN_CREATE_NAME   = "create_name"
-	INVENTORY_DATA_COLUMN_UPDATE_ID     = "update_id"
-	INVENTORY_DATA_COLUMN_UPDATE_NAME   = "update_name"
+	InventoryDataColumn_Id           = "id"
+	InventoryDataColumn_CreatedAt    = "created_at"
+	InventoryDataColumn_UpdatedAt    = "updated_at"
+	InventoryDataColumn_IsFrozen     = "is_frozen"
+	InventoryDataColumn_Name         = "name"
+	InventoryDataColumn_SerialNo     = "serial_no"
+	InventoryDataColumn_Quantity     = "quantity"
+	InventoryDataColumn_Price        = "price"
+	InventoryDataColumn_Location     = "location"
+	InventoryDataColumn_ProductExtra = "product_extra"
+	InventoryDataColumn_CreateId     = "create_id"
+	InventoryDataColumn_CreateName   = "create_name"
+	InventoryDataColumn_UpdateId     = "update_id"
+	InventoryDataColumn_UpdateName   = "update_name"
 )
 
 type InventoryData struct {
