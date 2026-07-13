@@ -134,16 +134,7 @@ func exportModels(cmd *CmdFlags, table *TableSchema) (err error) {
 			packages[v] = true
 		}
 	}
-	if cmd.BaseModel != nil && len(cmd.BaseModel.Package) > 0 {
-		for k, v := range cmd.BaseModel.Package {
-			if ok := packages[v]; ok {
-				continue //package already exist
-			}
-			strHead += fmt.Sprintf(`import %s "%s"`, k, v)
-			strHead += "\n"
-			packages[v] = true
-		}
-	}
+
 	if haveDecimal(cmd, table, table.Columns, cmd.EnableDecimal) {
 		strHead += cmd.ImportVer + "\n\n" //根据数据库中是否存在decimal类型决定是否导入sqlca包
 	}
@@ -289,20 +280,6 @@ func makeOrmMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return
 }
 
-func makeTableBaseModel(cmd *CmdFlags) (strContent string) {
-	var baseModel = cmd.BaseModel
-	if baseModel != nil {
-		modelType := baseModel.Type
-		strContent = fmt.Sprintf("%s\n", modelType)
-		for k := range baseModel.Package {
-			if k != "" {
-				strContent = fmt.Sprintf("%s.%s\n", k, modelType)
-			}
-		}
-	}
-	return strContent
-}
-
 func makeOrmInsertMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	return fmt.Sprintf(`
 //insert into table by data model
@@ -398,15 +375,8 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 	// 添加结构体类型定义开始部分，使用表名作为结构体名称
 	strContent += fmt.Sprintf("type %v struct { \n", table.StructName)
 
-	// 添加基础模型部分
-	strContent += makeTableBaseModel(cmd) //base model
-
 	// 遍历表的每一列
 	for _, col := range table.Columns {
-		// 跳过基础列
-		if cmd.IsBaseColumn(col.Name) {
-			continue
-		}
 		// 跳过在排除列表中的列
 		if IsInSlice(col.Name, cmd.Without) {
 			continue
@@ -482,27 +452,7 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		col.GoName = strColName
 	}
 
-	// 生成gorm preload声明变量
-	for k, vs := range cmd.Preloads {
-		if k == table.TableName {
-			for _, v := range vs {
-				strContent += fmt.Sprintf("%s %s `json:\"%s\" db:\"-\" gorm:\"%s\"`\n", v.VarVal, v.TypeVal, strings.ToLower(v.VarVal), v.TagVal)
-			}
-		}
-	}
-
 	strContent += "}\n\n"
 
-	return
-}
-
-func GenerateMethodDeclare(strShortName, strStructName, strMethodName, strArgs, strReturn, strLogic string) (strFunc string) {
-	if strReturn == "" {
-		strFunc = fmt.Sprintf("func (%s *%s) %s(%s) {\n", strShortName, strStructName, strMethodName, strArgs)
-	} else {
-		strFunc = fmt.Sprintf("func (%s *%s) %s(%s) %s {\n", strShortName, strStructName, strMethodName, strArgs, strReturn)
-	}
-	strFunc += strLogic
-	strFunc += fmt.Sprintf("}\n\n")
 	return
 }

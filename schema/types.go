@@ -252,18 +252,6 @@ type CommTagType struct {
 	TagValue string `json:"tag_value"`
 }
 
-type BaseModel struct {
-	Columns []string          `json:"columns"`
-	Type    string            `json:"type"`
-	Package map[string]string `json:"package"`
-}
-
-type PreloadModel struct {
-	VarVal  string `json:"var_val"`
-	TypeVal string `json:"type_val"`
-	TagVal  string `json:"tag_val"`
-}
-
 type CmdFlags struct {
 	ConnUrl        string
 	Database       string
@@ -301,14 +289,11 @@ type CmdFlags struct {
 	TagTypes       []*CommTagType
 	ProtoOptions   map[string]string
 	FieldStyle     FieldStyle
-	BaseModel      *BaseModel
-	Preloads       map[string][]*PreloadModel
 }
 
 func NewCmdFlags() *CmdFlags {
 	return &CmdFlags{
 		ProtoOptions: make(map[string]string),
-		Preloads:     make(map[string][]*PreloadModel),
 	}
 }
 
@@ -324,25 +309,6 @@ func (c *CmdFlags) GoString() string {
 func (c *CmdFlags) IsIgnoreColumn(table, column string) bool {
 	for _, v := range c.Without {
 		if v == column || v == table+"."+column {
-			return true
-		}
-	}
-	if c.BaseModel != nil {
-		for _, v := range c.BaseModel.Columns {
-			if v == column {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func (c *CmdFlags) IsBaseColumn(strColumnName string) bool {
-	if c.BaseModel == nil || len(c.BaseModel.Columns) == 0 {
-		return false
-	}
-	for _, v := range c.BaseModel.Columns {
-		if v == strColumnName {
 			return true
 		}
 	}
@@ -403,83 +369,6 @@ func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
 	}
 	c.SpecTypes = sts
 	return
-}
-
-func (c *CmdFlags) ParseBaseModel(strBaseModel string) {
-	strBaseModel = strings.TrimSpace(strBaseModel)
-	if strBaseModel == "" {
-		return
-	}
-	tt := strings.Split(strBaseModel, "=")
-	if len(tt) != 2 {
-		log.Warnf("base model [%s] format illegal", strBaseModel)
-		return
-	}
-
-	c.BaseModel = &BaseModel{}
-
-	var strSpecType string
-	var strColumns string
-	var strPackage, strAlias string
-	strSpecType = tt[0]
-	strColumns = tt[1]
-
-	var columns = strings.Split(strColumns, ",")
-	for i, col := range columns {
-		columns[i] = strings.TrimSpace(col)
-	}
-
-	idx := strings.LastIndex(strSpecType, ".")
-	if idx > 0 {
-		strPackage = strSpecType[:idx]
-		strSpecType = strSpecType[idx+1:]
-		strAlias = strings.ReplaceAll(strPackage, "/", "_")
-		strAlias = strings.ReplaceAll(strAlias, "-", "_")
-		strAlias = strings.ReplaceAll(strAlias, ".", "_")
-		c.BaseModel.Package = map[string]string{
-			strAlias: strPackage,
-		}
-	}
-	c.BaseModel.Columns = columns
-	c.BaseModel.Type = strSpecType
-	return
-}
-
-// "users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
-func (c *CmdFlags) ParsePreloadModel(strPreloadModel string) {
-	strPreloadModel = strings.TrimSpace(strPreloadModel)
-	models := strings.Split(strPreloadModel, ",")
-	for _, m := range models {
-		m = strings.TrimSpace(m)
-		if m == "" {
-			continue
-		}
-
-		values := strings.Split(m, "=")
-		if len(values) != 2 {
-			continue
-		}
-		vars := strings.Split(values[0], ".")
-		if len(vars) != 2 {
-			continue
-		}
-		table := vars[0]
-		varVal := vars[1]
-
-		ass := strings.ReplaceAll(values[1], ")", "")
-		preloads := strings.Split(ass, "(")
-		if len(preloads) != 2 {
-			continue
-		}
-		typVal := preloads[0]
-		tagVal := preloads[1]
-		preload := &PreloadModel{
-			VarVal:  varVal,
-			TypeVal: typVal,
-			TagVal:  tagVal,
-		}
-		c.Preloads[table] = append(c.Preloads[table], preload)
-	}
 }
 
 func (c *CmdFlags) GetJsonPropertiesSlice() (jsonProps []string) {

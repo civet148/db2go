@@ -9,7 +9,7 @@ USAGE:
    db2go [global options] command [command options] [arguments...]
 
 VERSION:
-   v3.6.0 20260317 17:47:51 commit ffd2e42
+   v3.8.0 20260713 16:46:14 commit 8881abd
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -37,12 +37,10 @@ GLOBAL OPTIONS:
    --tinyint-as-bool value, -B value    convert tinyint columns redeclare as bool type
    --ssh value                          ssh tunnel e.g ssh://root:123456@192.168.1.23:22
    --v2                                 sqlca v2 package imports (default: false)
-   --export value, --ddl value          export database DDL to file
+   --ddl value                          export database DDL to file
    --debug, -d                          open debug mode (default: false)
    --proto-options value, --po value    set protobuf options, multiple options seperated by ';'
    --field-style value, --style value   protobuf message field camel style (small or big)
-   --base-model value, --bm value       specify base model. e.g "BaseModel=created_at,updated_at"
-   --preload-model value, --pm value    specify gorm preload model. e.g "users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
    --help, -h                           show help (default: false)
    --version, -v                        print the version (default: false)
 
@@ -87,10 +85,6 @@ rem 指定具体表对应字段类型(不指定表则全局生效)
 set SPEC_TYPES="users.extra_data=struct%%, users.is_deleted=bool"
 rem 导入models路径(仅生成DAO文件使用)
 set IMPORT_MODELS="github.com/civet148/db2go/models"
-rem 基础模型声明
-set BASE_MODEL="BaseModel=created_at,updated_at"
-rem 预加载模型声明
-set PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
 rem 数据库DDL文件
 set DDL_FILE="deploy/test.sql"
 
@@ -114,7 +108,7 @@ IF "%errorlevel%" == "0" (
 
 db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" \
  --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --dao dao --tinyint-as-bool "%TINYINT_TO_BOOL%" \
- --tag "%TAGS%" --import-models %IMPORT_MODELS% --base-model "%BASE_MODEL%" --ddl "%DDL_FILE%" --preload-model "%PRELOAD_MODEL%"
+ --tag "%TAGS%" --import-models %IMPORT_MODELS% --ddl "%DDL_FILE%" 
 
 echo "generate go file ok, formatting..."
 gofmt -w %OUT_DIR%/%PACK_NAME%
@@ -148,10 +142,6 @@ JSON_PROPERTIES="omitempty"
 SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
 # 导入models路径(仅生成DAO文件使用)
 IMPORT_MODELS="github.com/civet148/db2go/models"
-# 基础模型声明
-BASE_MODEL="BaseModel=created_at,updated_at"
-# 预加载模型声明
-PRELOAD_MODEL="users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
@@ -171,7 +161,7 @@ fi
 
 db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
  --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --dao dao --tinyint-as-bool "${TINYINT_TO_BOOL}" \
- --tag "${TAGS}" --import-models ${IMPORT_MODELS} --base-model "${BASE_MODEL}" --ddl "${DDL_FILE}" --preload-model "${PRELOAD_MODEL}"
+ --tag "${TAGS}" --import-models ${IMPORT_MODELS} --ddl "${DDL_FILE}" 
 
 echo "generate go file ok, formatting..."
 gofmt -w ${OUT_DIR}/${PACK_NAME}
@@ -183,8 +173,10 @@ gofmt -w ${OUT_DIR}/${PACK_NAME}
 ```go
 package models
 
-import github_com_civet148_db2go_types "github.com/civet148/db2go/types"
-import "github.com/civet148/sqlca/v3"
+import (
+	"time"
+	"github.com/civet148/sqlca/v3"
+)
 
 const TableNameInventoryData = "inventory_data" //产品库存数据表
 
@@ -203,10 +195,11 @@ const (
 	INVENTORY_DATA_COLUMN_PRICE         = "price"
 	INVENTORY_DATA_COLUMN_PRODUCT_EXTRA = "product_extra"
 	INVENTORY_DATA_COLUMN_LOCATION      = "location"
+	INVENTORY_DATA_COLUMN_CREATED_AT    = "created_at"
+	INVENTORY_DATA_COLUMN_UPDATED_AT    = "updated_at"
 )
 
 type InventoryData struct {
-	github_com_civet148_db2go_types.BaseModel
 	Id           uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                  //产品ID
 	CreateId     uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;"`       //创建人ID
 	CreateName   string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);"`               //创建人姓名
@@ -219,6 +212,8 @@ type InventoryData struct {
 	Price        sqlca.Decimal `json:"price,omitempty" db:"price" gorm:"column:price;type:decimal(16,2);default:0.00;"`                  //产品均价
 	ProductExtra string        `json:"product_extra,omitempty" db:"product_extra" gorm:"column:product_extra;type:text;" sqlca:"isnull"` //产品附带数据(JSON文本)
 	Location     sqlca.Point   `json:"location,omitempty" db:"location" gorm:"column:location;type:point;" sqlca:"isnull"`               //地理位置
+	CreatedAt    time.Time     `json:"created_at,omitempty" db:"created_at" gorm:"column:created_at;type:timestamp;not null;index;default:CURRENT_TIMESTAMP;autoCreatedAt"` //创建时间
+	UpdatedAt    time.Time     `json:"updated_at,omitempty" db:"updated_at" gorm:"column:updated_at;type:timestamp;not null;index;default:CURRENT_TIMESTAMP;autoUpdatedAt"` //更新时间
 }
 
 func (do *InventoryData) GetId() uint64               { return do.Id }
@@ -227,14 +222,10 @@ func (do *InventoryData) GetCreateId() uint64         { return do.CreateId }
 func (do *InventoryData) SetCreateId(v uint64)        { do.CreateId = v }
 func (do *InventoryData) GetCreateName() string       { return do.CreateName }
 func (do *InventoryData) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryData) GetCreateTime() string       { return do.CreateTime }
-func (do *InventoryData) SetCreateTime(v string)      { do.CreateTime = v }
 func (do *InventoryData) GetUpdateId() uint64         { return do.UpdateId }
 func (do *InventoryData) SetUpdateId(v uint64)        { do.UpdateId = v }
 func (do *InventoryData) GetUpdateName() string       { return do.UpdateName }
 func (do *InventoryData) SetUpdateName(v string)      { do.UpdateName = v }
-func (do *InventoryData) GetUpdateTime() string       { return do.UpdateTime }
-func (do *InventoryData) SetUpdateTime(v string)      { do.UpdateTime = v }
 func (do *InventoryData) GetIsFrozen() int8           { return do.IsFrozen }
 func (do *InventoryData) SetIsFrozen(v int8)          { do.IsFrozen = v }
 func (do *InventoryData) GetName() string             { return do.Name }
@@ -249,6 +240,10 @@ func (do *InventoryData) GetProductExtra() string     { return do.ProductExtra }
 func (do *InventoryData) SetProductExtra(v string)    { do.ProductExtra = v }
 func (do *InventoryData) GetLocation() sqlca.Point    { return do.Location }
 func (do *InventoryData) SetLocation(v sqlca.Point)   { do.Location = v }
+func (do *InventoryData) GetCreatedAt() time.Time     { return do.CreatedAt }
+func (do *InventoryData) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
+func (do *InventoryData) GetUpdatedAt() time.Time     { return do.UpdatedAt }
+func (do *InventoryData) SetUpdatedAt(v time.Time)    { do.UpdatedAt = v }
 
 ////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////
 

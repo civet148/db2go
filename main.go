@@ -18,7 +18,7 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "v3.7.3"
+	Version     = "v3.8.0"
 	ProgramName = "db2go"
 )
 
@@ -53,10 +53,8 @@ const (
 	CmdFlag_V2             = "v2"
 	CmdFlag_Debug          = "debug"
 	CmdFlag_JsonStyle      = "json-style"
-	CmdFlag_Export         = "export"
+	CmdFlag_ExportDDL      = "ddl"
 	CmdFlag_FieldStyle     = "field-style"
-	CmdFlag_BaseModel      = "base-model"
-	CmdFlag_PreloadModel   = "preload-model"
 )
 
 func init() {
@@ -199,9 +197,8 @@ func main() {
 				Usage: "sqlca v2 package imports",
 			},
 			&cli.StringFlag{
-				Name:    CmdFlag_Export,
-				Aliases: []string{"ddl"},
-				Usage:   "export database DDL to file",
+				Name:  CmdFlag_ExportDDL,
+				Usage: "export database DDL to file",
 			},
 			&cli.BoolFlag{
 				Name:    CmdFlag_Debug,
@@ -217,16 +214,6 @@ func main() {
 				Name:    CmdFlag_FieldStyle,
 				Aliases: []string{"style"},
 				Usage:   "protobuf message field camel style (small or big)",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_BaseModel,
-				Aliases: []string{"bm"},
-				Usage:   "specify base model. e.g types.BaseModel=created_at,updated_at",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_PreloadModel,
-				Aliases: []string{"pm"},
-				Usage:   "specify gorm preload model. e.g users.Roles=[]*Role(many2many:user_roles), users.Profile=UserProfile(foreignKey:UserId;)t",
 			},
 		},
 		Action: func(ctx *cli.Context) error {
@@ -259,10 +246,8 @@ func doAction(ctx *cli.Context) error {
 	cmd.OneFile = ctx.Bool(CmdFlag_Merge)
 	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
-	cmd.ParseBaseModel(ctx.String(CmdFlag_BaseModel))
-	cmd.ParsePreloadModel(ctx.String(CmdFlag_PreloadModel))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
-	cmd.ExportDDL = ctx.String(CmdFlag_Export)
+	cmd.ExportDDL = ctx.String(CmdFlag_ExportDDL)
 	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
 
 	if ctx.Bool(CmdFlag_V2) {
