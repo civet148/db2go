@@ -156,15 +156,11 @@ func IsInSlice(in string, s []string) bool {
 func MakeTags(cmd *CmdFlags, strColName, strColType, strTagValue, strComment string, strAppends string) string {
 	strComment = ReplaceCRLF(strComment)
 	var strJsonValue string
-	var strJsonProperties = cmd.GetJsonPropertiesSlice()
 	strJsonValue = strTagValue
 	if cmd.JsonStyle == JSON_STYLE_SMALL_CAMELCASE {
 		strJsonValue = SmallCamelCase(strTagValue)
 	} else if cmd.JsonStyle == JSON_STYLE_BIG_CAMELCASE {
 		strJsonValue = BigCamelCase(strTagValue)
-	}
-	if len(strJsonProperties) > 0 {
-		strJsonValue += fmt.Sprintf(",%s", strings.Join(strJsonProperties, ","))
 	}
 	return fmt.Sprintf("	%v %v `json:\"%v\" db:\"%v\" %v` //%v \n",
 		strColName, strColType, strJsonValue, strTagValue, strAppends, strComment)
@@ -279,22 +275,13 @@ func CreateOutputFile(cmd *CmdFlags, table *TableSchema, strFileSuffix string, a
 }
 
 // 将数据库字段类型转为go语言对应的数据类型
-func GetGoColumnType(cmd *CmdFlags, table *TableSchema, col TableColumn, enableDecimal bool, tinyintAsBool []string) (strGoColType string, isDecimal bool) {
+func GetGoColumnType(cmd *CmdFlags, table *TableSchema, col TableColumn, enableDecimal bool) (strGoColType string, isDecimal bool) {
 
 	var bUnsigned bool
-	var strColName, strDataType, strColumnType, strTableName string
-	strColName = col.Name
+	var strDataType, strColumnType, strTableName string
 	strDataType = col.DataType
 	strColumnType = col.ColumnType
 	strTableName = table.TableName
-
-	//tinyint type column redeclare as bool
-	if len(tinyintAsBool) > 0 && strDataType == DB_COLUMN_TYPE_TINYINT {
-		if IsInSlice(strColName, tinyintAsBool) {
-			//log.Warnf("table [%s] column [%s] %s redeclare as bool type", strTableName, strColName, strDataType)
-			return DB_COLUMN_TYPE_BOOL, false
-		}
-	}
 
 	if strings.Contains(strColumnType, "unsigned") { //判断字段是否为无符号类型
 		bUnsigned = true

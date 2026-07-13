@@ -18,7 +18,7 @@ import (
 
 const (
 	SshScheme   = "ssh://"
-	Version     = "v3.8.0"
+	Version     = "v3.8.1"
 	ProgramName = "db2go"
 )
 
@@ -28,33 +28,28 @@ var (
 )
 
 const (
-	CmdFlag_Url            = "url"
-	CmdFlag_Output         = "out"
-	CmdFlag_Database       = "db"
-	CmdFlag_DAO            = "dao"
-	CmdFlag_Tables         = "table"
-	CmdFlag_Tags           = "tag"
-	CmdFlag_Prefix         = "prefix"
-	CmdFlag_Suffix         = "suffix"
-	CmdFlag_Package        = "package"
-	CmdFlag_Without        = "without"
-	CmdFlag_ReadOnly       = "readonly"
-	CmdFlag_Protobuf       = "proto"
-	CmdFlag_SpecType       = "spec-type"
-	CmdFlag_EnableDecimal  = "enable-decimal"
-	CmdFlag_GogoOptions    = "gogo-options"
-	CmdFlag_ProtoOptions   = "proto-options"
-	CmdFlag_Merge          = "merge"
-	CmdFlag_OmitEmpty      = "omitempty"
-	CmdFlag_JsonProperties = "json-properties"
-	CmdFlag_TinyintAsBool  = "tinyint-as-bool"
-	CmdFlag_SSH            = "ssh"
-	CmdFlag_ImportModels   = "import-models"
-	CmdFlag_V2             = "v2"
-	CmdFlag_Debug          = "debug"
-	CmdFlag_JsonStyle      = "json-style"
-	CmdFlag_ExportDDL      = "ddl"
-	CmdFlag_FieldStyle     = "field-style"
+	CmdFlag_Url           = "url"
+	CmdFlag_Output        = "out"
+	CmdFlag_Database      = "db"
+	CmdFlag_Tables        = "table"
+	CmdFlag_Tags          = "tag"
+	CmdFlag_Prefix        = "prefix"
+	CmdFlag_Suffix        = "suffix"
+	CmdFlag_Package       = "package"
+	CmdFlag_Without       = "without"
+	CmdFlag_ReadOnly      = "readonly"
+	CmdFlag_Protobuf      = "proto"
+	CmdFlag_SpecType      = "spec-type"
+	CmdFlag_EnableDecimal = "enable-decimal"
+	CmdFlag_GogoOptions   = "gogo-options"
+	CmdFlag_ProtoOptions  = "proto-options"
+	CmdFlag_Merge         = "merge"
+	CmdFlag_SSH           = "ssh"
+	CmdFlag_V2            = "v2"
+	CmdFlag_Debug         = "debug"
+	CmdFlag_JsonStyle     = "json-style"
+	CmdFlag_ExportDDL     = "ddl"
+	CmdFlag_FieldStyle    = "field-style"
 )
 
 func init() {
@@ -165,30 +160,6 @@ func main() {
 				Usage:   "export to one file",
 			},
 			&cli.StringFlag{
-				Name:  CmdFlag_DAO,
-				Usage: "generate data access object file",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_ImportModels,
-				Aliases: []string{"im"},
-				Usage:   "project name",
-			},
-			&cli.BoolFlag{
-				Name:    CmdFlag_OmitEmpty,
-				Aliases: []string{"E"},
-				Usage:   "json omitempty",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_JsonProperties,
-				Aliases: []string{"jp"},
-				Usage:   "customized properties for json tag",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_TinyintAsBool,
-				Aliases: []string{"B"},
-				Usage:   "convert tinyint columns redeclare as bool type",
-			},
-			&cli.StringFlag{
 				Name:  CmdFlag_SSH,
 				Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
 			},
@@ -238,13 +209,9 @@ func doAction(ctx *cli.Context) error {
 	cmd.PackageName = ctx.String(CmdFlag_Package)
 	cmd.Protobuf = ctx.Bool(CmdFlag_Protobuf)
 	cmd.EnableDecimal = ctx.Bool(CmdFlag_EnableDecimal)
-	cmd.DAO = ctx.String(CmdFlag_DAO)
-	cmd.ImportModels = ctx.String(CmdFlag_ImportModels)
-	cmd.OmitEmpty = ctx.Bool(CmdFlag_OmitEmpty)
 	cmd.SSH = ctx.String(CmdFlag_SSH)
 	cmd.Database = ctx.String(CmdFlag_Database)
 	cmd.OneFile = ctx.Bool(CmdFlag_Merge)
-	cmd.JsonProperties = ctx.String(CmdFlag_JsonProperties)
 	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
 	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
 	cmd.ExportDDL = ctx.String(CmdFlag_ExportDDL)
@@ -256,9 +223,6 @@ func doAction(ctx *cli.Context) error {
 	} else {
 		cmd.SqlcaPkg = schema.SQLCA_V3_PKG
 		cmd.ImportVer = schema.IMPORT_SQLCA_V3
-	}
-	if cmd.DAO != "" && cmd.ImportModels == "" {
-		return log.Errorf("models path required eg. github.com/xxx/your-repo/models")
 	}
 	if cmd.SSH != "" {
 		if !strings.Contains(cmd.SSH, SshScheme) {
@@ -305,10 +269,6 @@ func doAction(ctx *cli.Context) error {
 
 	if v := ctx.String(CmdFlag_Without); v != "" {
 		cmd.Without = schema.TrimSpaceSlice(schema.Split(v))
-	}
-
-	if v := ctx.String(CmdFlag_TinyintAsBool); v != "" {
-		cmd.TinyintAsBool = schema.TrimSpaceSlice(schema.Split(v))
 	}
 
 	if cmd.Protobuf {

@@ -30,11 +30,7 @@ GLOBAL OPTIONS:
    --enable-decimal, -D                 decimal as sqlca.Decimal type (default: false)
    --gogo-options value, --gogo value   gogo proto options
    --merge, -M                          export to one file (default: false)
-   --dao value                          generate data access object file
-   --import-models value, --im value    project name
    --omitempty, -E                      json omitempty (default: false)
-   --json-properties value, --jp value  customized properties for json tag
-   --tinyint-as-bool value, -B value    convert tinyint columns redeclare as bool type
    --ssh value                          ssh tunnel e.g ssh://root:123456@192.168.1.23:22
    --v2                                 sqlca v2 package imports (default: false)
    --ddl value                          export database DDL to file
@@ -75,16 +71,10 @@ rem 忽略字段名(逗号分隔)
 set WITH_OUT=""
 rem 添加标签
 set TAGS="gorm"
-rem tinyint转换成bool
-set TINYINT_TO_BOOL="deleted,is_admin,disable"
 rem 数据库连接源DSN
 set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
-rem JSON属性
-set JSON_PROPERTIES="omitempty"
 rem 指定具体表对应字段类型(不指定表则全局生效)
 set SPEC_TYPES="users.extra_data=struct%%, users.is_deleted=bool"
-rem 导入models路径(仅生成DAO文件使用)
-set IMPORT_MODELS="github.com/civet148/db2go/models"
 rem 数据库DDL文件
 set DDL_FILE="deploy/test.sql"
 
@@ -106,9 +96,8 @@ IF "%errorlevel%" == "0" (
 )
 
 
-db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" \
- --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --dao dao --tinyint-as-bool "%TINYINT_TO_BOOL%" \
- --tag "%TAGS%" --import-models %IMPORT_MODELS% --ddl "%DDL_FILE%" 
+db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
+ --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tag "%TAGS%" --ddl "%DDL_FILE%" 
 
 echo "generate go file ok, formatting..."
 gofmt -w %OUT_DIR%/%PACK_NAME%
@@ -132,16 +121,10 @@ TABLE_NAME="-user_roles"
 WITH_OUT=""
 # 添加标签
 TAGS="gorm"
-# TINYINT转换成bool
-TINYINT_TO_BOOL="deleted,is_admin,disable"
 # 数据库连接源DSN
 DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
-# JSON属性
-JSON_PROPERTIES="omitempty"
 # 指定具体表对应字段类型(不指定表则全局生效)
 SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
-# 导入models路径(仅生成DAO文件使用)
-IMPORT_MODELS="github.com/civet148/db2go/models"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
@@ -160,8 +143,7 @@ if ! which db2go >/dev/null 2>&1; then
 fi
 
 db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
- --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --dao dao --tinyint-as-bool "${TINYINT_TO_BOOL}" \
- --tag "${TAGS}" --import-models ${IMPORT_MODELS} --ddl "${DDL_FILE}" 
+ --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --tag "${TAGS}" --ddl "${DDL_FILE}" 
 
 echo "generate go file ok, formatting..."
 gofmt -w ${OUT_DIR}/${PACK_NAME}

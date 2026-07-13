@@ -253,42 +253,37 @@ type CommTagType struct {
 }
 
 type CmdFlags struct {
-	ConnUrl        string
-	Database       string
-	Tables         []string
-	Without        []string
-	ReadOnly       []string
-	ExtraTags      []string
-	ExcludeTables  []string
-	Scheme         string
-	Host           string
-	User           string
-	Password       string
-	Charset        string
-	OutDir         string
-	Prefix         string
-	Suffix         string
-	PackageName    string
-	Protobuf       bool
-	EnableDecimal  bool
-	OneFile        bool
-	GogoOptions    []string
-	DAO            string
-	ImportModels   string
-	OmitEmpty      bool
-	TinyintAsBool  []string
-	Engine         *sqlca.Engine
-	JsonProperties string
-	JsonStyle      string
-	SSH            string
-	SpecTypes      []*SpecType
-	ImportVer      string
-	SqlcaPkg       string
-	Debug          bool
-	ExportDDL      string
-	TagTypes       []*CommTagType
-	ProtoOptions   map[string]string
-	FieldStyle     FieldStyle
+	ConnUrl       string
+	Database      string
+	Tables        []string
+	Without       []string
+	ReadOnly      []string
+	ExtraTags     []string
+	ExcludeTables []string
+	Scheme        string
+	Host          string
+	User          string
+	Password      string
+	Charset       string
+	OutDir        string
+	Prefix        string
+	Suffix        string
+	PackageName   string
+	Protobuf      bool
+	EnableDecimal bool
+	OneFile       bool
+	GogoOptions   []string
+	Engine        *sqlca.Engine
+	JsonStyle     string
+	SSH           string
+	SpecTypes     []*SpecType
+	ImportVer     string
+	SqlcaPkg      string
+	Debug         bool
+	ExportDDL     string
+	TagTypes      []*CommTagType
+	ProtoOptions  map[string]string
+	FieldStyle    FieldStyle
 }
 
 func NewCmdFlags() *CmdFlags {
@@ -368,28 +363,6 @@ func (c *CmdFlags) ParseSpecTypes(strSpecType string) {
 		})
 	}
 	c.SpecTypes = sts
-	return
-}
-
-func (c *CmdFlags) GetJsonPropertiesSlice() (jsonProps []string) {
-	var dup bool
-
-	if c.JsonProperties != "" {
-		jsonProps = strings.Split(c.JsonProperties, ",")
-	}
-
-	if c.OmitEmpty {
-		for _, v := range jsonProps {
-			if v == JSON_PROPERTY_OMIT_EMTPY {
-				dup = true
-				break
-			}
-		}
-		if !dup {
-			jsonProps = append(jsonProps, JSON_PROPERTY_OMIT_EMTPY)
-		}
-	}
-	//log.Debugf("jsonProps [%+v]", jsonProps)
 	return
 }
 

@@ -12,10 +12,10 @@ const (
 )
 
 type UserProfile struct {
-	Id      uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                              //
-	UserId  uint64 `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;uniqueIndex:idx_user_profiles_user_id;default:null;" sqlca:"isnull"` //
-	Avatar  string `json:"avatar,omitempty" db:"avatar" gorm:"column:avatar;type:varchar(512);default:null;" sqlca:"isnull"`                                             //
-	Address string `json:"address,omitempty" db:"address" gorm:"column:address;type:varchar(128);default:null;" sqlca:"isnull"`                                          //
+	Id      uint64 `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                              //
+	UserId  uint64 `json:"user_id" db:"user_id" gorm:"column:user_id;type:bigint unsigned;uniqueIndex:idx_user_profiles_user_id;default:null;" sqlca:"isnull"` //
+	Avatar  string `json:"avatar" db:"avatar" gorm:"column:avatar;type:varchar(512);default:null;" sqlca:"isnull"`                                             //
+	Address string `json:"address" db:"address" gorm:"column:address;type:varchar(128);default:null;" sqlca:"isnull"`                                          //
 }
 
 func (do UserProfile) TableName() string { return "user_profiles" }

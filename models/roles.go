@@ -10,8 +10,8 @@ const (
 )
 
 type Role struct {
-	Id   uint64 `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                      //
-	Name string `json:"name,omitempty" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name;default:null;" sqlca:"isnull"` //
+	Id   uint64 `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                      //
+	Name string `json:"name" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name;default:null;" sqlca:"isnull"` //
 }
 
 func (do Role) TableName() string { return "roles" }

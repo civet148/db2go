@@ -86,9 +86,6 @@ func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 		if err = exportModels(cmd, v); err != nil {
 			return err
 		}
-		if err = exportDAO(cmd, v); err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -160,75 +157,11 @@ func getImportSpecTypes(cmd *CmdFlags, table *TableSchema) (specTypes []*SpecTyp
 
 func haveDecimal(cmd *CmdFlags, table *TableSchema, TableCols []TableColumn, enableDecimal bool) (ok bool) {
 	for _, v := range TableCols {
-		_, ok = GetGoColumnType(cmd, table, v, enableDecimal, nil)
+		_, ok = GetGoColumnType(cmd, table, v, enableDecimal)
 		if ok {
 			break
 		}
 	}
-	return
-}
-
-func exportDAO(cmd *CmdFlags, table *TableSchema) (err error) {
-	var strContent string
-	if cmd.DAO == "" {
-		return nil
-	}
-	var strDir, strOutputFilePath string
-
-	if strings.LastIndex(cmd.OutDir, fmt.Sprintf("%v", os.PathSeparator)) == -1 {
-		strDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.DAO)
-	} else {
-		strDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.DAO)
-	}
-	if err = MakeDir(strDir); err != nil {
-		return err
-	}
-
-	var fi os.FileInfo
-
-	strOutputFilePath = filepath.Join(strDir, table.TableName+".go")
-	if fi, err = os.Stat(strOutputFilePath); err == nil {
-		if fi.IsDir() {
-			return log.Errorf("dao file [%v] is dir", strOutputFilePath)
-		}
-	}
-
-	strContent += fmt.Sprintf("package %v\n\n", cmd.DAO)
-	strContent += fmt.Sprintf(`import (
-    "fmt"
-	"%s"
-	"%s"
-)
-
-`, cmd.SqlcaPkg, cmd.ImportModels)
-
-	strContent += makeNewMethod(cmd, table)
-	strContent += makeOrmMethods(cmd, table)
-
-	if err = writeToFile(strOutputFilePath, strContent, true); err != nil {
-		return log.Errorf("export dao for table [%v] to file [%v] error [%s]", table.TableName, strOutputFilePath, err.Error())
-	}
-
-	return nil
-}
-
-// make new DAO method
-func makeNewMethod(cmd *CmdFlags, table *TableSchema) (strContent string) {
-	strContent += fmt.Sprintf(`
-type %s struct {
-	db *sqlca.Engine
-}
-
-`, table.StructDAO)
-
-	strContent += fmt.Sprintf(`
-func New%v(db *sqlca.Engine) *%v {
-	return &%v{
-		db: db,
-	}
-}
-
-`, table.StructDAO, table.StructDAO, table.StructDAO)
 	return
 }
 
@@ -248,7 +181,7 @@ func makeObjectMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 			continue
 		}
 		strColName := BigCamelCase(v.Name)
-		strColType, _ := GetGoColumnType(cmd, table, v, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColType, _ := GetGoColumnType(cmd, table, v, cmd.EnableDecimal)
 		strContent += MakeGetter(table.StructName, strColName, strColType)
 	}
 	strContent += "\n"
@@ -257,7 +190,7 @@ func makeObjectMethods(cmd *CmdFlags, table *TableSchema) (strContent string) {
 			continue
 		}
 		strColName := BigCamelCase(v.Name)
-		strColType, _ := GetGoColumnType(cmd, table, v, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColType, _ := GetGoColumnType(cmd, table, v, cmd.EnableDecimal)
 		strContent += MakeSetter(table.StructName, strColName, strColType)
 	}
 	strContent += "\n"
@@ -387,7 +320,7 @@ func makeTableStructure(cmd *CmdFlags, table *TableSchema) (strContent string) {
 		// 将列名转换为大驼峰命名
 		strColName = BigCamelCase(col.Name)
 		// 获取列的Go语言类型
-		strColType, _ = GetGoColumnType(cmd, table, col, cmd.EnableDecimal, cmd.TinyintAsBool)
+		strColType, _ = GetGoColumnType(cmd, table, col, cmd.EnableDecimal)
 		// 处理额外的标签
 		for _, t := range cmd.ExtraTags {
 			tv := col.Name

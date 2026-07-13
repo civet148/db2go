@@ -27,20 +27,20 @@ const (
 )
 
 type InventoryOut struct {
-	Id         uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                            //
-	IsDeleted  int8          `json:"is_deleted,omitempty" db:"is_deleted" gorm:"column:is_deleted;type:tinyint(1);default:0;" sqlca:"isnull"`                                                    //
-	DeleteTime *time.Time    `json:"delete_time,omitempty" db:"delete_time" gorm:"column:delete_time;type:datetime;default:null;" sqlca:"isnull"`                                                //
-	ProductId  uint64        `json:"product_id,omitempty" db:"product_id" gorm:"column:product_id;type:bigint unsigned;index:i_product_id;uniqueIndex:UNIQ_PROD_USER;default:0;" sqlca:"isnull"` //
-	OrderNo    string        `json:"order_no,omitempty" db:"order_no" gorm:"column:order_no;type:varchar(64);uniqueIndex:UNIQ_ORDER_NO;default:null;" sqlca:"isnull"`                            //
-	UserId     uint64        `json:"user_id,omitempty" db:"user_id" gorm:"column:user_id;type:bigint unsigned;index:i_user_id;uniqueIndex:UNIQ_PROD_USER;default:0;" sqlca:"isnull"`             //
-	UserName   string        `json:"user_name,omitempty" db:"user_name" gorm:"column:user_name;type:varchar(64);index:FULTXT_user_name;default:null;" sqlca:"isnull"`                            //
-	Quantity   sqlca.Decimal `json:"quantity,omitempty" db:"quantity" gorm:"column:quantity;type:decimal(16,6);default:0.000000;" sqlca:"isnull"`                                                //
-	Weight     sqlca.Decimal `json:"weight,omitempty" db:"weight" gorm:"column:weight;type:decimal(16,6);default:0.000000;" sqlca:"isnull"`                                                      //
-	Remark     string        `json:"remark,omitempty" db:"remark" gorm:"column:remark;type:varchar(512);default:null;" sqlca:"isnull"`                                                           //
-	CreateId   uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                                                  //
-	CreateName string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);default:null;" sqlca:"isnull"`                                             //
-	UpdateId   uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                                                  //
-	UpdateName string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);default:null;" sqlca:"isnull"`                                             //
+	Id         uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                                                                            //
+	IsDeleted  int8          `json:"is_deleted" db:"is_deleted" gorm:"column:is_deleted;type:tinyint(1);default:0;" sqlca:"isnull"`                                                    //
+	DeleteTime *time.Time    `json:"delete_time" db:"delete_time" gorm:"column:delete_time;type:datetime;default:null;" sqlca:"isnull"`                                                //
+	ProductId  uint64        `json:"product_id" db:"product_id" gorm:"column:product_id;type:bigint unsigned;index:i_product_id;uniqueIndex:UNIQ_PROD_USER;default:0;" sqlca:"isnull"` //
+	OrderNo    string        `json:"order_no" db:"order_no" gorm:"column:order_no;type:varchar(64);uniqueIndex:UNIQ_ORDER_NO;default:null;" sqlca:"isnull"`                            //
+	UserId     uint64        `json:"user_id" db:"user_id" gorm:"column:user_id;type:bigint unsigned;index:i_user_id;uniqueIndex:UNIQ_PROD_USER;default:0;" sqlca:"isnull"`             //
+	UserName   string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(64);index:FULTXT_user_name;default:null;" sqlca:"isnull"`                            //
+	Quantity   sqlca.Decimal `json:"quantity" db:"quantity" gorm:"column:quantity;type:decimal(16,6);default:0.000000;" sqlca:"isnull"`                                                //
+	Weight     sqlca.Decimal `json:"weight" db:"weight" gorm:"column:weight;type:decimal(16,6);default:0.000000;" sqlca:"isnull"`                                                      //
+	Remark     string        `json:"remark" db:"remark" gorm:"column:remark;type:varchar(512);default:null;" sqlca:"isnull"`                                                           //
+	CreateId   uint64        `json:"create_id" db:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                                                  //
+	CreateName string        `json:"create_name" db:"create_name" gorm:"column:create_name;type:varchar(64);default:null;" sqlca:"isnull"`                                             //
+	UpdateId   uint64        `json:"update_id" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;" sqlca:"isnull"`                                                  //
+	UpdateName string        `json:"update_name" db:"update_name" gorm:"column:update_name;type:varchar(64);default:null;" sqlca:"isnull"`                                             //
 }
 
 func (do InventoryOut) TableName() string { return "inventory_out" }
