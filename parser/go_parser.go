@@ -94,7 +94,7 @@ func (cl CodeLine) GetKey() string {
 }
 
 func (cl CodeLine) String() string {
-	return cl.Raw + "\n"
+	return cl.Code + cl.Comment + "\n"
 }
 
 func (cl CodeLine) IsTypeStart() bool {
@@ -175,7 +175,7 @@ func (cb CodeBlock) String() string {
 		if lb.Disabled {
 			continue
 		}
-		code += lb.Raw + "\n"
+		code += lb.Code + lb.Comment + "\n"
 	}
 	return code
 }
@@ -224,7 +224,7 @@ func (ti *TypeInfo) String() string {
 		if l.Disabled {
 			continue
 		}
-		code += l.Raw + "\n"
+		code += l.Code + l.Comment + "\n"
 	}
 	for _, m := range ti.Methods {
 		code += m.String() + "\n"

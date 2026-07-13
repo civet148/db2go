@@ -105,14 +105,14 @@ func mergeVars(base, work *GoFileParseResult) (codes []*CodeLine) {
 }
 
 func mergeConsts(base, work *GoFileParseResult) (codes []*CodeBlock) {
-	var codeHashMap = make(map[string]string)
-	var lineHashMap = make(map[string]string)
+	var codeHashMap = make(map[string]*CodeBlock)
+	var lineHashMap = make(map[string]*CodeLine)
 	for _, cb := range base.Consts {
 		key := cb.GetHash()
-		codeHashMap[key] = cb.GetCode()
+		codeHashMap[key] = cb
 		codes = append(codes, cb)
 		for _, line := range cb.Lines {
-			lineHashMap[line.GetHash()] = line.GetCode()
+			lineHashMap[line.GetHash()] = line
 		}
 	}
 
@@ -143,7 +143,7 @@ func mergeConsts(base, work *GoFileParseResult) (codes []*CodeBlock) {
 }
 
 func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePrefix, multiPrefix, multiSuffix string) (codes []*CodeLine) {
-	var codeHashMap = make(map[string]string)
+	var codeHashMap = make(map[string]*CodeLine)
 	if len(baseLineBlocks) == 0 && len(workLineBlocks) == 0 {
 		return nil
 	}
@@ -170,7 +170,7 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 				Code:    code,
 				Comment: lc.Comment,
 			})
-			codeHashMap[CodeHash(code)] = code
+			codeHashMap[CodeHash(code)] = lc
 		}
 	}
 	for _, lb := range workLineBlocks {
@@ -205,17 +205,17 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 }
 
 func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
-	var codeFieldMap = make(map[string]string)
-	var codeMethodMap = make(map[string]string)
+	var codeFieldMap = make(map[string]*CodeLine)
+	var codeMethodMap = make(map[string]*CodeBlock)
 	for _, bt := range base.Types {
 		for _, line := range bt.Lines {
 			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
 				continue
 			}
-			codeFieldMap[line.Key] = line.Code
+			codeFieldMap[line.Key] = line
 		}
 		for _, method := range bt.Methods {
-			codeMethodMap[method.GetKey()] = method.GetCode()
+			codeMethodMap[method.GetKey()] = method
 		}
 	}
 	for k, wt := range work.Types {
@@ -227,10 +227,14 @@ func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
 				continue
 			}
-			if _, ok := codeFieldMap[line.Key]; !ok {
+			if bl, ok := codeFieldMap[line.Key]; !ok {
 				var bt *TypeInfo
 				if bt, ok = base.Types[k]; ok {
 					bt.InsertField(line)
+				}
+			} else {
+				if isEmptyComment(bl.Comment) && !isEmptyComment(line.Comment) {
+					bl.Comment = line.Comment
 				}
 			}
 		}
@@ -250,9 +254,9 @@ func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 }
 
 func mergeFuncs(base, work *GoFileParseResult) []*CodeBlock {
-	var codeFuncMap = make(map[string]string)
+	var codeFuncMap = make(map[string]*CodeBlock)
 	for _, bf := range base.Functions {
-		codeFuncMap[bf.GetKey()] = bf.GetCode()
+		codeFuncMap[bf.GetKey()] = bf
 	}
 	for _, wf := range work.Functions {
 		if _, ok := codeFuncMap[wf.GetKey()]; !ok {
@@ -268,4 +272,12 @@ func SaveFileWithFormat(code, output string) (err error) {
 		return err
 	}
 	return os.WriteFile(output, data, 0644)
+}
+
+func isEmptyComment(comment string) bool {
+	comment = strings.TrimSpace(comment)
+	comment = strings.Replace(comment, "\n", "", -1)
+	comment = strings.ReplaceAll(comment, "\r", "")
+	comment = strings.ReplaceAll(comment, "\t", "")
+	return comment == "" || comment == "//" || comment == "/**/"
 }
