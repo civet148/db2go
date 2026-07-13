@@ -224,7 +224,7 @@ func BigCamelCase(strIn string) (strOut string) {
 		if i == 0 {
 			strOut += strings.ToUpper(strChr)
 		} else {
-			if v == '_' {
+			if v == '_' || v == '-' {
 				idxUnderLine = i //ignore
 			} else {
 				if i == idxUnderLine+1 {
@@ -245,7 +245,7 @@ func SmallCamelCase(strIn string) (strOut string) {
 		if i == 0 {
 			strOut += strings.ToLower(strChr)
 		} else {
-			if v == '_' {
+			if v == '_' || v == '-' {
 				idxUnderLine = i //ignore
 			} else {
 				if i == idxUnderLine+1 {

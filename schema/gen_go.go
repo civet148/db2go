@@ -283,14 +283,10 @@ func (dao *%v) QueryByCondition(conditions map[string]interface{}, columns...str
 }
 
 func makeColumnConsts(cmd *CmdFlags, table *TableSchema) (strContent string) {
-	var strUpperTableName string
-	var strUpperColumnName string
-	strUpperTableName = strings.ToUpper(table.TableName)
 
 	strContent += fmt.Sprintf("const (\n")
 	for _, v := range table.Columns {
-		strUpperColumnName = strings.ToUpper(v.Name)
-		strContent += fmt.Sprintf("%s_%s_%s = \"%s\"\n", strUpperTableName, "COLUMN", strUpperColumnName, v.Name)
+		strContent += fmt.Sprintf("%s%s_%s = \"%s\"\n", BigCamelCase(table.TableName), "Column", BigCamelCase(v.Name), v.Name)
 	}
 	strContent += fmt.Sprintf(")\n\n")
 	return
