@@ -1,6 +1,8 @@
 package models
 
-import "github.com/civet148/sqlca/v3"
+import (
+	"github.com/civet148/sqlca/v3"
+)
 
 const TableNameInventoryData = "inventory_data" //
 

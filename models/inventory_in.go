@@ -1,7 +1,9 @@
 package models
 
-import "time"
-import "github.com/civet148/sqlca/v3"
+import (
+	"github.com/civet148/sqlca/v3"
+	"time"
+)
 
 const TableNameInventoryIn = "inventory_in" //
 
