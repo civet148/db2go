@@ -12,12 +12,16 @@ import (
 import "os"
 import ()
 
+/*
+* 我是UserApi的前置注释
+*/
 type UserApi interface{
   GetUserList(ctx context.Context) (dos []*User, err error)
   GetUserById(ctx context.Context, id uint64) (do *User, err error)
 }
 
-const TableNameUsers = "users" //
+// 我是TableNameUsers常量的前置注释
+const TableNameUsers = "users" // 我是TableNameUsers的行注释
 
 var (
     a = 1 /*A相*/
@@ -59,7 +63,11 @@ type User struct {
 	Email    string      `json:"email,omitempty" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;" sqlca:"isnull"`                 // 邮箱地址
 	Location  *sqlca_v3.Point    `json:"location" db:"location" gorm:"column:location;default:null;"` // 定位信息
 	Roles    []*Role     `json:"roles" db:"-" gorm:"many2many:user_roles"`     // 角色数组
+	// 我是Profile的前置注释
 	Profile  UserProfile `json:"profile" db:"-" gorm:"foreignKey:UserId;"`     // 用户配置
+	/*
+	* 我是BaseModel的前置注释
+	*/
 	BaseModel `json:"-" db:"-" gorm:"embedded"`
 }
 
