@@ -30,7 +30,6 @@ GLOBAL OPTIONS:
    --enable-decimal, -D                 decimal as sqlca.Decimal type (default: false)
    --gogo-options value, --gogo value   gogo proto options
    --merge, -M                          export to one file (default: false)
-   --omitempty, -E                      json omitempty (default: false)
    --ssh value                          ssh tunnel e.g ssh://root:123456@192.168.1.23:22
    --v2                                 sqlca v2 package imports (default: false)
    --ddl value                          export database DDL to file
@@ -96,7 +95,7 @@ IF "%errorlevel%" == "0" (
 )
 
 
-db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --json-properties "%JSON_PROPERTIES%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
+db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
  --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tag "%TAGS%" --ddl "%DDL_FILE%" 
 
 echo "generate go file ok, formatting..."
@@ -142,7 +141,7 @@ if ! which db2go >/dev/null 2>&1; then
     fi
 fi
 
-db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --json-properties "${JSON_PROPERTIES}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
+db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
  --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --tag "${TAGS}" --ddl "${DDL_FILE}" 
 
 echo "generate go file ok, formatting..."
