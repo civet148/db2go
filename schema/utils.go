@@ -26,7 +26,11 @@ const (
 func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 	// 文件不存在，以创建并覆盖方式生成新的文件
 	if direct || !isFileExist(strOutputPath) {
-		if err = writeFileContext(strOutputPath, strBody); err != nil {
+		var newCode []byte
+		if newCode, err = format.Source([]byte(strBody)); err != nil {
+			return log.Errorf("格式化新导出代码文件内容失败，请检查db2go导出逻辑! 错误：%v", err.Error())
+		}
+		if err = writeFileContext(strOutputPath, string(newCode)); err != nil {
 			return log.Errorf("生成文件[%v]失败：%v", strOutputPath, err.Error())
 		}
 	} else {
@@ -66,8 +70,8 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 		if err = writeToFile(strOutputPath, mergeCode, true); err != nil {
 			return log.Errorf("写入代码文件[%v]失败，%v", strOutputPath, err.Error())
 		}
-		log.Infof("写入代码文件[%v]成功", strOutputPath)
 	}
+	log.Infof("写入代码文件[%v]成功", strOutputPath)
 	return nil
 }
 
