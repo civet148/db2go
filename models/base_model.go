@@ -15,3 +15,8 @@ func (do BaseModel) GetUpdatedAt() time.Time { return do.UpdatedAt }
 func (do *BaseModel) SetCreatedAt(v time.Time) { do.CreatedAt = v }
 
 func (do *BaseModel) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+
+type UserExtraData struct {
+	HomeAddress string `json:"home_address"`
+	PostCode    string `json:"post_code"`
+}

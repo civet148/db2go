@@ -35,67 +35,65 @@ type GoFileTmplData struct {
 	Columns        []ColumnTmplData
 }
 
-func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
-	for _, v := range tables {
-		if IsInSlice(v.TableName, cmd.ExcludeTables) {
-			continue
-		}
-		v.InitPackage(cmd)
+func (t *TableSchema) ExportTableSchema(cmd *CmdFlags) (err error) {
+	if IsInSlice(t.TableName, cmd.ExcludeTables) {
+		return nil
+	}
+	t.InitPackage(cmd)
 
-		if err = MakeDir(cmd.OutDir); err != nil {
-			return err
-		}
+	if err = MakeDir(cmd.OutDir); err != nil {
+		return err
+	}
 
-		v.OutDir = cmd.OutDir
+	t.OutDir = cmd.OutDir
 
-		if cmd.PackageName == "" {
-			cmd.PackageName = v.SchemeName
-			if strings.LastIndex(cmd.OutDir, fmt.Sprintf("%v", os.PathSeparator)) == -1 {
-				v.SchemeDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.PackageName)
-			} else {
-				v.SchemeDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.PackageName)
-			}
+	if cmd.PackageName == "" {
+		cmd.PackageName = t.SchemeName
+		if strings.LastIndex(cmd.OutDir, fmt.Sprintf("%v", os.PathSeparator)) == -1 {
+			t.SchemeDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.PackageName)
 		} else {
-			v.SchemeDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.PackageName)
+			t.SchemeDir = fmt.Sprintf("%v%v", cmd.OutDir, cmd.PackageName)
 		}
+	} else {
+		t.SchemeDir = fmt.Sprintf("%v/%v", cmd.OutDir, cmd.PackageName)
+	}
 
-		if err = MakeDir(v.SchemeDir); err != nil {
-			return err
-		}
+	if err = MakeDir(t.SchemeDir); err != nil {
+		return err
+	}
 
-		var strPrefix, strSuffix string
-		if cmd.Prefix != "" {
-			strPrefix = fmt.Sprintf("%v_", cmd.Prefix)
-		}
-		if cmd.Suffix != "" {
-			strSuffix = fmt.Sprintf("_%v", cmd.Suffix)
-		}
+	var strPrefix, strSuffix string
+	if cmd.Prefix != "" {
+		strPrefix = fmt.Sprintf("%v_", cmd.Prefix)
+	}
+	if cmd.Suffix != "" {
+		strSuffix = fmt.Sprintf("_%v", cmd.Suffix)
+	}
 
-		v.OutFilePath = fmt.Sprintf("%v/%v%v%v.go", v.SchemeDir, strPrefix, v.TableName, strSuffix)
-		if err = exportModels(cmd, v); err != nil {
-			return err
-		}
+	t.OutFilePath = fmt.Sprintf("%v/%v%v%v.go", t.SchemeDir, strPrefix, t.TableName, strSuffix)
+	if err = t.exportModels(cmd); err != nil {
+		return err
 	}
 	return nil
 }
 
-func exportModels(cmd *CmdFlags, table *TableSchema) error {
-	table.TableNameCamelCase = BigCamelCase(table.TableName)
-	table.TableComment = ReplaceCRLF(table.TableComment)
-	table.StructName = TableNameToStructName(table.TableNameCamelCase)
-	table.StructDAO = table.StructName
-	for i, v := range table.Columns {
-		table.Columns[i].Comment = ReplaceCRLF(v.Comment)
+func (t *TableSchema) exportModels(cmd *CmdFlags) error {
+	t.TableNameCamelCase = BigCamelCase(t.TableName)
+	t.TableComment = ReplaceCRLF(t.TableComment)
+	t.StructName = TableNameToStructName(t.TableNameCamelCase)
+	t.StructDAO = t.StructName
+	for i, v := range t.Columns {
+		t.Columns[i].Comment = ReplaceCRLF(v.Comment)
 	}
 
 	var importPkgs []string
-	for k := range table.ImportPackages {
+	for k := range t.ImportPackages {
 		importPkgs = append(importPkgs, k)
 	}
 
-	specTypes := getImportSpecTypes(cmd, table)
+	specTypes := getImportSpecTypes(cmd, t)
 	for _, st := range specTypes {
-		if table.TableName != st.Table && st.Table != TABLE_ALL {
+		if t.TableName != st.Table && st.Table != TABLE_ALL {
 			continue
 		}
 		for _, v := range st.Package {
@@ -106,24 +104,24 @@ func exportModels(cmd *CmdFlags, table *TableSchema) error {
 	}
 
 	var importVer string
-	if haveDecimal(cmd, table, table.Columns, cmd.EnableDecimal) {
+	if haveDecimal(cmd, t, t.Columns, cmd.EnableDecimal) {
 		importVer = cmd.ImportVer
 	}
 
 	var cols []ColumnTmplData
-	for _, col := range table.Columns {
+	for _, col := range t.Columns {
 		if IsInSlice(col.Name, cmd.Without) {
 			continue
 		}
-		cols = append(cols, buildColumnTmplData(cmd, table, col))
+		cols = append(cols, buildColumnTmplData(cmd, t, col))
 	}
 
 	data := GoFileTmplData{
 		PackageName:    cmd.PackageName,
-		TableNameConst: fmt.Sprintf("%s%v", TableNamePrefix, table.TableNameCamelCase),
-		TableName:      table.TableName,
-		TableComment:   table.TableComment,
-		StructName:     table.StructName,
+		TableNameConst: fmt.Sprintf("%s%v", TableNamePrefix, t.TableNameCamelCase),
+		TableName:      t.TableName,
+		TableComment:   t.TableComment,
+		StructName:     t.StructName,
 		ImportPackages: importPkgs,
 		ImportVer:      importVer,
 		Columns:        cols,
@@ -135,7 +133,7 @@ func exportModels(cmd *CmdFlags, table *TableSchema) error {
 		return fmt.Errorf("execute go template error: %w", err)
 	}
 
-	return writeToFile(table.OutFilePath, buf.String(), false)
+	return writeToFile(t.OutFilePath, buf.String(), false)
 }
 
 func buildColumnTmplData(cmd *CmdFlags, table *TableSchema, col TableColumn) ColumnTmplData {

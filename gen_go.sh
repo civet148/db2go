@@ -15,7 +15,7 @@ DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 # 添加标签
 TAGS="gorm"
 # 指定具体表对应字段类型(不指定表则全局生效)
-SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
+SPEC_TYPES="users.extra_data=UserExtraData, users.is_deleted=bool"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 

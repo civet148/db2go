@@ -60,10 +60,9 @@ func ExportGoSchema(provider SchemaProvider, cmd *CmdFlags) error {
 		if err = provider.QueryTableCreateSQL(v); err != nil {
 			log.Warnf("query table [%s] create SQL error [%s]", v.TableName, err.Error())
 		}
-	}
-
-	if err = ExportTableSchema(cmd, schemas); err != nil {
-		return err
+		if err = v.ExportTableSchema(cmd); err != nil {
+			return err
+		}
 	}
 
 	if cmd.ExportDDL != "" {
