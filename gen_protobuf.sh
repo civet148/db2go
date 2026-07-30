@@ -2,7 +2,7 @@
 
 OUT_DIR=.
 PACK_NAME="proto"
-WITH_OUT="created_at, updated_at"
+WITH_OUT=""
 TABLE_NAME=""
 #DSN_URL="mssql://sa:123456@127.0.0.1:1433/test?instance=SQLEXPRESS&windows=false"
 #DSN_URL="postgres://postgres:123456@127.0.0.1:5432/test?sslmode=disable"

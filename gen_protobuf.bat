@@ -3,7 +3,7 @@ go build -ldflags "-s -w"
 
 set OUT_DIR=.
 set PACK_NAME="proto"
-set WITH_OUT="created_at, updated_at"
+set WITH_OUT=""
 set TABLE_NAME="users, classes"
 rem set DSN_URL="mssql://sa:123456@127.0.0.1:1433/test?instance=SQLEXPRESS&windows=false"
 rem set DSN_URL="postgres://postgres:123456@127.0.0.1:5432/test?sslmode=disable"
