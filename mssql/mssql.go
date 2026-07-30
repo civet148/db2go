@@ -93,3 +93,7 @@ func (m *ExporterMssql) QueryTableIndexes(table *schema.TableSchema) (err error)
 func (m *ExporterMssql) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (*schema.CreateDatabaseDDL, error) {
 	return nil, nil
 }
+
+func (m *ExporterMssql) QueryTableCreateSQL(table *schema.TableSchema) error {
+	return nil
+}

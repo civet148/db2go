@@ -15,6 +15,7 @@ type SchemaProvider interface {
 	QueryTableColumns(table *TableSchema) error
 	QueryTableIndexes(table *TableSchema) error
 	QueryCreateDatabaseDDL(cmd *CmdFlags) (*CreateDatabaseDDL, error)
+	QueryTableCreateSQL(table *TableSchema) error
 }
 
 func NewEngine(cmd *CmdFlags) (*sqlca.Engine, error) {
@@ -55,6 +56,9 @@ func ExportGoSchema(provider SchemaProvider, cmd *CmdFlags) error {
 		}
 		if err = provider.QueryTableIndexes(v); err != nil {
 			return log.Error(err.Error())
+		}
+		if err = provider.QueryTableCreateSQL(v); err != nil {
+			log.Warnf("query table [%s] create SQL error [%s]", v.TableName, err.Error())
 		}
 	}
 

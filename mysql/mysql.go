@@ -104,3 +104,11 @@ func (m *ExporterMysql) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (ddl *schem
 	}
 	return ddl, nil
 }
+
+func (m *ExporterMysql) QueryTableCreateSQL(table *schema.TableSchema) error {
+	_, err := m.Cmd.Engine.Model(&table.TableName, &table.TableCreateSQL).QueryRaw("SHOW CREATE TABLE `%s`", table.TableName)
+	if err != nil {
+		return log.Error(err.Error())
+	}
+	return nil
+}

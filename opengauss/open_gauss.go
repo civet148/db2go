@@ -94,3 +94,7 @@ func (m *ExporterOpenGauss) QueryTableIndexes(table *schema.TableSchema) (err er
 func (m *ExporterOpenGauss) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (*schema.CreateDatabaseDDL, error) {
 	return nil, nil
 }
+
+func (m *ExporterOpenGauss) QueryTableCreateSQL(table *schema.TableSchema) error {
+	return nil
+}

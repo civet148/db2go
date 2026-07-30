@@ -116,3 +116,7 @@ ORDER BY index_name, k.ord;`, table.SchemeName, table.TableName)
 func (m *ExporterPostgres) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (*schema.CreateDatabaseDDL, error) {
 	return nil, nil
 }
+
+func (m *ExporterPostgres) QueryTableCreateSQL(table *schema.TableSchema) error {
+	return nil
+}
