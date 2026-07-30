@@ -113,13 +113,13 @@ func WithEnableDecimal(enable bool) Option {
 
 func WithSSH(ssh string) Option {
 	return func(c *CmdFlags) {
-	if ssh != "" {
-		if !strings.Contains(ssh, "ssh://") {
-			c.SSH = "ssh://" + ssh
-		} else {
-			c.SSH = ssh
+		if ssh != "" {
+			if !strings.Contains(ssh, "ssh://") {
+				c.SSH = "ssh://" + ssh
+			} else {
+				c.SSH = ssh
+			}
 		}
-	}
 	}
 }
 
@@ -186,24 +186,6 @@ func WithEngine(e *sqlca.Engine) Option {
 func WithScheme(scheme string) Option {
 	return func(c *CmdFlags) {
 		c.Scheme = scheme
-	}
-}
-
-func WithHost(host string) Option {
-	return func(c *CmdFlags) {
-		c.Host = host
-	}
-}
-
-func WithUser(user string) Option {
-	return func(c *CmdFlags) {
-		c.User = user
-	}
-}
-
-func WithPassword(password string) Option {
-	return func(c *CmdFlags) {
-		c.Password = password
 	}
 }
 

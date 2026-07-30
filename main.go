@@ -268,9 +268,6 @@ func execute(cmd *schema.CmdFlags) error {
 	}
 
 	cmd.Scheme = ui.Scheme
-	cmd.Host = ui.Host
-	cmd.User = ui.User
-	cmd.Password = ui.Password
 
 	log.Json("command options", cmd)
 

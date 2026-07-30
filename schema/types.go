@@ -261,10 +261,6 @@ type CmdFlags struct {
 	ExtraTags     []string
 	ExcludeTables []string
 	Scheme        string
-	Host          string
-	User          string
-	Password      string
-	Charset       string
 	OutDir        string
 	Prefix        string
 	Suffix        string
