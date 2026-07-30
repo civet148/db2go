@@ -1,0 +1,12 @@
+syntax = "proto3";
+package proto;
+
+
+
+
+message User {
+	uint64 id = 1; //
+	string user_name = 4; //
+	string email = 5; //
+}
+
