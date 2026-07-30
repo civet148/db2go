@@ -186,18 +186,6 @@ func ReplaceColumnType(cmd *CmdFlags, strTableName, strColName, strColType strin
 	return strColType
 }
 
-func MakeTableNameGetter(strStructName, strTableName string) (strGetter string) {
-	return fmt.Sprintf("func (do %v) TableName() string { return \"%s\" } \n", strStructName, strTableName)
-}
-
-func MakeGetter(strStructName, strColName, strColType string) (strGetter string) {
-	return fmt.Sprintf("func (do %v) Get%v() %v { return do.%v } \n\n", strStructName, strColName, strColType, strColName)
-}
-
-func MakeSetter(strStructName, strColName, strColType string) (strSetter string) {
-	return fmt.Sprintf("func (do *%v) Set%v(v %v) { do.%v = v } \n\n", strStructName, strColName, strColType, strColName)
-}
-
 func ReplaceCRLF(strIn string) (strOut string) {
 	strOut = strings.ReplaceAll(strIn, "\r", "")
 	strOut = strings.ReplaceAll(strOut, "\n", "")
