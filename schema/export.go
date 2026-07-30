@@ -78,43 +78,6 @@ func ExportGoSchema(provider SchemaProvider, cmd *CmdFlags) error {
 	return nil
 }
 
-func ExportProtoSchema(provider SchemaProvider, cmd *CmdFlags) error {
-	schemas, err := provider.QueryTableSchemas(cmd)
-	if err != nil {
-		return log.Errorf(err.Error())
-	}
-
-	strHead := MakeProtoHead(cmd)
-	var file *os.File
-	for i, v := range schemas {
-		if err = provider.QueryTableColumns(v); err != nil {
-			return log.Error(err.Error())
-		}
-
-		var appendMode bool
-		if i > 0 && cmd.OneFile {
-			appendMode = true
-		}
-
-		strBody := MakeProtoBody(cmd, v)
-
-		if file, err = CreateOutputFile(cmd, v, "proto", appendMode); err != nil {
-			return log.Error(err.Error())
-		}
-
-		if i == 0 {
-			file.WriteString(strHead)
-		} else if !cmd.OneFile {
-			file.WriteString(strHead)
-		}
-		file.WriteString(strBody)
-	}
-	if file != nil {
-		file.Close()
-	}
-	return nil
-}
-
 func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
 	if len(tables) == 0 {
 		return nil

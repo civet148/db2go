@@ -1,0 +1,21 @@
+syntax = "proto3";
+package {{.PackageName}};
+
+{{if .HasGogoImport}}
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+{{end}}
+{{- range $o := .GogoOptions}}
+option {{$o}};
+{{end -}}
+{{- range $k, $v := .ProtoOptions}}
+option {{$k}}="{{$v}}";
+{{end}}
+
+{{range $m := .Messages}}
+message {{$m.Name}} {
+{{- range $f := $m.Fields}}
+	{{$f.Type}} {{$f.Name}} = {{$f.Ordinal}}; //{{$f.Comment}}
+{{- end}}
+}
+
+{{end -}}

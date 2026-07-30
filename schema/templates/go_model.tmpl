@@ -1,0 +1,33 @@
+package {{.PackageName}}
+
+const {{.TableNameConst}} = "{{.TableName}}"{{if .TableComment}} //{{.TableComment}}{{end}}
+
+{{if .ImportPackages}}{{range $p := .ImportPackages}}
+import "{{$p}}"{{end}}
+{{end}}{{if .ImportVer}}
+{{.ImportVer}}
+{{end}}
+{{if .Columns}}const (
+{{- range .Columns}}
+	{{.ConstName}} = "{{.ColumnName}}"
+{{- end}}
+)
+
+{{end -}}
+type {{.StructName}} struct {
+{{- range .Columns}}
+	{{.GoName}} {{.GoType}} `{{.Tags}}`{{if .Comment}} //{{.Comment}}{{end}}
+{{- end}}
+}
+
+func (do {{.StructName}}) TableName() string {
+	return {{.TableNameConst}}
+}
+{{- range .Columns}}
+
+func (do {{.StructName}}) Get{{.GoName}}() {{.GoType}} { return do.{{.GoName}} }
+{{- end}}
+{{- range .Columns}}
+
+func (do *{{.StructName}}) Set{{.GoName}}(v {{.GoType}}) { do.{{.GoName}} = v }
+{{- end}}
