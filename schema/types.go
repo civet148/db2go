@@ -286,10 +286,14 @@ type CmdFlags struct {
 	FieldStyle    FieldStyle
 }
 
-func NewCmdFlags() *CmdFlags {
-	return &CmdFlags{
+func NewCmdFlags(opts ...Option) *CmdFlags {
+	c := &CmdFlags{
 		ProtoOptions: make(map[string]string),
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (c *CmdFlags) String() string {

@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	SshScheme   = "ssh://"
 	Version     = "v3.8.3"
 	ProgramName = "db2go"
 )
@@ -27,271 +26,245 @@ var (
 	GitCommit = "<N/A>"
 )
 
-const (
-	CmdFlag_Url           = "url"
-	CmdFlag_Output        = "out"
-	CmdFlag_Database      = "db"
-	CmdFlag_Tables        = "table"
-	CmdFlag_Tags          = "tag"
-	CmdFlag_Prefix        = "prefix"
-	CmdFlag_Suffix        = "suffix"
-	CmdFlag_Package       = "package"
-	CmdFlag_Without       = "without"
-	CmdFlag_ReadOnly      = "readonly"
-	CmdFlag_Protobuf      = "proto"
-	CmdFlag_SpecType      = "spec-type"
-	CmdFlag_EnableDecimal = "enable-decimal"
-	CmdFlag_GogoOptions   = "gogo-options"
-	CmdFlag_ProtoOptions  = "proto-options"
-	CmdFlag_Merge         = "merge"
-	CmdFlag_SSH           = "ssh"
-	CmdFlag_V2            = "v2"
-	CmdFlag_Debug         = "debug"
-	CmdFlag_JsonStyle     = "json-style"
-	CmdFlag_ExportDDL     = "ddl"
-	CmdFlag_FieldStyle    = "field-style"
-)
-
 func init() {
 	log.SetLevel("info")
 }
 
 func grace() {
-	//capture signal of Ctrl+C and gracefully exit
 	sigChannel := make(chan os.Signal, 1)
 	signal.Notify(sigChannel, os.Interrupt)
 	go func() {
 		for {
 			select {
 			case s := <-sigChannel:
-				{
-					if s != nil && s == os.Interrupt {
-						fmt.Printf("Ctrl+C signal captured, program exiting...\n")
-						close(sigChannel)
-						os.Exit(0)
-					}
+				if s != nil && s == os.Interrupt {
+					fmt.Printf("Ctrl+C signal captured, program exiting...\n")
+					close(sigChannel)
+					os.Exit(0)
 				}
 			}
 		}
 	}()
 }
 
-func main() {
+func commonFlags() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:     "url",
+			Aliases:  []string{"u"},
+			Usage:    "data source name of database",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:    "out",
+			Aliases: []string{"o"},
+			Usage:   "output path",
+			Value:   ".",
+		},
+		&cli.StringFlag{
+			Name:  "db",
+			Usage: "database name to export",
+		},
+		&cli.StringFlag{
+			Name:    "table",
+			Aliases: []string{"t"},
+			Usage:   "database tables to export (prefix with - to exclude)",
+		},
+		&cli.StringFlag{
+			Name:    "prefix",
+			Aliases: []string{"p"},
+			Usage:   "filename prefix",
+		},
+		&cli.StringFlag{
+			Name:    "suffix",
+			Aliases: []string{"s"},
+			Usage:   "filename suffix",
+		},
+		&cli.StringFlag{
+			Name:    "package",
+			Aliases: []string{"P"},
+			Usage:   "package name",
+		},
+		&cli.StringFlag{
+			Name:  "without",
+			Usage: "exclude columns split by comma",
+		},
+		&cli.StringFlag{
+			Name:    "spec-type",
+			Aliases: []string{"S"},
+			Usage:   "specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'",
+		},
+		&cli.BoolFlag{
+			Name:    "enable-decimal",
+			Aliases: []string{"D"},
+			Usage:   "decimal as sqlca.Decimal type",
+		},
+		&cli.StringFlag{
+			Name:  "ssh",
+			Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
+		},
+		&cli.BoolFlag{
+			Name:  "v2",
+			Usage: "sqlca v2 package imports",
+		},
+		&cli.BoolFlag{
+			Name:    "debug",
+			Aliases: []string{"d"},
+			Usage:   "open debug mode",
+		},
+		&cli.StringFlag{
+			Name:    "field-style",
+			Aliases: []string{"style"},
+			Usage:   "protobuf message field camel style (small or big)",
+		},
+		&cli.StringFlag{
+			Name:  "ddl",
+			Usage: "export database DDL to file",
+		},
+	}
+}
 
+func goFlags() []cli.Flag {
+	return append(commonFlags(),
+		&cli.StringFlag{
+			Name:    "tag",
+			Aliases: []string{"T"},
+			Usage:   "export tags for golang",
+		},
+		&cli.StringFlag{
+			Name:    "readonly",
+			Aliases: []string{"R"},
+			Usage:   "readonly columns split by comma",
+		},
+	)
+}
+
+func protoFlags() []cli.Flag {
+	return append(commonFlags(),
+		&cli.StringFlag{
+			Name:    "proto-options",
+			Aliases: []string{"po"},
+			Usage:   "set protobuf options, multiple options separated by ';'",
+		},
+		&cli.StringFlag{
+			Name:    "gogo-options",
+			Aliases: []string{"gogo"},
+			Usage:   "gogo proto options",
+		},
+		&cli.BoolFlag{
+			Name:    "merge",
+			Aliases: []string{"M"},
+			Usage:   "export to one file",
+		},
+	)
+}
+
+func main() {
 	grace()
 
 	app := &cli.App{
 		Name:    ProgramName,
-		Usage:   "db2go [options] --url <DSN>",
+		Usage:   "db2go [command] [options]",
 		Version: fmt.Sprintf("%s %s commit %s", Version, BuildTime, GitCommit),
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     CmdFlag_Url,
-				Aliases:  []string{"u"},
-				Usage:    "data source name of database",
-				Required: true,
+		Commands: []*cli.Command{
+			{
+				Name:  "go",
+				Usage: "Generate Go model files from database tables",
+				Flags: goFlags(),
+				Action: func(ctx *cli.Context) error {
+					return runGo(ctx)
+				},
 			},
-			&cli.StringFlag{
-				Name:    CmdFlag_Output,
-				Aliases: []string{"o"},
-				Usage:   "output path",
-				Value:   ".",
+			{
+				Name:  "proto",
+				Usage: "Generate protobuf files from database tables",
+				Flags: protoFlags(),
+				Action: func(ctx *cli.Context) error {
+					return runProto(ctx)
+				},
 			},
-			&cli.StringFlag{
-				Name:  CmdFlag_Database,
-				Usage: "database name to export",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_Tables,
-				Aliases: []string{"t"},
-				Usage:   "database tables to export",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_Tags,
-				Aliases: []string{"T"},
-				Usage:   "export tags for golang",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_Prefix,
-				Aliases: []string{"p"},
-				Usage:   "filename prefix",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_Suffix,
-				Aliases: []string{"s"},
-				Usage:   "filename suffix",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_Package,
-				Aliases: []string{"P"},
-				Usage:   "package name",
-			},
-			&cli.StringFlag{
-				Name:  CmdFlag_Without,
-				Usage: "exclude columns split by colon",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_ReadOnly,
-				Aliases: []string{"R"},
-				Usage:   "readonly columns split by colon",
-			},
-			&cli.BoolFlag{
-				Name:  CmdFlag_Protobuf,
-				Usage: "export protobuf file",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_SpecType,
-				Aliases: []string{"S"},
-				Usage:   "specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'",
-			},
-			&cli.BoolFlag{
-				Name:    CmdFlag_EnableDecimal,
-				Aliases: []string{"D"},
-				Usage:   "decimal as sqlca.Decimal type",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_GogoOptions,
-				Aliases: []string{"gogo"},
-				Usage:   "gogo proto options",
-			},
-			&cli.BoolFlag{
-				Name:    CmdFlag_Merge,
-				Aliases: []string{"M"},
-				Usage:   "export to one file",
-			},
-			&cli.StringFlag{
-				Name:  CmdFlag_SSH,
-				Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
-			},
-			&cli.BoolFlag{
-				Name:  CmdFlag_V2,
-				Usage: "sqlca v2 package imports",
-			},
-			&cli.StringFlag{
-				Name:  CmdFlag_ExportDDL,
-				Usage: "export database DDL to file",
-			},
-			&cli.BoolFlag{
-				Name:    CmdFlag_Debug,
-				Aliases: []string{"d"},
-				Usage:   "open debug mode",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_ProtoOptions,
-				Aliases: []string{"po"},
-				Usage:   "set protobuf options, multiple options seperated by ';'",
-			},
-			&cli.StringFlag{
-				Name:    CmdFlag_FieldStyle,
-				Aliases: []string{"style"},
-				Usage:   "protobuf message field camel style (small or big)",
-			},
-		},
-		Action: func(ctx *cli.Context) error {
-
-			return doAction(ctx)
 		},
 	}
+
 	if err := app.Run(os.Args); err != nil {
 		os.Exit(1)
-		return
 	}
 }
 
-func doAction(ctx *cli.Context) error {
-	//var err error
-	var cmd = schema.NewCmdFlags()
-	cmd.Debug = ctx.Bool(CmdFlag_Debug)
-	cmd.Prefix = ctx.String(CmdFlag_Prefix)
-	cmd.Suffix = ctx.String(CmdFlag_Suffix)
-	cmd.OutDir = ctx.String(CmdFlag_Output)
-	cmd.ConnUrl = ctx.String(CmdFlag_Url)
-	cmd.PackageName = ctx.String(CmdFlag_Package)
-	cmd.Protobuf = ctx.Bool(CmdFlag_Protobuf)
-	cmd.EnableDecimal = ctx.Bool(CmdFlag_EnableDecimal)
-	cmd.SSH = ctx.String(CmdFlag_SSH)
-	cmd.Database = ctx.String(CmdFlag_Database)
-	cmd.OneFile = ctx.Bool(CmdFlag_Merge)
-	cmd.ParseSpecTypes(ctx.String(CmdFlag_SpecType))
-	cmd.JsonStyle = ctx.String(CmdFlag_JsonStyle)
-	cmd.ExportDDL = ctx.String(CmdFlag_ExportDDL)
-	cmd.FieldStyle = schema.FieldStyleFromString(ctx.String(CmdFlag_FieldStyle))
+func buildCommonOptions(ctx *cli.Context) []schema.Option {
+	var opts []schema.Option
 
-	if ctx.Bool(CmdFlag_V2) {
-		cmd.SqlcaPkg = schema.SQLCA_V2_PKG
-		cmd.ImportVer = schema.IMPORT_SQLCA_V2
-	} else {
-		cmd.SqlcaPkg = schema.SQLCA_V3_PKG
-		cmd.ImportVer = schema.IMPORT_SQLCA_V3
+	opts = append(opts, schema.WithURL(ctx.String("url")))
+	opts = append(opts, schema.WithOutput(ctx.String("out")))
+	opts = append(opts, schema.WithDatabase(ctx.String("db")))
+	opts = append(opts, schema.WithTableFilter(ctx.String("table")))
+	opts = append(opts, schema.WithPrefix(ctx.String("prefix")))
+	opts = append(opts, schema.WithSuffix(ctx.String("suffix")))
+	opts = append(opts, schema.WithPackageName(ctx.String("package")))
+	opts = append(opts, schema.WithDebug(ctx.Bool("debug")))
+
+	if v := ctx.String("without"); v != "" {
+		opts = append(opts, schema.WithWithout(schema.TrimSpaceSlice(schema.Split(v))))
 	}
-	if cmd.SSH != "" {
-		if !strings.Contains(cmd.SSH, SshScheme) {
-			cmd.SSH = SshScheme + cmd.SSH
-		}
+	if v := ctx.String("spec-type"); v != "" {
+		opts = append(opts, schema.WithSpecType(v))
 	}
-	if cmd.Protobuf {
-		var strProtoOptions string
-		strProtoOptions = ctx.String(CmdFlag_ProtoOptions)
-		if strProtoOptions != "" {
-			opts := strings.Split(strProtoOptions, ";")
-			for _, opt := range opts {
-				ss := strings.Split(opt, "=")
-				if len(ss) != 2 {
-					return log.Errorf("invalid protobuf option %s", opt)
-				}
-				cmd.ProtoOptions[ss[0]] = ss[1]
+	opts = append(opts, schema.WithEnableDecimal(ctx.Bool("enable-decimal")))
+	opts = append(opts, schema.WithSSH(ctx.String("ssh")))
+	opts = append(opts, schema.WithV2(ctx.Bool("v2")))
+	opts = append(opts, schema.WithFieldStyle(ctx.String("field-style")))
+	opts = append(opts, schema.WithExportDDL(ctx.String("ddl")))
+
+	return opts
+}
+
+func runGo(ctx *cli.Context) error {
+	opts := buildCommonOptions(ctx)
+
+	if v := ctx.String("tag"); v != "" {
+		tags := schema.TrimSpaceSlice(schema.Split(v))
+		opts = append(opts, schema.WithTags(tags))
+	}
+	if v := ctx.String("readonly"); v != "" {
+		opts = append(opts, schema.WithReadOnly(schema.TrimSpaceSlice(schema.Split(v))))
+	}
+
+	cmd := schema.NewCmdFlags(opts...)
+	log.Infof("开始生成golang文件...")
+	return execute(cmd)
+}
+
+func runProto(ctx *cli.Context) error {
+	opts := buildCommonOptions(ctx)
+
+	if v := ctx.String("proto-options"); v != "" {
+		protoOpts := make(map[string]string)
+		for _, opt := range strings.Split(v, ";") {
+			ss := strings.Split(opt, "=")
+			if len(ss) != 2 {
+				return fmt.Errorf("invalid protobuf option %s", opt)
 			}
+			protoOpts[ss[0]] = ss[1]
 		}
+		opts = append(opts, schema.WithProtoOptions(protoOpts))
 	}
-	if cmd.Debug {
-		log.SetLevel("debug")
+	if v := ctx.String("gogo-options"); v != "" {
+		opts = append(opts, schema.WithGogoOptions(schema.TrimSpaceSlice(schema.Split(v))))
 	}
+	opts = append(opts, schema.WithOneFile(ctx.Bool("merge")))
+	opts = append(opts, schema.WithProtobuf(true))
 
+	cmd := schema.NewCmdFlags(opts...)
+	log.Infof("开始生成protobuf文件...")
+	return execute(cmd)
+}
+
+func execute(cmd *schema.CmdFlags) error {
 	ui := sqlca.ParseUrl(cmd.ConnUrl)
 
 	if cmd.Database == "" {
-		//use default database
 		cmd.Database = schema.GetDatabaseName(ui.Path)
 		log.Infof("using default database %s", cmd.Database)
-	}
-
-	if v := ctx.String(CmdFlag_Tables); v != "" {
-		var tables []string
-		tables = schema.TrimSpaceSlice(schema.Split(v))
-		for _, t := range tables {
-			if t[0] == '-' {
-				cmd.ExcludeTables = append(cmd.ExcludeTables, t[1:])
-			} else {
-				cmd.Tables = append(cmd.Tables, t)
-			}
-		}
-	}
-
-	if v := ctx.String(CmdFlag_Without); v != "" {
-		cmd.Without = schema.TrimSpaceSlice(schema.Split(v))
-	}
-
-	if cmd.Protobuf {
-		gogoOpt := ctx.String(CmdFlag_GogoOptions)
-		if gogoOpt != "" {
-			cmd.GogoOptions = schema.TrimSpaceSlice(schema.Split(gogoOpt))
-		}
-	}
-
-	if v := ctx.String(CmdFlag_Tags); v != "" {
-		cmd.ExtraTags = schema.TrimSpaceSlice(schema.Split(v))
-		var hasGorm bool
-		for _, tag := range cmd.ExtraTags {
-			if tag == "gorm" {
-				hasGorm = true
-			}
-		}
-		if !hasGorm {
-			cmd.ExtraTags = append(cmd.ExtraTags, "gorm")
-		}
-	}
-	if v := ctx.String(CmdFlag_ReadOnly); v != "" {
-		cmd.ReadOnly = schema.TrimSpaceSlice(schema.Split(v))
 	}
 
 	cmd.Scheme = ui.Scheme
@@ -303,22 +276,30 @@ func doAction(ctx *cli.Context) error {
 
 	var err error
 	if strings.TrimSpace(cmd.SSH) != "" {
-		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl, Option(cmd.SSH))
+		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl, sshOption(cmd.SSH))
 	} else {
 		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl)
 	}
 	if err != nil {
 		return log.Errorf("connect database [%s] error [%s]", cmd.ConnUrl, err.Error())
 	}
-	return export(cmd, cmd.Engine)
+
+	exporter := schema.NewExporter(cmd, cmd.Engine)
+	if exporter == nil {
+		return log.Errorf("unsupported scheme: %s", cmd.Scheme)
+	}
+
+	if cmd.Protobuf {
+		return exporter.ExportProto()
+	}
+	return exporter.ExportGo()
 }
 
-func Option(strSSH string) *sqlca.Options {
+func sshOption(strSSH string) *sqlca.Options {
 	if strSSH == "" {
 		return nil
 	}
 	ssh := sqlca.ParseUrl(strSSH)
-
 	return &sqlca.Options{
 		SSH: &sqlca.SSH{
 			User:     ssh.User,
@@ -326,24 +307,4 @@ func Option(strSSH string) *sqlca.Options {
 			Host:     ssh.Host,
 		},
 	}
-}
-
-func export(cmd *schema.CmdFlags, e *sqlca.Engine) (err error) {
-	exporter := schema.NewExporter(cmd, e)
-	if exporter == nil {
-		return log.Errorf("不支持的导出类型: %v", err.Error())
-	}
-	if cmd.Protobuf {
-		log.Infof("开始生成protobuf文件...")
-		if err = exporter.ExportProto(); err != nil {
-			log.Errorf("export [%v] to protobuf file error [%v]", cmd.Scheme, err.Error())
-			return err
-		}
-	} else {
-		log.Infof("开始生成golang文件...")
-		if err := exporter.ExportGo(); err != nil {
-			return err
-		}
-	}
-	return nil
 }

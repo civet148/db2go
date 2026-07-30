@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/civet148/db2go/schema"
@@ -11,9 +10,8 @@ import (
 )
 
 type ExporterMysql struct {
-	Cmd     *schema.CmdFlags
-	Engine  *sqlca.Engine
-	Schemas []*schema.TableSchema
+	Cmd    *schema.CmdFlags
+	Engine *sqlca.Engine
 }
 
 func init() {
@@ -21,7 +19,6 @@ func init() {
 }
 
 func NewExporterMysql(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
-
 	return &ExporterMysql{
 		Cmd:    cmd,
 		Engine: e,
@@ -29,106 +26,19 @@ func NewExporterMysql(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
 }
 
 func (m *ExporterMysql) ExportGo() (err error) {
-	var cmd = m.Cmd
-	var e = m.Engine
-	var schemas = m.Schemas
-	//var tableNames []string
-
-	if cmd.Database == "" {
-		err = fmt.Errorf("no database selected")
-		return log.Error(err.Error())
-	}
-	//var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
-	var ddl *schema.CreateDatabaseDDL
-	ddl, err = m.queryCreateDatabaseDDL(cmd, e)
-	if err != nil {
-		return err
-	}
-	if schemas, err = m.queryTableSchemas(cmd, e); err != nil {
-
-		return log.Errorf("query tables error [%s]", err.Error())
-	}
-	for _, v := range schemas {
-		if err = m.queryTableColumns(v); err != nil {
-			return log.Error(err.Error())
-		}
-		if err = m.queryTableIndexes(v); err != nil {
-			return log.Error(err.Error())
-		}
-		if err = m.queryTableCreateStructure(v); err != nil {
-			return log.Error(err.Error())
-		}
-	}
-	err = schema.ExportTableSchema(cmd, schemas)
-	if err != nil {
-		return err
-	}
-	if cmd.ExportDDL != "" {
-		err = schema.ExportToSqlFile(cmd, ddl, schemas)
-		if err != nil {
-			log.Warnf("export to file [%s] error [%s]", cmd.ExportDDL, err.Error())
-		}
-	}
-	return nil
+	return schema.ExportGoSchema(m, m.Cmd)
 }
 
 func (m *ExporterMysql) ExportProto() (err error) {
-	var cmd = m.Cmd
-	var e = m.Engine
-	var schemas = m.Schemas
-	if schemas, err = m.queryTableSchemas(cmd, e); err != nil {
-		log.Errorf(err.Error())
-		return
-	}
-
-	var file *os.File
-	strHead := schema.MakeProtoHead(cmd)
-	for i, v := range schemas {
-		if err = m.queryTableColumns(v); err != nil {
-			log.Error(err.Error())
-			return
-		}
-
-		var append bool
-		if i > 0 && cmd.OneFile {
-			append = true
-		}
-
-		strBody := schema.MakeProtoBody(cmd, v)
-
-		if file, err = schema.CreateOutputFile(cmd, v, "proto", append); err != nil {
-			log.Error(err.Error())
-			return
-		}
-
-		if i == 0 {
-			file.WriteString(strHead)
-		} else if !cmd.OneFile {
-			file.WriteString(strHead)
-		}
-		file.WriteString(strBody)
-	}
-	file.Close()
-	return
+	return schema.ExportProtoSchema(m, m.Cmd)
 }
 
-func (m *ExporterMysql) queryCreateDatabaseDDL(cmd *schema.CmdFlags, e *sqlca.Engine) (ddl *schema.CreateDatabaseDDL, err error) {
-	_, err = e.Model(&ddl).QueryRaw("SHOW CREATE DATABASE `%s`", cmd.Database)
-	if err != nil {
-		return nil, log.Error(err.Error())
-	}
-	return ddl, nil
-}
-
-func (m *ExporterMysql) queryTableSchemas(cmd *schema.CmdFlags, e *sqlca.Engine) (schemas []*schema.TableSchema, err error) {
-
+func (m *ExporterMysql) QueryTableSchemas(cmd *schema.CmdFlags) ([]*schema.TableSchema, error) {
 	var strQuery string
 	var tables []string
 
 	if cmd.Database == "" {
-		err = fmt.Errorf("no database selected")
-		log.Error(err.Error())
-		return
+		return nil, fmt.Errorf("no database selected")
 	}
 	var strDatabaseName = fmt.Sprintf("'%v'", cmd.Database)
 
@@ -151,25 +61,17 @@ func (m *ExporterMysql) queryTableSchemas(cmd *schema.CmdFlags, e *sqlca.Engine)
 			strDatabaseName, strings.Join(tables, ","))
 	}
 
-	_, err = e.Model(&schemas).QueryRaw(strQuery)
+	var schemas []*schema.TableSchema
+	_, err := cmd.Engine.Model(&schemas).QueryRaw(strQuery)
 	if err != nil {
 		log.Errorf("%s", err)
-		return
+		return nil, err
 	}
-	return
+	return schemas, nil
 }
 
-func (m *ExporterMysql) queryTableColumns(table *schema.TableSchema) (err error) {
-
-	/*
-		 SELECT
-				`TABLE_NAME` as table_name, `COLUMN_NAME` as column_name, `DATA_TYPE` as data_type, `COLUMN_TYPE` as column_type, `EXTRA` as extra,
-				`COLUMN_KEY` as column_key, `COLUMN_COMMENT` as column_comment, `IS_NULLABLE` as is_nullable, COLUMN_DEFAULT as column_default, COLUMN_KEY as column_key
-		 FROM `INFORMATION_SCHEMA`.`COLUMNS`
-		 WHERE `TABLE_SCHEMA` = 'test' AND `TABLE_NAME` = 'users' ORDER BY ORDINAL_POSITION ASC
-	*/
-	var e = m.Engine
-	_, err = e.Model(&table.Columns).QueryRaw("select `TABLE_NAME` as table_name, `COLUMN_NAME` as column_name, `DATA_TYPE` as data_type, `COLUMN_TYPE` as column_type, `EXTRA` as extra,"+
+func (m *ExporterMysql) QueryTableColumns(table *schema.TableSchema) (err error) {
+	_, err = m.Cmd.Engine.Model(&table.Columns).QueryRaw("select `TABLE_NAME` as table_name, `COLUMN_NAME` as column_name, `DATA_TYPE` as data_type, `COLUMN_TYPE` as column_type, `EXTRA` as extra,"+
 		" `COLUMN_KEY` as column_key, `COLUMN_COMMENT` as column_comment, `IS_NULLABLE` as is_nullable, COLUMN_DEFAULT as column_default, COLUMN_KEY as column_key "+
 		" FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA` = '%v' AND `TABLE_NAME` = '%v' ORDER BY ORDINAL_POSITION ASC", table.SchemeName, table.TableName)
 	if err != nil {
@@ -181,25 +83,8 @@ func (m *ExporterMysql) queryTableColumns(table *schema.TableSchema) (err error)
 	return
 }
 
-func (m *ExporterMysql) queryTableCreateStructure(table *schema.TableSchema) (err error) {
-	if _, err = m.Engine.Model(&table.TableName, &table.TableCreateSQL).QueryRaw("SHOW CREATE TABLE `%s`", table.TableName); err != nil {
-		log.Error(err.Error())
-		return
-	}
-	return
-}
-
-func (m *ExporterMysql) queryTableIndexes(table *schema.TableSchema) (err error) {
-	/*
-		SELECT
-		    TABLE_SCHEMA AS 'db_name', TABLE_NAME AS 'table_name', INDEX_NAME AS 'index_name', COLUMN_NAME AS 'column_name',
-			SEQ_IN_INDEX AS 'seq_in_index', INDEX_TYPE AS 'index_type', NON_UNIQUE AS 'non_unique', INDEX_COMMENT AS 'index_comment'
-		FROM INFORMATION_SCHEMA.STATISTICS
-		WHERE TABLE_SCHEMA = 'test' AND TABLE_NAME = 'inventory_out'
-		ORDER BY INDEX_NAME, SEQ_IN_INDEX;
-	*/
-	var e = m.Engine
-	_, err = e.Model(&table.Indexes).QueryRaw(`SELECT
+func (m *ExporterMysql) QueryTableIndexes(table *schema.TableSchema) (err error) {
+	_, err = m.Cmd.Engine.Model(&table.Indexes).QueryRaw(`SELECT
 		    TABLE_SCHEMA AS 'db_name', TABLE_NAME AS 'table_name', INDEX_NAME AS 'index_name', COLUMN_NAME AS 'column_name',
 			SEQ_IN_INDEX AS 'seq_in_index', INDEX_TYPE AS 'index_type', NON_UNIQUE AS 'non_unique', INDEX_COMMENT AS 'index_comment'
 		FROM INFORMATION_SCHEMA.STATISTICS
@@ -210,4 +95,12 @@ func (m *ExporterMysql) queryTableIndexes(table *schema.TableSchema) (err error)
 		return
 	}
 	return nil
+}
+
+func (m *ExporterMysql) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (ddl *schema.CreateDatabaseDDL, err error) {
+	_, err = cmd.Engine.Model(&ddl).QueryRaw("SHOW CREATE DATABASE `%s`", cmd.Database)
+	if err != nil {
+		return nil, log.Error(err.Error())
+	}
+	return ddl, nil
 }

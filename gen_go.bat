@@ -37,7 +37,7 @@ IF "%errorlevel%" == "0" (
 )
 
 
-db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" \
+db2go go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" \
  --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tag "%TAGS%" --ddl "%DDL_FILE%"
 
 echo "generate go file ok, formatting..."

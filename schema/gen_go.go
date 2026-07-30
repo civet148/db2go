@@ -3,47 +3,12 @@ package schema
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
-
-	"github.com/civet148/log"
 )
 
 const (
 	TableNamePrefix = "TableName"
 )
-
-func ExportToSqlFile(cmd *CmdFlags, ddl *CreateDatabaseDDL, tables []*TableSchema) (err error) {
-	if len(tables) == 0 {
-		return nil //no table found
-	}
-	var strDatabase = fmt.Sprintf("`%s`", cmd.Database)
-	var strTemplate string
-
-	strTemplate += ddl.CreateSQL + ";\n"
-	strTemplate += fmt.Sprintf(`USE %s;`, strDatabase)
-	strTemplate += "\n\n"
-	for _, t := range tables {
-		strTemplate += "\n"
-		strTemplate += t.TableCreateSQL
-		strTemplate += ";\n"
-	}
-	dir := filepath.Dir(cmd.ExportDDL)
-	if err = MakeDir(dir); err != nil {
-		return err
-	}
-
-	var fi *os.File
-	fi, err = os.OpenFile(cmd.ExportDDL, os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
-	if err != nil {
-		return log.Errorf("open file [%v] error (%v)", cmd.ExportDDL, err.Error())
-	}
-	_, err = fi.WriteString(strTemplate)
-	if err != nil {
-		return log.Errorf(err.Error())
-	}
-	return nil
-}
 
 func ExportTableSchema(cmd *CmdFlags, tables []*TableSchema) (err error) {
 	for _, v := range tables {
