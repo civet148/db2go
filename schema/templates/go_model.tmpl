@@ -1,12 +1,12 @@
 package {{.PackageName}}
 
-const {{.TableNameConst}} = "{{.TableName}}"{{if .TableComment}} //{{.TableComment}}{{end}}
-
 {{if .ImportPackages}}{{range $p := .ImportPackages}}
 import "{{$p}}"{{end}}
 {{end}}{{if .ImportVer}}
 {{.ImportVer}}
 {{end}}
+const {{.TableNameConst}} = "{{.TableName}}"{{if .TableComment}} //{{.TableComment}}{{end}}
+
 {{if .Columns}}const (
 {{- range .Columns}}
 	{{.ConstName}} = "{{.ColumnName}}"
@@ -25,9 +25,9 @@ func (do {{.StructName}}) TableName() string {
 }
 {{- range .Columns}}
 
-func (do {{.StructName}}) Get{{.GoName}}() {{.GoType}} { return do.{{.GoName}} }
+func (do {{$.StructName}}) Get{{.GoName}}() {{.GoType}} { return do.{{.GoName}} }
 {{- end}}
 {{- range .Columns}}
 
-func (do *{{.StructName}}) Set{{.GoName}}(v {{.GoType}}) { do.{{.GoName}} = v }
+func (do *{{$.StructName}}) Set{{.GoName}}(v {{.GoType}}) { do.{{.GoName}} = v }
 {{- end}}
