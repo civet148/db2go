@@ -1,0 +1,23 @@
+syntax = "proto3";
+package proto;
+
+
+
+
+message InventoryIn {
+	uint64 id = 1; //
+	sint32 is_deleted = 4; //
+	string delete_time = 5; //
+	uint64 product_id = 6; //
+	string order_no = 7; //
+	uint64 user_id = 8; //
+	string user_name = 9; //
+	double quantity = 10; //
+	double weight = 11; //
+	string remark = 12; //
+	uint64 create_id = 13; //
+	string create_name = 14; //
+	uint64 update_id = 15; //
+	string update_name = 16; //
+}
+

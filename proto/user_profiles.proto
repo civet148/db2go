@@ -1,0 +1,13 @@
+syntax = "proto3";
+package proto;
+
+
+
+
+message UserProfile {
+	uint64 id = 1; //
+	uint64 user_id = 4; //
+	string avatar = 5; //
+	string address = 6; //
+}
+

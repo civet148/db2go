@@ -1,0 +1,21 @@
+syntax = "proto3";
+package proto;
+
+
+
+
+message InventoryData {
+	uint64 id = 1; //
+	sint32 is_frozen = 4; //
+	string name = 5; //产品：名称；不能为空
+	string serial_no = 6; //产品序列号
+	double quantity = 7; //
+	double price = 8; //
+	string location = 9; //
+	string product_extra = 10; //
+	uint64 create_id = 11; //
+	string create_name = 12; //
+	uint64 update_id = 13; //
+	string update_name = 14; //
+}
+

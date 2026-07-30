@@ -1,0 +1,11 @@
+syntax = "proto3";
+package proto;
+
+
+
+
+message Role {
+	uint64 id = 1; //
+	string name = 4; //
+}
+
