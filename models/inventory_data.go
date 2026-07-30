@@ -2,12 +2,15 @@ package models
 
 import (
 	"github.com/civet148/sqlca/v3"
+	"time"
 )
 
 const TableNameInventoryData = "inventory_data"
 
 const (
 	InventoryDataColumn_Id           = "id"
+	InventoryDataColumn_CreatedAt    = "created_at"
+	InventoryDataColumn_UpdatedAt    = "updated_at"
 	InventoryDataColumn_IsFrozen     = "is_frozen"
 	InventoryDataColumn_Name         = "name"
 	InventoryDataColumn_SerialNo     = "serial_no"
@@ -21,13 +24,10 @@ const (
 	InventoryDataColumn_UpdateName   = "update_name"
 )
 
-const (
-	InventoryDataColumn_CreatedAt = "created_at"
-	InventoryDataColumn_UpdatedAt = "updated_at"
-)
-
 type InventoryData struct {
 	Id           uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
+	CreatedAt    time.Time     `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_inventory_data_created_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	UpdatedAt    time.Time     `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_inventory_data_updated_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
 	IsFrozen     int8          `json:"is_frozen" db:"is_frozen" gorm:"column:is_frozen;type:tinyint(1);default:0;" sqlca:"isnull"`
 	Name         string        `json:"name" db:"name" gorm:"column:name;type:varchar(255);default:null;comment:产品：名称；不能为空;" sqlca:"isnull"`                            //产品：名称；不能为空
 	SerialNo     string        `json:"serial_no" db:"serial_no" gorm:"column:serial_no;type:varchar(68);index:i_serial_no;default:null;comment:产品序列号;" sqlca:"isnull"` //产品序列号
@@ -46,6 +46,10 @@ func (do InventoryData) TableName() string {
 }
 
 func (do InventoryData) GetId() uint64 { return do.Id }
+
+func (do InventoryData) GetCreatedAt() time.Time { return do.CreatedAt }
+
+func (do InventoryData) GetUpdatedAt() time.Time { return do.UpdatedAt }
 
 func (do InventoryData) GetIsFrozen() int8 { return do.IsFrozen }
 
@@ -70,6 +74,10 @@ func (do InventoryData) GetUpdateId() uint64 { return do.UpdateId }
 func (do InventoryData) GetUpdateName() string { return do.UpdateName }
 
 func (do *InventoryData) SetId(v uint64) { do.Id = v }
+
+func (do *InventoryData) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+
+func (do *InventoryData) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
 
 func (do *InventoryData) SetIsFrozen(v int8) { do.IsFrozen = v }
 
