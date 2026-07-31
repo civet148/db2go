@@ -6,6 +6,8 @@ package proto;
 
 message UserProfile {
 	uint64 id = 1; //
+	string created_at = 2; //
+	string updated_at = 3; //
 	uint64 user_id = 4; //
 	string avatar = 5; //
 	string address = 6; //

@@ -6,6 +6,8 @@ package proto;
 
 message InventoryData {
 	uint64 id = 1; //
+	string created_at = 2; //
+	string updated_at = 3; //
 	sint32 is_frozen = 4; //
 	string name = 5; //产品：名称；不能为空
 	string serial_no = 6; //产品序列号

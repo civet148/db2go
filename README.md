@@ -3,42 +3,22 @@
 ## Usage
 ```shell
 NAME:
-   db2go - db2go [options] --url <DSN>
+   db2go - db2go [command] [options]
 
 USAGE:
    db2go [global options] command [command options] [arguments...]
 
 VERSION:
-   v3.8.0 20260713 16:46:14 commit 8881abd
+   v3.9.1 20260731 10:29:06 commit 67292be
 
 COMMANDS:
+   go       Generate Go model files from database tables
+   proto    Generate protobuf files from database tables
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --url value, -u value                data source name of database
-   --out value, -o value                output path (default: ".")
-   --db value                           database name to export
-   --table value, -t value              database tables to export
-   --tag value, -T value                export tags for golang
-   --prefix value, -p value             filename prefix
-   --suffix value, -s value             filename suffix
-   --package value, -P value            package name
-   --without value                      exclude columns split by colon
-   --readonly value, -R value           readonly columns split by colon
-   --proto                              export protobuf file (default: false)
-   --spec-type value, -S value          specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'
-   --enable-decimal, -D                 decimal as sqlca.Decimal type (default: false)
-   --gogo-options value, --gogo value   gogo proto options
-   --merge, -M                          export to one file (default: false)
-   --ssh value                          ssh tunnel e.g ssh://root:123456@192.168.1.23:22
-   --v2                                 sqlca v2 package imports (default: false)
-   --ddl value                          export database DDL to file
-   --debug, -d                          open debug mode (default: false)
-   --proto-options value, --po value    set protobuf options, multiple options seperated by ';'
-   --field-style value, --style value   protobuf message field camel style (small or big)
-   --help, -h                           show help (default: false)
-   --version, -v                        print the version (default: false)
-
+   --help, -h     show help (default: false)
+   --version, -v  print the version (default: false)
 ```
 
 ## 1. 编译安装
@@ -95,7 +75,7 @@ IF "%errorlevel%" == "0" (
 )
 
 
-db2go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
+db2go go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
  --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tag "%TAGS%" --ddl "%DDL_FILE%" 
 
 echo "generate go file ok, formatting..."
@@ -141,7 +121,7 @@ if ! which db2go >/dev/null 2>&1; then
     fi
 fi
 
-db2go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
+db2go go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
  --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --tag "${TAGS}" --ddl "${DDL_FILE}" 
 
 echo "generate go file ok, formatting..."
@@ -155,78 +135,56 @@ gofmt -w ${OUT_DIR}/${PACK_NAME}
 package models
 
 import (
-	"time"
-	"github.com/civet148/sqlca/v3"
+    "time"
 )
 
-const TableNameInventoryData = "inventory_data" //产品库存数据表
 
-const (
-	INVENTORY_DATA_COLUMN_ID            = "id"
-	INVENTORY_DATA_COLUMN_CREATE_ID     = "create_id"
-	INVENTORY_DATA_COLUMN_CREATE_NAME   = "create_name"
-	INVENTORY_DATA_COLUMN_CREATE_TIME   = "create_time"
-	INVENTORY_DATA_COLUMN_UPDATE_ID     = "update_id"
-	INVENTORY_DATA_COLUMN_UPDATE_NAME   = "update_name"
-	INVENTORY_DATA_COLUMN_UPDATE_TIME   = "update_time"
-	INVENTORY_DATA_COLUMN_IS_FROZEN     = "is_frozen"
-	INVENTORY_DATA_COLUMN_NAME          = "name"
-	INVENTORY_DATA_COLUMN_SERIAL_NO     = "serial_no"
-	INVENTORY_DATA_COLUMN_QUANTITY      = "quantity"
-	INVENTORY_DATA_COLUMN_PRICE         = "price"
-	INVENTORY_DATA_COLUMN_PRODUCT_EXTRA = "product_extra"
-	INVENTORY_DATA_COLUMN_LOCATION      = "location"
-	INVENTORY_DATA_COLUMN_CREATED_AT    = "created_at"
-	INVENTORY_DATA_COLUMN_UPDATED_AT    = "updated_at"
-)
-
-type InventoryData struct {
-	Id           uint64        `json:"id,omitempty" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`                                  //产品ID
-	CreateId     uint64        `json:"create_id,omitempty" db:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;"`       //创建人ID
-	CreateName   string        `json:"create_name,omitempty" db:"create_name" gorm:"column:create_name;type:varchar(64);"`               //创建人姓名
-	UpdateId     uint64        `json:"update_id,omitempty" db:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;"`       //更新人ID
-	UpdateName   string        `json:"update_name,omitempty" db:"update_name" gorm:"column:update_name;type:varchar(64);"`               //更新人姓名
-	IsFrozen     int8          `json:"is_frozen,omitempty" db:"is_frozen" gorm:"column:is_frozen;type:tinyint(1);default:0;"`            //冻结状态(0: 未冻结 1: 已冻结)
-	Name         string        `json:"name,omitempty" db:"name" gorm:"column:name;type:varchar(255);"`                                   //产品名称
-	SerialNo     string        `json:"serial_no,omitempty" db:"serial_no" gorm:"column:serial_no;type:varchar(64);"`                     //产品编号
-	Quantity     sqlca.Decimal `json:"quantity,omitempty" db:"quantity" gorm:"column:quantity;type:decimal(16,3);default:0.000;"`        //产品库存
-	Price        sqlca.Decimal `json:"price,omitempty" db:"price" gorm:"column:price;type:decimal(16,2);default:0.00;"`                  //产品均价
-	ProductExtra string        `json:"product_extra,omitempty" db:"product_extra" gorm:"column:product_extra;type:text;" sqlca:"isnull"` //产品附带数据(JSON文本)
-	Location     sqlca.Point   `json:"location,omitempty" db:"location" gorm:"column:location;type:point;" sqlca:"isnull"`               //地理位置
-	CreatedAt    time.Time     `json:"created_at,omitempty" db:"created_at" gorm:"column:created_at;type:timestamp;not null;index;default:CURRENT_TIMESTAMP;autoCreatedAt"` //创建时间
-	UpdatedAt    time.Time     `json:"updated_at,omitempty" db:"updated_at" gorm:"column:updated_at;type:timestamp;not null;index;default:CURRENT_TIMESTAMP;autoUpdatedAt"` //更新时间
+// 手动定义的用户额外数据结构，对应数据库表 users 的 extra_data 字段
+// db2go自动合并数据库导出部分代码和手动写的代码
+type UserExtraData struct {
+	HomeAddress string `json:"home_address"`
+	PostCode    string `json:"post_code"`
 }
 
-func (do *InventoryData) GetId() uint64               { return do.Id }
-func (do *InventoryData) SetId(v uint64)              { do.Id = v }
-func (do *InventoryData) GetCreateId() uint64         { return do.CreateId }
-func (do *InventoryData) SetCreateId(v uint64)        { do.CreateId = v }
-func (do *InventoryData) GetCreateName() string       { return do.CreateName }
-func (do *InventoryData) SetCreateName(v string)      { do.CreateName = v }
-func (do *InventoryData) GetUpdateId() uint64         { return do.UpdateId }
-func (do *InventoryData) SetUpdateId(v uint64)        { do.UpdateId = v }
-func (do *InventoryData) GetUpdateName() string       { return do.UpdateName }
-func (do *InventoryData) SetUpdateName(v string)      { do.UpdateName = v }
-func (do *InventoryData) GetIsFrozen() int8           { return do.IsFrozen }
-func (do *InventoryData) SetIsFrozen(v int8)          { do.IsFrozen = v }
-func (do *InventoryData) GetName() string             { return do.Name }
-func (do *InventoryData) SetName(v string)            { do.Name = v }
-func (do *InventoryData) GetSerialNo() string         { return do.SerialNo }
-func (do *InventoryData) SetSerialNo(v string)        { do.SerialNo = v }
-func (do *InventoryData) GetQuantity() sqlca.Decimal  { return do.Quantity }
-func (do *InventoryData) SetQuantity(v sqlca.Decimal) { do.Quantity = v }
-func (do *InventoryData) GetPrice() sqlca.Decimal     { return do.Price }
-func (do *InventoryData) SetPrice(v sqlca.Decimal)    { do.Price = v }
-func (do *InventoryData) GetProductExtra() string     { return do.ProductExtra }
-func (do *InventoryData) SetProductExtra(v string)    { do.ProductExtra = v }
-func (do *InventoryData) GetLocation() sqlca.Point    { return do.Location }
-func (do *InventoryData) SetLocation(v sqlca.Point)   { do.Location = v }
-func (do *InventoryData) GetCreatedAt() time.Time     { return do.CreatedAt }
-func (do *InventoryData) SetCreatedAt(v time.Time)    { do.CreatedAt = v }
-func (do *InventoryData) GetUpdatedAt() time.Time     { return do.UpdatedAt }
-func (do *InventoryData) SetUpdatedAt(v time.Time)    { do.UpdatedAt = v }
+const TableNameUsers = "users"
 
-////////////////////// ----- 自定义代码请写在下面 ----- //////////////////////
+const (
+    UsersColumn_Id        = "id"
+    UsersColumn_CreatedAt = "created_at"
+    UsersColumn_UpdatedAt = "updated_at"
+    UsersColumn_UserName  = "user_name"
+    UsersColumn_Email     = "email"
+    UsersColumn_ExtraData = "extra_data"
+)
+
+type User struct {
+    Id          uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
+    CreatedAt   time.Time     `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_users_created_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+    UpdatedAt   time.Time     `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_users_updated_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+    UserName    string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;default:null;" sqlca:"isnull"`
+    Email       string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;default:null;" sqlca:"isnull"`
+    ExtraData   UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;default:null;" sqlca:"isnull"`
+    UserProfile *UserProfile  `json:"user_profile" db:"-" gorm:"-"` // 手动添加的代码，db2go自动合并
+    Roles       []*Role       `json:"roles" db:"-" sqlca:"-"` // 手动添加的代码，db2go自动合并
+}
+
+func (do User) TableName() string {
+    return TableNameUsers
+}
+
+func (do User) GetId() uint64 { return do.Id }
+func (do User) GetCreatedAt() time.Time { return do.CreatedAt }
+func (do User) GetUpdatedAt() time.Time { return do.UpdatedAt }
+func (do User) GetUserName() string { return do.UserName }
+func (do User) GetEmail() string { return do.Email }
+func (do User) GetExtraData() UserExtraData { return do.ExtraData }
+
+func (do *User) SetId(v uint64) { do.Id = v }
+func (do *User) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+func (do *User) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+func (do *User) SetUserName(v string) { do.UserName = v }
+func (do *User) SetEmail(v string) { do.Email = v }
+func (do *User) SetExtraData(v UserExtraData) { do.ExtraData = v }
 
 ```
 
@@ -266,7 +224,7 @@ IF "%errorlevel%" == "0" (
 
 rem 判断db2go是否安装成功
 IF "%errorlevel%" == "0" (
-    db2go --url %DSN_URL% --proto --out %OUT_DIR% --table %TABLE_NAME% --package %PACK_NAME%  --without %WITH_OUT% --proto-options %PROTO_OPTION% --merge
+    db2go --url %DSN_URL% --proto --out %OUT_DIR% --table %TABLE_NAME% --package %PACK_NAME%  --without %WITH_OUT% --proto-options %PROTO_OPTION%
     echo generate protobuf files ok
     gofmt -w %OUT_DIR%/%PACK_NAME%
 )

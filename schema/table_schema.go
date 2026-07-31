@@ -196,8 +196,6 @@ func CreateOutputFile(cmd *CmdFlags, table *TableSchema, strFileSuffix string, a
 
 	var strOutDir = cmd.OutDir
 	var strPackageName = cmd.PackageName
-	var strNamePrefix = cmd.Prefix
-	var strNameSuffix = cmd.Suffix
 
 	_, errStat := os.Stat(strOutDir)
 	if errStat != nil && os.IsNotExist(errStat) {
@@ -234,24 +232,13 @@ func CreateOutputFile(cmd *CmdFlags, table *TableSchema, strFileSuffix string, a
 		}
 	}
 
-	if strNamePrefix != "" {
-		strNamePrefix = fmt.Sprintf("%v_", strNamePrefix)
-	}
-	if strNameSuffix != "" {
-		strNameSuffix = fmt.Sprintf("_%v", strNameSuffix)
-	}
-
 	var flag = os.O_CREATE | os.O_RDWR | os.O_TRUNC
 
 	if append {
 		flag = os.O_CREATE | os.O_RDWR | os.O_APPEND
 	}
 
-	if cmd.OneFile { //数据库名称作为文件名
-		table.OutFilePath = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.SchemeName, strNameSuffix, strFileSuffix)
-	} else { //数据表名作为文件名
-		table.OutFilePath = fmt.Sprintf("%v/%v%v%v.%v", table.SchemeDir, strNamePrefix, table.TableName, strNameSuffix, strFileSuffix)
-	}
+	table.OutFilePath = fmt.Sprintf("%v/%v.%v", table.SchemeDir, table.TableName, strFileSuffix)
 
 	file, err = os.OpenFile(table.OutFilePath, flag, os.ModePerm)
 	if err != nil {

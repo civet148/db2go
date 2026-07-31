@@ -23,11 +23,11 @@ type ProtoMessageTmplData struct {
 }
 
 type ProtoFileTmplData struct {
-	PackageName  string
+	PackageName   string
 	HasGogoImport bool
-	GogoOptions  []string
-	ProtoOptions map[string]string
-	Messages     []ProtoMessageTmplData
+	GogoOptions   []string
+	ProtoOptions  map[string]string
+	Messages      []ProtoMessageTmplData
 }
 
 func MakeProtoHead(cmd *CmdFlags) string {
@@ -100,31 +100,6 @@ func ExportProtoSchema(provider SchemaProvider, cmd *CmdFlags) error {
 	schemas, err := provider.QueryTableSchemas(cmd)
 	if err != nil {
 		return logErrorf(err.Error())
-	}
-
-	if cmd.OneFile {
-		var msgs []ProtoMessageTmplData
-		for _, v := range schemas {
-			if err = provider.QueryTableColumns(v); err != nil {
-				return logError(err.Error())
-			}
-			msgs = append(msgs, buildProtoMessageData(cmd, v))
-		}
-
-		data := buildProtoFileData(cmd, msgs)
-		tmpl := template.Must(template.New("proto_file").Parse(protoFileTmpl))
-		var buf strings.Builder
-		if err = tmpl.Execute(&buf, data); err != nil {
-			return fmt.Errorf("execute proto template error: %w", err)
-		}
-
-		file, err := CreateOutputFile(cmd, schemas[0], "proto", false)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		_, err = file.WriteString(buf.String())
-		return err
 	}
 
 	for _, v := range schemas {

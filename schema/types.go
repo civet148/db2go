@@ -262,18 +262,14 @@ type CmdFlags struct {
 	ExcludeTables []string
 	Scheme        string
 	OutDir        string
-	Prefix        string
-	Suffix        string
 	PackageName   string
 	Protobuf      bool
 	EnableDecimal bool
-	OneFile       bool
 	GogoOptions   []string
 	Engine        *sqlca.Engine
 	JsonStyle     string
 	SSH           string
 	SpecTypes     []*SpecType
-	ImportVer     string
 	SqlcaPkg      string
 	Debug         bool
 	ExportDDL     string

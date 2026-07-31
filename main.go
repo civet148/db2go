@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	Version     = "v3.9.1"
+	Version     = "v3.10.0"
 	ProgramName = "db2go"
 )
 
@@ -62,23 +62,9 @@ func commonFlags() []cli.Flag {
 			Value:   ".",
 		},
 		&cli.StringFlag{
-			Name:  "db",
-			Usage: "database name to export",
-		},
-		&cli.StringFlag{
 			Name:    "table",
 			Aliases: []string{"t"},
 			Usage:   "database tables to export (prefix with - to exclude)",
-		},
-		&cli.StringFlag{
-			Name:    "prefix",
-			Aliases: []string{"p"},
-			Usage:   "filename prefix",
-		},
-		&cli.StringFlag{
-			Name:    "suffix",
-			Aliases: []string{"s"},
-			Usage:   "filename suffix",
 		},
 		&cli.StringFlag{
 			Name:    "package",
@@ -102,10 +88,6 @@ func commonFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:  "ssh",
 			Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
-		},
-		&cli.BoolFlag{
-			Name:  "v2",
-			Usage: "sqlca v2 package imports",
 		},
 		&cli.BoolFlag{
 			Name:    "debug",
@@ -151,11 +133,6 @@ func protoFlags() []cli.Flag {
 			Aliases: []string{"gogo"},
 			Usage:   "gogo proto options",
 		},
-		&cli.BoolFlag{
-			Name:    "merge",
-			Aliases: []string{"M"},
-			Usage:   "export to one file",
-		},
 	)
 }
 
@@ -198,8 +175,6 @@ func buildCommonOptions(ctx *cli.Context) []schema.Option {
 	opts = append(opts, schema.WithOutput(ctx.String("out")))
 	opts = append(opts, schema.WithDatabase(ctx.String("db")))
 	opts = append(opts, schema.WithTableFilter(ctx.String("table")))
-	opts = append(opts, schema.WithPrefix(ctx.String("prefix")))
-	opts = append(opts, schema.WithSuffix(ctx.String("suffix")))
 	opts = append(opts, schema.WithPackageName(ctx.String("package")))
 	opts = append(opts, schema.WithDebug(ctx.Bool("debug")))
 
@@ -211,7 +186,6 @@ func buildCommonOptions(ctx *cli.Context) []schema.Option {
 	}
 	opts = append(opts, schema.WithEnableDecimal(ctx.Bool("enable-decimal")))
 	opts = append(opts, schema.WithSSH(ctx.String("ssh")))
-	opts = append(opts, schema.WithV2(ctx.Bool("v2")))
 	opts = append(opts, schema.WithFieldStyle(ctx.String("field-style")))
 	opts = append(opts, schema.WithExportDDL(ctx.String("ddl")))
 
@@ -251,7 +225,6 @@ func runProto(ctx *cli.Context) error {
 	if v := ctx.String("gogo-options"); v != "" {
 		opts = append(opts, schema.WithGogoOptions(schema.TrimSpaceSlice(schema.Split(v))))
 	}
-	opts = append(opts, schema.WithOneFile(ctx.Bool("merge")))
 	opts = append(opts, schema.WithProtobuf(true))
 
 	cmd := schema.NewCmdFlags(opts...)
@@ -262,26 +235,30 @@ func runProto(ctx *cli.Context) error {
 func execute(cmd *schema.CmdFlags) error {
 	ui := sqlca.ParseUrl(cmd.ConnUrl)
 
-	if cmd.Database == "" {
-		cmd.Database = schema.GetDatabaseName(ui.Path)
-		log.Infof("using default database %s", cmd.Database)
+	var opts = []schema.Option{
+		schema.WithDatabase(schema.GetDatabaseName(ui.Path)),
+		schema.WithScheme(ui.Scheme),
 	}
-
-	cmd.Scheme = ui.Scheme
 
 	log.Json("command options", cmd)
 
 	var err error
+	var db *sqlca.Engine
 	if strings.TrimSpace(cmd.SSH) != "" {
-		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl, sshOption(cmd.SSH))
+		db, err = sqlca.NewEngine(cmd.ConnUrl, sshOption(cmd.SSH))
 	} else {
-		cmd.Engine, err = sqlca.NewEngine(cmd.ConnUrl)
+		db, err = sqlca.NewEngine(cmd.ConnUrl)
 	}
 	if err != nil {
 		return log.Errorf("connect database [%s] error [%s]", cmd.ConnUrl, err.Error())
 	}
+	opts = append(opts, schema.WithEngine(db))
 
-	exporter := schema.NewExporter(cmd, cmd.Engine)
+	for _, op := range opts {
+		op(cmd)
+	}
+
+	exporter := schema.NewExporter(cmd, db)
 	if exporter == nil {
 		return log.Errorf("unsupported scheme: %s", cmd.Scheme)
 	}

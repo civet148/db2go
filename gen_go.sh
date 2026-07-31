@@ -9,7 +9,7 @@ READ_ONLY="created_at, updated_at"
 # 忽略字段名(逗号分隔)
 WITH_OUT=""
 # 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
-TABLE_NAME=""
+TABLE_NAME="-user_roles"
 # 数据库连接源DSN
 DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 # 添加标签

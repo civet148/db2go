@@ -62,15 +62,7 @@ func (t *TableSchema) ExportTableSchema(cmd *CmdFlags) (err error) {
 		return err
 	}
 
-	var strPrefix, strSuffix string
-	if cmd.Prefix != "" {
-		strPrefix = fmt.Sprintf("%v_", cmd.Prefix)
-	}
-	if cmd.Suffix != "" {
-		strSuffix = fmt.Sprintf("_%v", cmd.Suffix)
-	}
-
-	t.OutFilePath = fmt.Sprintf("%v/%v%v%v.go", t.SchemeDir, strPrefix, t.TableName, strSuffix)
+	t.OutFilePath = fmt.Sprintf("%v/%v.go", t.SchemeDir, t.TableName)
 	if err = t.exportModels(cmd); err != nil {
 		return err
 	}
@@ -103,9 +95,9 @@ func (t *TableSchema) exportModels(cmd *CmdFlags) error {
 		}
 	}
 
-	var importVer string
+	var importSqlcaV3 string
 	if haveDecimal(cmd, t, t.Columns, cmd.EnableDecimal) {
-		importVer = cmd.ImportVer
+		importSqlcaV3 = IMPORT_SQLCA_V3
 	}
 
 	var cols []ColumnTmplData
@@ -123,7 +115,7 @@ func (t *TableSchema) exportModels(cmd *CmdFlags) error {
 		TableComment:   t.TableComment,
 		StructName:     t.StructName,
 		ImportPackages: importPkgs,
-		ImportVer:      importVer,
+		ImportVer:      importSqlcaV3,
 		Columns:        cols,
 	}
 
