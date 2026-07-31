@@ -17,12 +17,12 @@ import (
 )
 
 const (
-	Version     = "v3.10.0"
+	Version     = "v3.10.1"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-07-30"
+	BuildTime = "2026-07-31"
 	GitCommit = "<N/A>"
 )
 
@@ -58,7 +58,7 @@ func commonFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:    "out",
 			Aliases: []string{"o"},
-			Usage:   "output path",
+			Usage:   "output directory",
 			Value:   ".",
 		},
 		&cli.StringFlag{
@@ -76,16 +76,6 @@ func commonFlags() []cli.Flag {
 			Usage: "exclude columns split by comma",
 		},
 		&cli.StringFlag{
-			Name:    "spec-type",
-			Aliases: []string{"S"},
-			Usage:   "specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'",
-		},
-		&cli.BoolFlag{
-			Name:    "enable-decimal",
-			Aliases: []string{"D"},
-			Usage:   "decimal as sqlca.Decimal type",
-		},
-		&cli.StringFlag{
 			Name:  "ssh",
 			Usage: "ssh tunnel e.g ssh://root:123456@192.168.1.23:22",
 		},
@@ -93,15 +83,6 @@ func commonFlags() []cli.Flag {
 			Name:    "debug",
 			Aliases: []string{"d"},
 			Usage:   "open debug mode",
-		},
-		&cli.StringFlag{
-			Name:    "field-style",
-			Aliases: []string{"style"},
-			Usage:   "protobuf message field camel style (small or big)",
-		},
-		&cli.StringFlag{
-			Name:  "ddl",
-			Usage: "export database DDL to file",
 		},
 	}
 }
@@ -118,6 +99,20 @@ func goFlags() []cli.Flag {
 			Aliases: []string{"R"},
 			Usage:   "readonly columns split by comma",
 		},
+		&cli.StringFlag{
+			Name:    "spec-type",
+			Aliases: []string{"S"},
+			Usage:   "specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'",
+		},
+		&cli.BoolFlag{
+			Name:    "enable-decimal",
+			Aliases: []string{"D"},
+			Usage:   "decimal as sqlca.Decimal type",
+		},
+		&cli.StringFlag{
+			Name:  "ddl",
+			Usage: "export database DDL to file",
+		},
 	)
 }
 
@@ -132,6 +127,11 @@ func protoFlags() []cli.Flag {
 			Name:    "gogo-options",
 			Aliases: []string{"gogo"},
 			Usage:   "gogo proto options",
+		},
+		&cli.StringFlag{
+			Name:    "field-style",
+			Aliases: []string{"style"},
+			Usage:   "protobuf message field camel style (small or big)",
 		},
 	)
 }
