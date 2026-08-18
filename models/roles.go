@@ -15,9 +15,9 @@ const (
 
 type Role struct {
 	Id        uint64    `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
-	CreatedAt time.Time `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_roles_created_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_roles_updated_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-	Name      string    `json:"name" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name;default:null;" sqlca:"isnull"`
+	CreatedAt time.Time `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_roles_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_roles_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	Name      string    `json:"name" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name,priority:1;default:null;" sqlca:"isnull"`
 }
 
 func (do Role) TableName() string {

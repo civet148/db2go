@@ -42,10 +42,10 @@ func (t TableSchema) GetGormIndexes(column string) (index string, ok bool) {
 		if idx.ColumnName == column {
 			var strGormIndex string
 			if idx.NonUnique {
-				strGormIndex = fmt.Sprintf("index:%s", idx.IndexName)
+				strGormIndex = fmt.Sprintf("index:%s,priority:%d", idx.IndexName, idx.SeqInIndex)
 			} else {
 				if idx.IndexName != "PRIMARY" {
-					strGormIndex = fmt.Sprintf("uniqueIndex:%s", idx.IndexName)
+					strGormIndex = fmt.Sprintf("uniqueIndex:%s,priority:%d", idx.IndexName, idx.SeqInIndex)
 				}
 			}
 			colIndexes = append(colIndexes, strGormIndex)

@@ -33,7 +33,7 @@ DDL_FILE="deploy/test.sql"
 #    fi
 #fi
 
-make && ./db2go go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
+make && ./db2go go --debug --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
  --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --ddl "${DDL_FILE}" --tag "${TAGS}"
 
 echo "generate go file ok, formatting..."
