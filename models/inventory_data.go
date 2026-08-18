@@ -26,11 +26,11 @@ const (
 
 type InventoryData struct {
 	Id           uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
-	CreatedAt    time.Time     `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_inventory_data_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-	UpdatedAt    time.Time     `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_inventory_data_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	CreatedAt    *time.Time    `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_inventory_data_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	UpdatedAt    *time.Time    `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_inventory_data_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
 	IsFrozen     int8          `json:"is_frozen" db:"is_frozen" gorm:"column:is_frozen;type:tinyint(1);default:0;" sqlca:"isnull"`
 	Name         string        `json:"name" db:"name" gorm:"column:name;type:varchar(255);default:null;comment:产品：名称；不能为空;" sqlca:"isnull"`                                       //产品：名称；不能为空
-	SerialNo     string        `json:"serial_no" db:"serial_no" gorm:"column:serial_no;type:varchar(68);index:i_serial_no,priority:1;default:null;comment:产品序列号;" sqlca:"isnull"` //产品序列号
+	SerialNo     string        `json:"serial_no" db:"serial_no" gorm:"column:serial_no;type:varchar(64);index:i_serial_no,priority:1;default:null;comment:产品序列号;" sqlca:"isnull"` //产品序列号
 	Quantity     sqlca.Decimal `json:"quantity" db:"quantity" gorm:"column:quantity;type:decimal(16,3);default:0.000;" sqlca:"isnull"`
 	Price        sqlca.Decimal `json:"price" db:"price" gorm:"column:price;type:decimal(16,2);default:0.00;" sqlca:"isnull"`
 	Location     sqlca.Point   `json:"location" db:"location" gorm:"column:location;type:point;default:null;" sqlca:"isnull"`
@@ -47,9 +47,9 @@ func (do InventoryData) TableName() string {
 
 func (do InventoryData) GetId() uint64 { return do.Id }
 
-func (do InventoryData) GetCreatedAt() time.Time { return do.CreatedAt }
+func (do InventoryData) GetCreatedAt() *time.Time { return do.CreatedAt }
 
-func (do InventoryData) GetUpdatedAt() time.Time { return do.UpdatedAt }
+func (do InventoryData) GetUpdatedAt() *time.Time { return do.UpdatedAt }
 
 func (do InventoryData) GetIsFrozen() int8 { return do.IsFrozen }
 
@@ -75,9 +75,9 @@ func (do InventoryData) GetUpdateName() string { return do.UpdateName }
 
 func (do *InventoryData) SetId(v uint64) { do.Id = v }
 
-func (do *InventoryData) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+func (do *InventoryData) SetCreatedAt(v *time.Time) { do.CreatedAt = v }
 
-func (do *InventoryData) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+func (do *InventoryData) SetUpdatedAt(v *time.Time) { do.UpdatedAt = v }
 
 func (do *InventoryData) SetIsFrozen(v int8) { do.IsFrozen = v }
 

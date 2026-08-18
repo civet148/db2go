@@ -28,8 +28,8 @@ const (
 
 type InventoryIn struct {
 	Id         uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
-	CreatedAt  time.Time     `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_inventory_in_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-	UpdatedAt  time.Time     `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_inventory_in_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	CreatedAt  *time.Time    `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_inventory_in_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	UpdatedAt  *time.Time    `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_inventory_in_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
 	IsDeleted  int8          `json:"is_deleted" db:"is_deleted" gorm:"column:is_deleted;type:tinyint(1);default:0;" sqlca:"isnull"`
 	DeleteTime *time.Time    `json:"delete_time" db:"delete_time" gorm:"column:delete_time;type:datetime;default:null;" sqlca:"isnull"`
 	ProductId  uint64        `json:"product_id" db:"product_id" gorm:"column:product_id;type:bigint unsigned;index:i_p_u,priority:2;index:idx_prod_create_id,priority:1;default:null;" sqlca:"isnull"`
@@ -51,9 +51,9 @@ func (do InventoryIn) TableName() string {
 
 func (do InventoryIn) GetId() uint64 { return do.Id }
 
-func (do InventoryIn) GetCreatedAt() time.Time { return do.CreatedAt }
+func (do InventoryIn) GetCreatedAt() *time.Time { return do.CreatedAt }
 
-func (do InventoryIn) GetUpdatedAt() time.Time { return do.UpdatedAt }
+func (do InventoryIn) GetUpdatedAt() *time.Time { return do.UpdatedAt }
 
 func (do InventoryIn) GetIsDeleted() int8 { return do.IsDeleted }
 
@@ -83,9 +83,9 @@ func (do InventoryIn) GetUpdateName() string { return do.UpdateName }
 
 func (do *InventoryIn) SetId(v uint64) { do.Id = v }
 
-func (do *InventoryIn) SetCreatedAt(v time.Time) { do.CreatedAt = v }
+func (do *InventoryIn) SetCreatedAt(v *time.Time) { do.CreatedAt = v }
 
-func (do *InventoryIn) SetUpdatedAt(v time.Time) { do.UpdatedAt = v }
+func (do *InventoryIn) SetUpdatedAt(v *time.Time) { do.UpdatedAt = v }
 
 func (do *InventoryIn) SetIsDeleted(v int8) { do.IsDeleted = v }
 

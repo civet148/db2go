@@ -4,11 +4,11 @@ USE `test`;
 
 CREATE TABLE `inventory_data` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_frozen` tinyint(1) DEFAULT '0',
   `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品：名称；不能为空',
-  `serial_no` varchar(68) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品序列号',
+  `serial_no` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '产品序列号',
   `quantity` decimal(16,3) DEFAULT '0.000',
   `price` decimal(16,2) DEFAULT '0.00',
   `location` point DEFAULT NULL,
@@ -21,12 +21,12 @@ CREATE TABLE `inventory_data` (
   KEY `idx_inventory_data_created_at` (`created_at`),
   KEY `idx_inventory_data_updated_at` (`updated_at`),
   KEY `i_serial_no` (`serial_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=2076848208713093121 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2089603099957137409 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT '0',
   `delete_time` datetime DEFAULT NULL,
   `product_id` bigint unsigned DEFAULT NULL,
@@ -46,12 +46,12 @@ CREATE TABLE `inventory_in` (
   KEY `idx_inventory_in_updated_at` (`updated_at`),
   KEY `idx_prod_create_id` (`product_id`,`create_id`) USING BTREE,
   KEY `i_p_u` (`user_id`,`product_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2076848208708898817 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2089603099952943105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT '0',
   `delete_time` datetime DEFAULT NULL,
   `product_id` bigint unsigned DEFAULT '0',
@@ -77,8 +77,8 @@ CREATE TABLE `inventory_out` (
 
 CREATE TABLE `roles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `name` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_roles_name` (`name`),
@@ -88,8 +88,8 @@ CREATE TABLE `roles` (
 
 CREATE TABLE `user_profiles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` bigint unsigned DEFAULT NULL,
   `avatar` varchar(512) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `address` varchar(128) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -101,10 +101,10 @@ CREATE TABLE `user_profiles` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `user_roles` (
-  `user_id` bigint unsigned NOT NULL,
-  `role_id` bigint unsigned NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` bigint unsigned NOT NULL DEFAULT '0',
+  `role_id` bigint unsigned NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`,`role_id`),
   KEY `fk_user_roles_role` (`role_id`),
   KEY `idx_user_roles_created_at` (`created_at`),
@@ -115,8 +115,8 @@ CREATE TABLE `user_roles` (
 
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `user_name` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `extra_data` json DEFAULT NULL,
