@@ -45,6 +45,10 @@ type InventoryOut struct {
 	UpdateName string        `json:"update_name" db:"update_name" gorm:"column:update_name;type:varchar(64);default:null;" sqlca:"isnull"`
 }
 
+func (do InventoryOut) DatabaseName() string {
+	return "test"
+}
+
 func (do InventoryOut) TableName() string {
 	return TableNameInventoryOut
 }

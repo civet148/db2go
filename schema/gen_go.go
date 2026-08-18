@@ -27,6 +27,7 @@ type ColumnTmplData struct {
 type GoFileTmplData struct {
 	PackageName    string
 	TableNameConst string
+	DatabaseName   string
 	TableName      string
 	TableComment   string
 	StructName     string
@@ -111,6 +112,7 @@ func (t *TableSchema) exportModels(cmd *CmdFlags) error {
 	data := GoFileTmplData{
 		PackageName:    cmd.PackageName,
 		TableNameConst: fmt.Sprintf("%s%v", TableNamePrefix, t.TableNameCamelCase),
+		DatabaseName:   t.SchemeName,
 		TableName:      t.TableName,
 		TableComment:   t.TableComment,
 		StructName:     t.StructName,

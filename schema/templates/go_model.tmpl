@@ -20,6 +20,9 @@ type {{.StructName}} struct {
 {{- end}}
 }
 
+func (do {{.StructName}}) DatabaseName() string {
+	return "{{.DatabaseName}}"
+}
 func (do {{.StructName}}) TableName() string {
 	return {{.TableNameConst}}
 }

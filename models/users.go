@@ -26,6 +26,10 @@ type User struct {
 	Profile   UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;"`  // 用户资料明细
 }
 
+func (do User) DatabaseName() string {
+	return "test"
+}
+
 func (do User) TableName() string {
 	return TableNameUsers
 }

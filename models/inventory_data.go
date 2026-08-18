@@ -41,6 +41,10 @@ type InventoryData struct {
 	UpdateName   string        `json:"update_name" db:"update_name" gorm:"column:update_name;type:varchar(64);default:null;" sqlca:"isnull"`
 }
 
+func (do InventoryData) DatabaseName() string {
+	return "test"
+}
+
 func (do InventoryData) TableName() string {
 	return TableNameInventoryData
 }
