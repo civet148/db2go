@@ -33,6 +33,7 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 		if err = writeFileContext(strOutputPath, string(newCode)); err != nil {
 			return log.Errorf("生成文件[%v]失败：%v", strOutputPath, err.Error())
 		}
+		log.Infof("写入代码文件[%v]成功", strOutputPath)
 	} else {
 		var oldCode []byte
 		oldCode, err = ioutil.ReadFile(strOutputPath)
@@ -71,7 +72,6 @@ func writeToFile(strOutputPath, strBody string, direct bool) (err error) {
 			return log.Errorf("写入代码文件[%v]失败，%v", strOutputPath, err.Error())
 		}
 	}
-	log.Infof("写入代码文件[%v]成功", strOutputPath)
 	return nil
 }
 

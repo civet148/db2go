@@ -113,7 +113,7 @@ func (t *TableSchema) exportModels(cmd *CmdFlags) error {
 		PackageName:    cmd.PackageName,
 		TableNameConst: fmt.Sprintf("%s%v", TableNamePrefix, t.TableNameCamelCase),
 		DatabaseName:   t.SchemeName,
-		TableName:      t.TableName,
+		TableName:      fmt.Sprintf("`%s`.`%s`", t.SchemeName, t.TableName),
 		TableComment:   t.TableComment,
 		StructName:     t.StructName,
 		ImportPackages: importPkgs,

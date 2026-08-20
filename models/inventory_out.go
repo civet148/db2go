@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const TableNameInventoryOut = "inventory_out"
+const TableNameInventoryOut = "`test`.`inventory_out`"
 
 const (
 	InventoryOutColumn_Id         = "id"
