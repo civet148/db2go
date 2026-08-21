@@ -1,11 +1,12 @@
 package models
 
 import (
-	"github.com/civet148/sqlca/v3"
 	"time"
+
+	"github.com/civet148/sqlca/v3"
 )
 
-const TableNameInventoryIn = "`test`.`inventory_in`"
+const TableNameInventoryIn = "inventory_in"
 
 const (
 	InventoryInColumn_Id         = "id"

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-const TableNameUsers = "`test`.`users`"
+const TableNameUsers = "users"
 
 const (
 	UsersColumn_Id        = "id"
