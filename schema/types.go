@@ -10,7 +10,7 @@ import (
 
 const (
 	TAG_NAME_SQLCA      = "sqlca"
-	TAG_VALUE_IS_NULL   = "isnull"
+	TAG_VALUE_IS_NULL   = "nullable"
 	TAG_VALUE_READ_ONLY = "readonly"
 )
 
