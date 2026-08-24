@@ -1,8 +1,6 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
 const TableNameUserRoles = "user_roles"
 
@@ -23,7 +21,6 @@ type UserRole struct {
 func (do UserRole) DatabaseName() string {
 	return "test"
 }
-
 func (do UserRole) TableName() string {
 	return TableNameUserRoles
 }

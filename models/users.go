@@ -19,9 +19,9 @@ type User struct {
 	Id        uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
 	CreatedAt *time.Time    `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_users_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
 	UpdatedAt *time.Time    `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_users_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-	UserName  string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name,priority:1;default:null;" sqlca:"isnull"`
-	Email     string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email,priority:1;default:null;" sqlca:"isnull"`
-	ExtraData UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;default:null;" sqlca:"isnull"`
+	UserName  string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name,priority:1;default:null;" sqlca:"nullable"`
+	Email     string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email,priority:1;default:null;" sqlca:"nullable"`
+	ExtraData UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;default:null;" sqlca:"nullable"`
 	Roles     []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;"` // 用户角色列表
 	Profile   UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;"`  // 用户资料明细
 }
