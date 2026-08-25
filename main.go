@@ -17,12 +17,12 @@ import (
 )
 
 const (
-	Version     = "v3.10.4"
+	Version     = "v3.10.5"
 	ProgramName = "db2go"
 )
 
 var (
-	BuildTime = "2026-08-20"
+	BuildTime = "2026-08-25"
 	GitCommit = "<N/A>"
 )
 

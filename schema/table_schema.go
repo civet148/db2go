@@ -46,6 +46,8 @@ func (t TableSchema) GetGormIndexes(column string) (index string, ok bool) {
 			} else {
 				if idx.IndexName != "PRIMARY" {
 					strGormIndex = fmt.Sprintf("uniqueIndex:%s,priority:%d", idx.IndexName, idx.SeqInIndex)
+				} else {
+					strGormIndex = fmt.Sprintf("primarykey")
 				}
 			}
 			colIndexes = append(colIndexes, strGormIndex)
