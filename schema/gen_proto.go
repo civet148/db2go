@@ -96,12 +96,12 @@ func MakeProtoBody(cmd *CmdFlags, table *TableSchema) string {
 	return buf.String()
 }
 
-func ExportProtoSchema(provider SchemaProvider, cmd *CmdFlags) error {
-	schemas, err := provider.QueryTableSchemas(cmd)
+func ExportProtoSchema(provider SchemaProvider) error {
+	schemas, err := provider.QueryTableSchemas()
 	if err != nil {
 		return logErrorf(err.Error())
 	}
-
+	cmd := provider.GetCmd()
 	for _, v := range schemas {
 		if err = provider.QueryTableColumns(v); err != nil {
 			return logError(err.Error())

@@ -25,27 +25,31 @@ func NewExporterPostgres(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter 
 	}
 }
 
+func (m *ExporterPostgres) GetCmd() *schema.CmdFlags {
+	return m.Cmd
+}
+
 func (m *ExporterPostgres) ExportGo() (err error) {
-	return schema.ExportGoSchema(m, m.Cmd)
+	return schema.ExportGoSchema(m)
 }
 
 func (m *ExporterPostgres) ExportProto() (err error) {
-	return schema.ExportProtoSchema(m, m.Cmd)
+	return schema.ExportProtoSchema(m)
 }
 
-func (m *ExporterPostgres) QueryTableSchemas(cmd *schema.CmdFlags) ([]*schema.TableSchema, error) {
+func (m *ExporterPostgres) QueryTableSchemas() ([]*schema.TableSchema, error) {
 	var strQuery string
 	var tables []string
-
+	cmd := m.GetCmd()
 	if cmd.Database == "" {
 		return nil, fmt.Errorf("no database selected")
 	}
-
+	db := m.Cmd.Engine
 	if len(cmd.Tables) == 0 {
 		var rows int64
 		var err error
 		strQuery = `SELECT relname AS table_name FROM pg_class C WHERE relkind = 'r' AND relname NOT LIKE 'pg_%%' AND relname NOT LIKE 'sql_%%' ORDER BY relname`
-		if rows, err = cmd.Engine.Model(&cmd.Tables).QueryRaw(strQuery); err != nil {
+		if rows, err = db.Model(&cmd.Tables).QueryRaw(strQuery); err != nil {
 			log.Errorf(err.Error())
 			return nil, err
 		}
@@ -65,7 +69,7 @@ func (m *ExporterPostgres) QueryTableSchemas(cmd *schema.CmdFlags) ([]*schema.Ta
 		`SELECT '%v' as table_schema, relname AS table_name, CAST ( obj_description ( relfilenode, 'pg_class' ) AS VARCHAR ) AS table_comment
                  FROM pg_class C WHERE relkind = 'r' AND relname in (%v) ORDER BY relname`, cmd.Database, strings.Join(tables, ","))
 	var schemas []*schema.TableSchema
-	_, err := cmd.Engine.Model(&schemas).QueryRaw(strQuery)
+	_, err := db.Model(&schemas).QueryRaw(strQuery)
 	if err != nil {
 		log.Errorf("%s", err)
 		return nil, err
@@ -74,7 +78,8 @@ func (m *ExporterPostgres) QueryTableSchemas(cmd *schema.CmdFlags) ([]*schema.Ta
 }
 
 func (m *ExporterPostgres) QueryTableColumns(table *schema.TableSchema) (err error) {
-	_, err = m.Cmd.Engine.Model(&table.Columns).QueryRaw(`SELECT C.relname as table_name, A.attname AS column_name, format_type(A.atttypid,A.atttypmod) AS data_type,
+	db := m.Cmd.Engine
+	_, err = db.Model(&table.Columns).QueryRaw(`SELECT C.relname as table_name, A.attname AS column_name, format_type(A.atttypid,A.atttypmod) AS data_type,
 	col_description ( A.attrelid, A.attnum ) AS column_comment FROM pg_class AS C, pg_attribute AS A WHERE	C.relname = '%v' AND A.attrelid = C.oid	AND A.attnum > 0 
     AND format_type(A.atttypid,A.atttypmod) != '-'
     ORDER BY C.relname,A.attnum`, table.TableName)
@@ -88,7 +93,8 @@ func (m *ExporterPostgres) QueryTableColumns(table *schema.TableSchema) (err err
 }
 
 func (m *ExporterPostgres) QueryTableIndexes(table *schema.TableSchema) (err error) {
-	_, err = m.Cmd.Engine.Model(&table.Indexes).QueryRaw(`SELECT
+	db := m.Cmd.Engine
+	_, err = db.Model(&table.Indexes).QueryRaw(`SELECT
 	n.nspname AS db_name,
 	t.relname AS table_name,
 	i.relname AS index_name,
@@ -113,7 +119,7 @@ ORDER BY index_name, k.ord;`, table.SchemeName, table.TableName)
 	return nil
 }
 
-func (m *ExporterPostgres) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (*schema.CreateDatabaseDDL, error) {
+func (m *ExporterPostgres) QueryCreateDatabaseDDL() (*schema.CreateDatabaseDDL, error) {
 	return nil, nil
 }
 

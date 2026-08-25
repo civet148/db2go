@@ -25,18 +25,22 @@ func NewExporterMssql(cmd *schema.CmdFlags, e *sqlca.Engine) schema.Exporter {
 	}
 }
 
+func (m *ExporterMssql) GetCmd() *schema.CmdFlags {
+	return m.Cmd
+}
+
 func (m *ExporterMssql) ExportGo() (err error) {
-	return schema.ExportGoSchema(m, m.Cmd)
+	return schema.ExportGoSchema(m)
 }
 
 func (m *ExporterMssql) ExportProto() (err error) {
-	return schema.ExportProtoSchema(m, m.Cmd)
+	return schema.ExportProtoSchema(m)
 }
 
-func (m *ExporterMssql) QueryTableSchemas(cmd *schema.CmdFlags) ([]*schema.TableSchema, error) {
+func (m *ExporterMssql) QueryTableSchemas() ([]*schema.TableSchema, error) {
 	var strQuery string
 	var tables []string
-
+	cmd := m.Cmd
 	if cmd.Database == "" {
 		return nil, fmt.Errorf("no database selected")
 	}
@@ -90,7 +94,7 @@ func (m *ExporterMssql) QueryTableIndexes(table *schema.TableSchema) (err error)
 	return nil
 }
 
-func (m *ExporterMssql) QueryCreateDatabaseDDL(cmd *schema.CmdFlags) (*schema.CreateDatabaseDDL, error) {
+func (m *ExporterMssql) QueryCreateDatabaseDDL() (*schema.CreateDatabaseDDL, error) {
 	return nil, nil
 }
 

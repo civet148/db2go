@@ -21,7 +21,7 @@ CREATE TABLE `inventory_data` (
   KEY `idx_inventory_data_created_at` (`created_at`),
   KEY `idx_inventory_data_updated_at` (`updated_at`),
   KEY `i_serial_no` (`serial_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=2090644014213632001 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2091841599913857025 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -46,7 +46,7 @@ CREATE TABLE `inventory_in` (
   KEY `idx_inventory_in_updated_at` (`updated_at`),
   KEY `idx_prod_create_id` (`product_id`,`create_id`) USING BTREE,
   KEY `i_p_u` (`user_id`,`product_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2090644014205243393 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2091841599905468417 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -109,6 +109,7 @@ CREATE TABLE `user_roles` (
   KEY `fk_user_roles_role` (`role_id`),
   KEY `idx_user_roles_created_at` (`created_at`),
   KEY `idx_user_roles_updated_at` (`updated_at`),
+  KEY `fk_user_roles_user` (`user_id`),
   CONSTRAINT `fk_user_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
   CONSTRAINT `fk_user_roles_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

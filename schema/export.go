@@ -11,10 +11,11 @@ import (
 )
 
 type SchemaProvider interface {
-	QueryTableSchemas(cmd *CmdFlags) ([]*TableSchema, error)
+	GetCmd() *CmdFlags
+	QueryTableSchemas() ([]*TableSchema, error)
 	QueryTableColumns(table *TableSchema) error
 	QueryTableIndexes(table *TableSchema) error
-	QueryCreateDatabaseDDL(cmd *CmdFlags) (*CreateDatabaseDDL, error)
+	QueryCreateDatabaseDDL() (*CreateDatabaseDDL, error)
 	QueryTableCreateSQL(table *TableSchema) error
 }
 
@@ -39,13 +40,14 @@ func sshOption(strSSH string) *sqlca.Options {
 	}
 }
 
-func ExportGoSchema(provider SchemaProvider, cmd *CmdFlags) error {
-	ddl, err := provider.QueryCreateDatabaseDDL(cmd)
+func ExportGoSchema(provider SchemaProvider) error {
+	cmd := provider.GetCmd()
+	ddl, err := provider.QueryCreateDatabaseDDL()
 	if err != nil {
 		log.Warnf("query create database DDL error [%s]", err.Error())
 	}
 
-	schemas, err := provider.QueryTableSchemas(cmd)
+	schemas, err := provider.QueryTableSchemas()
 	if err != nil {
 		return log.Errorf("query tables error [%s]", err.Error())
 	}
@@ -67,7 +69,7 @@ func ExportGoSchema(provider SchemaProvider, cmd *CmdFlags) error {
 
 	if cmd.ExportDDL != "" {
 		if ddl == nil {
-			ddl, err = provider.QueryCreateDatabaseDDL(cmd)
+			ddl, err = provider.QueryCreateDatabaseDDL()
 			if err != nil {
 				log.Warnf("query DDL for export error [%s]", err.Error())
 			}

@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 const TableNameUserRoles = "user_roles"
 
@@ -12,7 +14,7 @@ const (
 )
 
 type UserRole struct {
-	UserId    uint64     `json:"user_id" db:"user_id" gorm:"column:user_id;type:bigint unsigned;;default:0;"`
+	UserId    uint64     `json:"user_id" db:"user_id" gorm:"column:user_id;type:bigint unsigned;index:fk_user_roles_user,priority:1;;default:0;"`
 	RoleId    uint64     `json:"role_id" db:"role_id" gorm:"column:role_id;type:bigint unsigned;index:fk_user_roles_role,priority:1;;default:0;"`
 	CreatedAt *time.Time `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_user_roles_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_user_roles_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
@@ -21,6 +23,7 @@ type UserRole struct {
 func (do UserRole) DatabaseName() string {
 	return "test"
 }
+
 func (do UserRole) TableName() string {
 	return TableNameUserRoles
 }

@@ -164,8 +164,8 @@ type User struct {
     UserName    string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;default:null;" sqlca:"isnull"`
     Email       string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;default:null;" sqlca:"isnull"`
     ExtraData   UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;default:null;" sqlca:"isnull"`
-	Roles       []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;"` // 用户角色列表(手工添加，自动合并)
-	Profile     UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;"`  // 用户资料明细(手工添加，自动合并)
+	Roles       []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;-:migration;"` // 用户角色列表(手工添加，自动合并)
+	Profile     UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;-:migration;"`  // 用户资料明细(手工添加，自动合并)
 }
 
 func (do User) TableName() string {

@@ -141,6 +141,9 @@ func NewExporter(cmd *CmdFlags, e *sqlca.Engine) Exporter {
 		log.Errorf("scheme [%v] instance not registered", cmd.Scheme)
 		return nil
 	}
+	if cmd.Debug {
+		e.Debug(true)
+	}
 	return inst(cmd, e)
 }
 
