@@ -20,13 +20,9 @@ type Role struct {
 	Name      string     `json:"name" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name,priority:1;default:null;" sqlca:"nullable"`
 }
 
-func (do Role) DatabaseName() string {
-	return "test"
-}
+func (do Role) DatabaseName() string { return "test" }
 
-func (do Role) TableName() string {
-	return TableNameRoles
-}
+func (do Role) TableName() string { return TableNameRoles }
 
 func (do Role) GetId() uint64 { return do.Id }
 

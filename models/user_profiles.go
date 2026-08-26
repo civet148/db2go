@@ -24,13 +24,9 @@ type UserProfile struct {
 	Address   string     `json:"address" db:"address" gorm:"column:address;type:varchar(128);default:null;" sqlca:"nullable"`
 }
 
-func (do UserProfile) DatabaseName() string {
-	return "test"
-}
+func (do UserProfile) DatabaseName() string { return "test" }
 
-func (do UserProfile) TableName() string {
-	return TableNameUserProfiles
-}
+func (do UserProfile) TableName() string { return TableNameUserProfiles }
 
 func (do UserProfile) GetId() uint64 { return do.Id }
 

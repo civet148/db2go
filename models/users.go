@@ -26,13 +26,9 @@ type User struct {
 	Profile   UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;-:migration;"`  // 用户资料明细
 }
 
-func (do User) DatabaseName() string {
-	return "test"
-}
+func (do User) DatabaseName() string { return "test" }
 
-func (do User) TableName() string {
-	return TableNameUsers
-}
+func (do User) TableName() string { return TableNameUsers }
 
 func (do User) GetId() uint64 { return do.Id }
 

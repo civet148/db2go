@@ -20,17 +20,13 @@ type {{.StructName}} struct {
 {{- end}}
 }
 
-func (do {{.StructName}}) DatabaseName() string {
-	return "{{.DatabaseName}}"
-}
-func (do {{.StructName}}) TableName() string {
-	return {{.TableNameConst}}
-}
-{{- range .Columns}}
+func (do {{.StructName}}) DatabaseName() string { return "{{.DatabaseName}}" }
+func (do {{.StructName}}) TableName() string { return {{.TableNameConst}} }
 
+{{- range .Columns}}
 func (do {{$.StructName}}) Get{{.GoName}}() {{.GoType}} { return do.{{.GoName}} }
 {{- end}}
-{{- range .Columns}}
 
+{{- range .Columns}}
 func (do *{{$.StructName}}) Set{{.GoName}}(v {{.GoType}}) { do.{{.GoName}} = v }
 {{- end}}

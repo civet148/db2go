@@ -20,13 +20,9 @@ type UserRole struct {
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_user_roles_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
 }
 
-func (do UserRole) DatabaseName() string {
-	return "test"
-}
+func (do UserRole) DatabaseName() string { return "test" }
 
-func (do UserRole) TableName() string {
-	return TableNameUserRoles
-}
+func (do UserRole) TableName() string { return TableNameUserRoles }
 
 func (do UserRole) GetUserId() uint64 { return do.UserId }
 
