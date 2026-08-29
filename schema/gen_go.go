@@ -182,7 +182,7 @@ func buildColumnTags(cmd *CmdFlags, table *TableSchema, col TableColumn) string 
 					tv += fmt.Sprintf("default:%s;", col.ColumnDefault)
 				}
 				if col.IsNullable == "YES" {
-					tv += "default:null;"
+					tv += "null;"
 				} else {
 					tv += "not null;"
 				}

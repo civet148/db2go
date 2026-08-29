@@ -17,7 +17,7 @@ type Role struct {
 	Id        uint64     `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
 	CreatedAt *time.Time `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_roles_created_at,priority:1;default:CURRENT_TIMESTAMP;not null;" sqlca:"readonly"`
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_roles_updated_at,priority:1;default:CURRENT_TIMESTAMP;not null;" sqlca:"readonly"`
-	Name      string     `json:"name" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name,priority:1;default:null;" sqlca:"nullable"`
+	Name      string     `json:"name" db:"name" gorm:"column:name;type:varchar(64);uniqueIndex:idx_roles_name,priority:1;null;" sqlca:"nullable"`
 }
 
 func (do Role) DatabaseName() string { return "test" }

@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	Version     = "v3.10.7"
+	Version     = "v3.10.8"
 	ProgramName = "db2go"
 )
 
