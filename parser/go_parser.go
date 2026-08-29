@@ -69,8 +69,11 @@ type CodeLine struct {
 	Raw      string // 原始完整行（输出文件还原格式）
 	Code     string // 去注释纯代码，差异对比专用
 	Comment  string // 该行全部注释，对比忽略
-	Key      string // 代码行对应的key，用于标识具体元素
 	Disabled bool   // 已禁用(生成合并代码时忽略)
+	Key      string // 代码行对应的key，用于标识具体元素
+	Tag      string // 结构体字段tag定义
+	Type     string // 结构体字段具体类型
+	Field    string // 结构体字段名
 }
 
 func (cl CodeLine) GetHash() string {
@@ -91,6 +94,18 @@ func (cl CodeLine) GetComment() string {
 
 func (cl CodeLine) GetKey() string {
 	return cl.Key
+}
+
+func (cl CodeLine) GetType() string {
+	return cl.Type
+}
+
+func (cl CodeLine) GetTag() string {
+	return cl.Tag
+}
+
+func (cl CodeLine) GetField() string {
+	return cl.Field
 }
 
 func (cl CodeLine) String() string {
@@ -403,6 +418,74 @@ func extractReceiverType(funcDecl *ast.FuncDecl) string {
 	return ""
 }
 
+// extractStructFieldTypeAndTag 从AST字段节点中提取字段类型与tag定义
+// typeStr: 字段类型原文（如 uint64、*sqlca_v3.Point、[]*Role）
+// tagStr:  字段tag原文（含反引号，如 `json:"id" db:"id"`）
+func extractStructFieldTypeAndTag(fset *token.FileSet, fixedContent string, field *ast.Field) (typeStr, tagStr string) {
+	if field == nil || field.Type == nil {
+		return "", ""
+	}
+	typeStart := fset.Position(field.Type.Pos()).Offset
+	typeEnd := fset.Position(field.Type.End()).Offset
+	if typeStart >= 0 && typeEnd >= typeStart && typeEnd <= len(fixedContent) {
+		typeStr = strings.TrimSpace(fixedContent[typeStart:typeEnd])
+	}
+	if field.Tag != nil {
+		tagStart := fset.Position(field.Tag.Pos()).Offset
+		tagEnd := fset.Position(field.Tag.End()).Offset
+		if tagStart >= 0 && tagEnd >= tagStart && tagEnd <= len(fixedContent) {
+			tagStr = fixedContent[tagStart:tagEnd]
+		}
+	}
+	return typeStr, tagStr
+}
+
+// extractFieldKey 根据AST字段节点提取字段key
+func extractFieldKey(typeName string, field *ast.Field) string {
+	if field == nil {
+		return ""
+	}
+	if len(field.Names) > 0 {
+		return typeName + "." + field.Names[0].Name
+	}
+	// 嵌入字段：取类型的基础标识符
+	name := fieldTypeBaseName(field.Type)
+	if name == "" {
+		return ""
+	}
+	return typeName + "." + name
+}
+
+// extractFieldName 提取结构体字段名（嵌入字段取类型基名）
+func extractFieldName(field *ast.Field) string {
+	if field == nil {
+		return ""
+	}
+	if len(field.Names) > 0 {
+		return field.Names[0].Name
+	}
+	return fieldTypeBaseName(field.Type)
+}
+
+// fieldTypeBaseName 提取字段类型的基名（用于嵌入字段key）
+func fieldTypeBaseName(expr ast.Expr) string {
+	switch t := expr.(type) {
+	case *ast.Ident:
+		return t.Name
+	case *ast.StarExpr:
+		return fieldTypeBaseName(t.X)
+	case *ast.IndexExpr:
+		return fieldTypeBaseName(t.X)
+	case *ast.IndexListExpr:
+		return fieldTypeBaseName(t.X)
+	case *ast.SelectorExpr:
+		return fieldTypeBaseName(t.Sel)
+	case *ast.ArrayType:
+		return fieldTypeBaseName(t.Elt)
+	}
+	return ""
+}
+
 // ParseGoFile 解析go文件入口
 func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 	srcBytes, err := os.ReadFile(filePath)
@@ -587,27 +670,22 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 
 					// 如果是结构体，处理字段
 					if structType, ok := typeSpec.Type.(*ast.StructType); ok && structType.Fields != nil {
-						// 获取结构体字段的起止行
-						fieldStart := getLineNum(structType.Fields.Pos())
-						fieldEnd := getLineNum(structType.Fields.End())
-
-						// 创建字段行到typeLines的映射
-						for i := fieldStart - 1; i < fieldEnd; i++ {
+						// 遍历AST字段节点，提取key、类型和tag
+						for _, fld := range structType.Fields.List {
+							if fld == nil {
+								continue
+							}
+							i := getLineNum(fld.Pos()) - 1
 							if i < 0 || i >= len(fixedLines) {
 								continue
 							}
-							raw := fixedLines[i]
-							c, _ := SplitCodeAndComment(raw)
-							key := extractKey(c, "type_field", tName)
-							if key != "" {
-								// 找到对应的行并更新key
-								for j := range typeLines {
-									if i == tStart-1+j {
-										typeLines[j].Key = key
-										break
-									}
-								}
+							j := i - (tStart - 1)
+							if j < 0 || j >= len(typeLines) {
+								continue
 							}
+							typeLines[j].Key = extractFieldKey(tName, fld)
+							typeLines[j].Field = extractFieldName(fld)
+							typeLines[j].Type, typeLines[j].Tag = extractStructFieldTypeAndTag(fset, fixedContent, fld)
 						}
 					}
 
@@ -727,7 +805,7 @@ func PrintResult(r *GoFileParseResult) {
 		fmt.Printf("Type[%s] LineStart:%d\n", name, info.StartLine)
 		fmt.Println("--- Fields ---")
 		for _, cl := range info.Lines {
-			fmt.Printf("CODE: %q | COMMENT: %q | KEY: %s\n", cl.Code, cl.Comment, cl.Key)
+			fmt.Printf("CODE: %q | COMMENT: %q | KEY: %s | FIELD: %s | TYPE: %s | TAG: %s\n", cl.Code, cl.Comment, cl.Key, cl.Field, cl.Type, cl.Tag)
 		}
 		if len(info.Methods) > 0 {
 			fmt.Println("--- Methods ---")
