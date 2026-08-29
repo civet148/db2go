@@ -466,7 +466,7 @@ func extractFieldKey(typeName string, field *ast.Field) string {
 	return typeName + "." + name
 }
 
-// extractFieldName 提取结构体字段名（嵌入字段取类型基名）
+// extractFieldName 提取结构体字段名（嵌入字段返回空字符串）
 func extractFieldName(field *ast.Field) string {
 	if field == nil {
 		return ""
@@ -474,7 +474,7 @@ func extractFieldName(field *ast.Field) string {
 	if len(field.Names) > 0 {
 		return field.Names[0].Name
 	}
-	return fieldTypeBaseName(field.Type)
+	return ""
 }
 
 // fieldTypeBaseName 提取字段类型的基名（用于嵌入字段key）

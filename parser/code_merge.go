@@ -237,7 +237,7 @@ func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 				if isEmptyComment(bl.Comment) && !isEmptyComment(line.Comment) {
 					bl.Comment = line.Comment
 				}
-				if bl.GetType() != line.GetType() { // 数据库导出的字段类型跟当前工作区代码不一致，以工作区代码为准
+				if line.GetField() != "" && bl.GetType() != line.GetType() { // 数据库导出的字段类型跟当前工作区代码不一致，以工作区代码为准
 					getterKey := fmt.Sprintf("Func.%s.Get%s", bt.Name, line.Field)
 					setterKey := fmt.Sprintf("Func.%s.Set%s", bt.Name, line.Field)
 					var getterFunc, setterFunc *CodeBlock
