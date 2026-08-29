@@ -74,6 +74,7 @@ type CodeLine struct {
 	Tag      string // 结构体字段tag定义
 	Type     string // 结构体字段具体类型
 	Field    string // 结构体字段名
+	IsStruct bool   // 是否为结构体(struct则设置为true，如果是interface或其他类型定义设置为false)
 }
 
 func (cl CodeLine) GetHash() string {
@@ -106,6 +107,10 @@ func (cl CodeLine) GetTag() string {
 
 func (cl CodeLine) GetField() string {
 	return cl.Field
+}
+
+func (cl CodeLine) GetIsStruct() bool {
+	return cl.IsStruct
 }
 
 func (cl CodeLine) String() string {
@@ -220,6 +225,7 @@ func (cb CodeBlock) GetKey() string {
 
 // TypeInfo 单个type定义存储结构
 type TypeInfo struct {
+	Name      string
 	StartLine int          // type起始行
 	Lines     []*CodeLine  // 类型完整分行代码
 	Methods   []*CodeBlock // 该类型的方法列表
@@ -239,7 +245,11 @@ func (ti *TypeInfo) String() string {
 		if l.Disabled {
 			continue
 		}
-		code += l.Code + l.Comment + "\n"
+		if l.GetIsStruct() {
+			code += l.GetField() + " " + l.GetType() + " " + l.GetTag() + " " + l.GetComment() + "\n" // struct结构体声明
+		} else {
+			code += l.GetCode() + " " + l.GetComment() + "\n" // interface或自定义类型声明
+		}
 	}
 	for _, m := range ti.Methods {
 		code += m.String() + "\n"
@@ -555,6 +565,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 					tName := typeSpec.Name.Name
 					if _, exists := res.Types[tName]; !exists {
 						res.Types[tName] = &TypeInfo{
+							Name:      tName,
 							StartLine: 0,
 							Lines:     []*CodeLine{},
 							Methods:   []*CodeBlock{},
@@ -683,6 +694,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 							if j < 0 || j >= len(typeLines) {
 								continue
 							}
+							typeLines[j].IsStruct = true
 							typeLines[j].Key = extractFieldKey(tName, fld)
 							typeLines[j].Field = extractFieldName(fld)
 							typeLines[j].Type, typeLines[j].Tag = extractStructFieldTypeAndTag(fset, fixedContent, fld)
@@ -696,6 +708,7 @@ func ParseGoFile(filePath string) (*GoFileParseResult, error) {
 						res.Types[tName] = info
 					} else {
 						res.Types[tName] = &TypeInfo{
+							Name:      tName,
 							StartLine: tStart,
 							Lines:     typeLines,
 							Methods:   []*CodeBlock{},
@@ -805,7 +818,7 @@ func PrintResult(r *GoFileParseResult) {
 		fmt.Printf("Type[%s] LineStart:%d\n", name, info.StartLine)
 		fmt.Println("--- Fields ---")
 		for _, cl := range info.Lines {
-			fmt.Printf("CODE: %q | COMMENT: %q | KEY: %s | FIELD: %s | TYPE: %s | TAG: %s\n", cl.Code, cl.Comment, cl.Key, cl.Field, cl.Type, cl.Tag)
+			fmt.Printf("CODE: %q | COMMENT: %q | KEY: %s | ISSTRUCT: %t | FIELD: %s | TYPE: %s | TAG: %s\n", cl.Code, cl.Comment, cl.Key, cl.IsStruct, cl.Field, cl.Type, cl.Tag)
 		}
 		if len(info.Methods) > 0 {
 			fmt.Println("--- Methods ---")

@@ -205,17 +205,17 @@ func mergePackageVarConst(baseLineBlocks, workLineBlocks []*CodeBlock, singlePre
 }
 
 func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
-	var codeFieldMap = make(map[string]*CodeLine)
-	var codeMethodMap = make(map[string]*CodeBlock)
+	var baseFields = make(map[string]*CodeLine)
+	var baseMethods = make(map[string]*CodeBlock)
 	for _, bt := range base.Types {
 		for _, line := range bt.Lines {
 			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
 				continue
 			}
-			codeFieldMap[line.Key] = line
+			baseFields[line.Key] = line
 		}
 		for _, method := range bt.Methods {
-			codeMethodMap[method.GetKey()] = method
+			baseMethods[method.GetKey()] = method
 		}
 	}
 	for k, wt := range work.Types {
@@ -227,19 +227,38 @@ func mergeTypes(base, work *GoFileParseResult) (types []*TypeInfo) {
 			if line.GetKey() == "" || line.IsTypeStart() || line.IsTypeEnd() {
 				continue
 			}
-			if bl, ok := codeFieldMap[line.Key]; !ok {
-				var bt *TypeInfo
-				if bt, ok = base.Types[k]; ok {
-					bt.InsertField(line)
-				}
+			var ok bool
+			var bt *TypeInfo
+			var bl *CodeLine
+			bt, ok = base.Types[k]
+			if bl, ok = baseFields[line.Key]; !ok {
+				bt.InsertField(line)
 			} else {
 				if isEmptyComment(bl.Comment) && !isEmptyComment(line.Comment) {
 					bl.Comment = line.Comment
 				}
+				if bl.GetType() != line.GetType() { // 数据库导出的字段类型跟当前工作区代码不一致，以工作区代码为准
+					getterKey := fmt.Sprintf("Func.%s.Get%s", bt.Name, line.Field)
+					setterKey := fmt.Sprintf("Func.%s.Set%s", bt.Name, line.Field)
+					var getterFunc, setterFunc *CodeBlock
+					getterFunc, ok = baseMethods[getterKey]
+					if ok {
+						for _, fl := range getterFunc.Lines {
+							fl.Code = strings.Replace(fl.Code, bl.Type, line.Type, 1) // 替换原有类型
+						}
+					}
+					setterFunc, ok = baseMethods[setterKey]
+					if ok {
+						for _, fl := range setterFunc.Lines {
+							fl.Code = strings.Replace(fl.Code, bl.Type, line.Type, 1) // 替换原有类型
+						}
+					}
+					bl.Type = line.GetType()
+				}
 			}
 		}
 		for _, method := range wt.Methods {
-			if _, ok := codeMethodMap[method.GetKey()]; !ok {
+			if _, ok := baseMethods[method.GetKey()]; !ok {
 				var bt *TypeInfo
 				if bt, ok = base.Types[k]; ok {
 					bt.InsertMethod(method)

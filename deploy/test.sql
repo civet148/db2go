@@ -119,6 +119,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `user_name` varchar(32) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `state` tinyint(1) DEFAULT '0',
   `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `extra_data` json DEFAULT NULL,
   PRIMARY KEY (`id`),
