@@ -14,10 +14,10 @@ const (
 )
 
 type UserRole struct {
-	UserId    uint64     `json:"user_id" db:"user_id" gorm:"column:user_id;type:bigint unsigned;index:fk_user_roles_user,priority:1;primarykey;default:0;"`
-	RoleId    uint64     `json:"role_id" db:"role_id" gorm:"column:role_id;type:bigint unsigned;index:fk_user_roles_role,priority:1;primarykey;default:0;"`
-	CreatedAt *time.Time `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_user_roles_created_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-	UpdatedAt *time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_user_roles_updated_at,priority:1;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
+	UserId    uint64     `json:"user_id" db:"user_id" gorm:"column:user_id;type:bigint unsigned;index:fk_user_roles_user,priority:1;primarykey;default:0;not null;"`
+	RoleId    uint64     `json:"role_id" db:"role_id" gorm:"column:role_id;type:bigint unsigned;index:fk_user_roles_role,priority:1;primarykey;default:0;not null;"`
+	CreatedAt *time.Time `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_user_roles_created_at,priority:1;default:CURRENT_TIMESTAMP;not null;" sqlca:"readonly"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_user_roles_updated_at,priority:1;default:CURRENT_TIMESTAMP;not null;" sqlca:"readonly"`
 }
 
 func (do UserRole) DatabaseName() string { return "test" }

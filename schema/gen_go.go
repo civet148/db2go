@@ -180,9 +180,13 @@ func buildColumnTags(cmd *CmdFlags, table *TableSchema, col TableColumn) string 
 				}
 				if col.ColumnDefault != "" {
 					tv += fmt.Sprintf("default:%s;", col.ColumnDefault)
-				} else {
-					tv += "default:null;"
 				}
+				if col.IsNullable == "YES" {
+					tv += "default:null;"
+				} else {
+					tv += "not null;"
+				}
+
 				if col.Comment != "" {
 					tv += fmt.Sprintf("comment:%s;", handleColumnComment(col.Comment))
 				}
