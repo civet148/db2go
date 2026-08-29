@@ -70,6 +70,10 @@ func (t *TableSchema) ExportTableSchema(cmd *CmdFlags) (err error) {
 	return nil
 }
 
+func (t *TableSchema) isWithoutColumn(cmd *CmdFlags, column string) bool {
+	return cmd.IsIgnoreColumn(t.TableName, column)
+}
+
 func (t *TableSchema) exportModels(cmd *CmdFlags) error {
 	t.TableNameCamelCase = BigCamelCase(t.TableName)
 	t.TableComment = ReplaceCRLF(t.TableComment)
@@ -103,7 +107,7 @@ func (t *TableSchema) exportModels(cmd *CmdFlags) error {
 
 	var cols []ColumnTmplData
 	for _, col := range t.Columns {
-		if IsInSlice(col.Name, cmd.Without) {
+		if t.isWithoutColumn(cmd, col.Name) {
 			continue
 		}
 		cols = append(cols, buildColumnTmplData(cmd, t, col))
