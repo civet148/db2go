@@ -95,13 +95,13 @@ where db2go.exe
 IF "%errorlevel%" == "0" (
     echo db2go already installed.
 ) ELSE (
-    echo db2go not found in system %%PATH%%, installing...
-    go install github.com/civet148/db2go@latest
+    echo "db2go not found in system %%PATH%%, installing..."
+    CGO_ENABLED=1 go install github.com/civet148/db2go@latest
     If "%errorlevel%" == "0" (
         echo db2go install succeeded
     ) ELSE (
         rem 安装失败，Linux/Mac请安装gcc工具链，Windows系统可以通过链接直接下载二进制(https://github.com/civet148/release/tree/master/db2go)
-        echo error: db2go install failed, Linux/Mac please install gcc tool-chain, Windows download from https://github.com/civet148/release/tree/master/db2go
+        echo "error: db2go install failed, Linux/Mac please install gcc tool-chain, Windows download from https://github.com/civet148/release/tree/master/db2go"
     )
 )
 
@@ -141,7 +141,7 @@ DDL_FILE="deploy/test.sql"
 ## 检查 db2go 是否已安装
 if ! which db2go >/dev/null 2>&1; then
     # 安装最新版 db2go
-    go install github.com/civet148/db2go@latest
+    CGO_ENABLED=1 go install github.com/civet148/db2go@latest
 
     # 检查是否安装成功
     if which db2go >/dev/null 2>&1; then
