@@ -1,24 +1,55 @@
 # db2go is a command to export database table structure to go or proto file 
 
 ## Usage
+
+- **导出数据表为go模型文件**
+ 
 ```shell
+[~@devhost] db2go go -h                                                                                                                                                                                                    ok  15:04:28 
 NAME:
-   db2go - db2go [command] [options]
+   db2go go - Generate Go model files from database tables
 
 USAGE:
-   db2go [global options] command [command options] [arguments...]
+   db2go go [command options] [arguments...]
 
-VERSION:
-   v3.9.1 20260731 10:29:06 commit 67292be
+OPTIONS:
+   --url value, -u value        data source name of database
+   --out value, -o value        output directory (default: ".")
+   --table value, -t value      database tables to export (prefix with - to exclude)
+   --package value, -P value    package name
+   --without value              exclude columns split by comma
+   --ssh value                  ssh tunnel e.g ssh://root:123456@192.168.1.23:22
+   --debug, -d                  open debug mode (default: false)
+   --tag value, -T value        export tags for golang
+   --readonly value, -R value   readonly columns split by comma
+   --spec-type value, -S value  specify column as customized types, e.g 'user.detail=UserDetail, user.data=UserData'
+   --enable-decimal, -D         decimal as sqlca.Decimal type (default: false)
+   --ddl value                  export database DDL to file
+   --help, -h                   show help (default: false)
+```
 
-COMMANDS:
-   go       Generate Go model files from database tables
-   proto    Generate protobuf files from database tables
-   help, h  Shows a list of commands or help for one command
+- **导出数据表为protobuf文件**
 
-GLOBAL OPTIONS:
-   --help, -h     show help (default: false)
-   --version, -v  print the version (default: false)
+```shell
+[~@devhost] db2go proto -h 
+NAME:
+   db2go proto - Generate protobuf files from database tables
+
+USAGE:
+   db2go proto [command options] [arguments...]
+
+OPTIONS:
+   --url value, -u value               data source name of database
+   --out value, -o value               output directory (default: ".")
+   --table value, -t value             database tables to export (prefix with - to exclude)
+   --package value, -P value           package name
+   --without value                     exclude columns split by comma
+   --ssh value                         ssh tunnel e.g ssh://root:123456@192.168.1.23:22
+   --debug, -d                         open debug mode (default: false)
+   --proto-options value, --po value   set protobuf options, multiple options separated by ';'
+   --gogo-options value, --gogo value  gogo proto options
+   --field-style value, --style value  protobuf message field camel style (small or big)
+   --help, -h                          show help (default: false)
 ```
 
 ## 1. 编译安装
