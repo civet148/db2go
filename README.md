@@ -47,13 +47,13 @@ set READ_ONLY="created_at, updated_at"
 rem 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
 set TABLE_NAME="-user_roles"
 rem 忽略字段名(逗号分隔)
-set WITH_OUT=""
+set WITHOUT=""
 rem 添加标签
 set TAGS="gorm"
 rem 数据库连接源DSN
 set DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 rem 指定具体表对应字段类型(不指定表则全局生效)
-set SPEC_TYPES="users.extra_data=struct%%, users.is_deleted=bool"
+set SPEC_TYPES="users.is_deleted=bool"
 rem 数据库DDL文件
 set DDL_FILE="deploy/test.sql"
 
@@ -76,7 +76,7 @@ IF "%errorlevel%" == "0" (
 
 
 db2go go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" ^
- --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tag "%TAGS%" --ddl "%DDL_FILE%" 
+ --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITHOUT%" --tag "%TAGS%" --ddl "%DDL_FILE%" 
 
 echo "generate go file ok, formatting..."
 gofmt -w %OUT_DIR%/%PACK_NAME%
@@ -97,13 +97,13 @@ READ_ONLY="created_at, updated_at"
 # 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
 TABLE_NAME="-user_roles"
 # 忽略字段名(逗号分隔)
-WITH_OUT=""
+WITHOUT=""
 # 添加标签
 TAGS="gorm"
 # 数据库连接源DSN
 DSN_URL="mysql://root:123456@127.0.0.1:3306/test?charset=utf8"
 # 指定具体表对应字段类型(不指定表则全局生效)
-SPEC_TYPES="users.extra_data=struct{}, users.is_deleted=bool"
+SPEC_TYPES="users.is_deleted=bool"
 # 数据库DDL文件
 DDL_FILE="deploy/test.sql"
 
@@ -122,7 +122,7 @@ if ! which db2go >/dev/null 2>&1; then
 fi
 
 db2go go --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
- --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --tag "${TAGS}" --ddl "${DDL_FILE}" 
+ --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITHOUT}" --tag "${TAGS}" --ddl "${DDL_FILE}" 
 
 echo "generate go file ok, formatting..."
 gofmt -w ${OUT_DIR}/${PACK_NAME}
@@ -157,15 +157,23 @@ const (
     UsersColumn_ExtraData = "extra_data"
 )
 
+type UserState int
+const (
+	UserState_Unknown UserState = iota
+	UserState_Active
+	UserState_Baned
+)
+
 type User struct {
-    Id          uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
-    CreatedAt   time.Time     `json:"created_at" db:"created_at" gorm:"column:created_at;type:timestamp;autoCreateTime;index:idx_users_created_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-    UpdatedAt   time.Time     `json:"updated_at" db:"updated_at" gorm:"column:updated_at;type:timestamp;autoUpdateTime;index:idx_users_updated_at;default:CURRENT_TIMESTAMP;" sqlca:"readonly"`
-    UserName    string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name;default:null;" sqlca:"isnull"`
-    Email       string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email;default:null;" sqlca:"isnull"`
-    ExtraData   UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;default:null;" sqlca:"isnull"`
-	Roles       []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;-:migration;"` // 用户角色列表(手工添加，自动合并)
-	Profile     UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;-:migration;"`  // 用户资料明细(手工添加，自动合并)
+	Id        uint64        `json:"id" db:"id" gorm:"column:id;primaryKey;autoIncrement;"`
+	UserName  string        `json:"user_name" db:"user_name" gorm:"column:user_name;type:varchar(32);uniqueIndex:idx_users_user_name,priority:1;null;" sqlca:"nullable"`
+	State     UserState     `json:"state" db:"state" gorm:"column:state;type:tinyint(1);default:0;null;" sqlca:"nullable"`
+	Email     string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email,priority:1;null;" sqlca:"nullable"`
+	ExtraData UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;null;" sqlca:"nullable"`
+	CreatedAt time.Time     `json:"created_at,omitempty" db:"created_at" gorm:"column:created_at;type:timestamp;not null;index;default:CURRENT_TIMESTAMP;autoCreatedAt;not null;"` //创建时间
+	UpdatedAt time.Time     `json:"updated_at,omitempty" db:"updated_at" gorm:"column:updated_at;type:timestamp;not null;index;default:CURRENT_TIMESTAMP;autoUpdatedAt;not null;"` //更新时间
+	Roles     []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;-:migration;"` // 关联角色表对象(手工添加，自动合并)
+	Profile   UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;-:migration;"`  // 关联用户资料对象(手工添加，自动合并)
 }
 
 func (do User) TableName() string {
@@ -202,7 +210,7 @@ set PACK_NAME="protos"
 rem 指定数据库表名（留空表示导出全部表结构）
 set TABLE_NAME=""
 rem 忽略哪些数据库表字段
-set WITH_OUT=""
+set WITHOUT=""
 rem 设置protobuf option
 set PROTO_OPTION="go_package=./pb"
 
@@ -224,9 +232,8 @@ IF "%errorlevel%" == "0" (
 
 rem 判断db2go是否安装成功
 IF "%errorlevel%" == "0" (
-    db2go --url %DSN_URL% --proto --out %OUT_DIR% --table %TABLE_NAME% --package %PACK_NAME%  --without %WITH_OUT% --proto-options %PROTO_OPTION%
+    db2go --url %DSN_URL% --proto --out %OUT_DIR% --table %TABLE_NAME% --package %PACK_NAME% --without %WITHOUT% --proto-options %PROTO_OPTION%
     echo generate protobuf files ok
-    gofmt -w %OUT_DIR%/%PACK_NAME%
 )
 
 PAUSE

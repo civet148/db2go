@@ -7,7 +7,7 @@ PACK_NAME="models"
 # 只读字段(不更新)
 READ_ONLY="created_at, updated_at"
 # 忽略字段名(逗号分隔)
-WITH_OUT="users.created_at, users.updated_at"
+WITHOUT="users.created_at, users.updated_at"
 # 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
 TABLE_NAME=""
 # 数据库连接源DSN
@@ -34,7 +34,7 @@ DDL_FILE="deploy/test.sql"
 #fi
 
 make && ./db2go go --debug --url "${DSN_URL}" --out "${OUT_DIR}" --table "${TABLE_NAME}" --enable-decimal  --spec-type "${SPEC_TYPES}" \
- --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITH_OUT}" --ddl "${DDL_FILE}" --tag "${TAGS}"
+ --package "${PACK_NAME}" --readonly "${READ_ONLY}" --without "${WITHOUT}" --ddl "${DDL_FILE}" --tag "${TAGS}"
 
 echo "generate go file ok, formatting..."
 gofmt -w ${OUT_DIR}/${PACK_NAME}

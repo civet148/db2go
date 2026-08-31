@@ -9,7 +9,7 @@ set READ_ONLY="created_at, updated_at"
 rem 指定或排除表名(不指定则整个数据库全部导出, 排除表名在表名前面加-)
 set TABLE_NAME="-user_roles"
 rem 忽略字段名(逗号分隔)
-set WITH_OUT=""
+set WITHOUT=""
 rem 添加标签
 set TAGS="gorm"
 rem 数据库连接源DSN
@@ -38,7 +38,7 @@ IF "%errorlevel%" == "0" (
 
 
 db2go go --url "%DSN_URL%" --out "%OUT_DIR%" --table "%TABLE_NAME%" --enable-decimal  --spec-type "%SPEC_TYPES%" \
- --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITH_OUT%" --tag "%TAGS%" --ddl "%DDL_FILE%"
+ --package "%PACK_NAME%" --readonly "%READ_ONLY%" --without "%WITHOUT%" --tag "%TAGS%" --ddl "%DDL_FILE%"
 
 echo "generate go file ok, formatting..."
 gofmt -w %OUT_DIR%/%PACK_NAME%

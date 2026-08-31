@@ -21,7 +21,7 @@ CREATE TABLE `inventory_data` (
   KEY `idx_inventory_data_created_at` (`created_at`),
   KEY `idx_inventory_data_updated_at` (`updated_at`),
   KEY `i_serial_no` (`serial_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=2093621966438141953 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2093631448014655489 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -46,7 +46,7 @@ CREATE TABLE `inventory_in` (
   KEY `idx_inventory_in_updated_at` (`updated_at`),
   KEY `idx_prod_create_id` (`product_id`,`create_id`) USING BTREE,
   KEY `i_p_u` (`user_id`,`product_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2093621966433947649 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2093631448006266881 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,

@@ -24,8 +24,8 @@ type User struct {
 	State     UserState     `json:"state" db:"state" gorm:"column:state;type:tinyint(1);default:0;null;" sqlca:"nullable"`
 	Email     string        `json:"email" db:"email" gorm:"column:email;type:varchar(64);uniqueIndex:idx_users_email,priority:1;null;" sqlca:"nullable"`
 	ExtraData UserExtraData `json:"extra_data" db:"extra_data" gorm:"column:extra_data;type:json;null;" sqlca:"nullable"`
-	Roles     []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;-:migration;"` // 用户角色列表
-	Profile   UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;-:migration;"`  // 用户资料明细
+	Roles     []*Role       `json:"roles,omitempty" db:"-" gorm:"many2many:user_roles;-:migration;"` // 用户角色列表(手工添加，自动合并)
+	Profile   UserProfile   `json:"profile,omitempty" db:"-" gorm:"foreignKey:UserId;-:migration;"`  // 用户资料明细(手工添加，自动合并)
 	BaseModel `json:"base_model" db:"-" gorm:"embedded"`
 }
 
