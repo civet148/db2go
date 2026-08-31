@@ -271,3 +271,18 @@ PAUSE
 
 ```
 
+```protobuf
+syntax = "proto3";
+package proto;
+
+message User {
+	uint64 id = 1; //
+	string created_at = 2; //
+	string updated_at = 3; //
+	string user_name = 4; //
+	sint32 state = 5; //
+	string email = 6; //
+	string extra_data = 7; //
+}
+
+```
