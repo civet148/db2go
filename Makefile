@@ -7,7 +7,7 @@ build:
 	CGO_ENABLED=1 go build -ldflags "-s -w -X 'main.BuildTime=${DATE_TIME}' -X 'main.GitCommit=${COMMIT_ID}'"
 
 install:
-	CGO_ENABLED=1 go install -ldflags "-s -w -X 'main.BuildTime=${DATE_TIME}' -X 'main.GitCommit=${COMMIT_ID}'" && db2go -v
+	CGO_ENABLED=1 go build -ldflags "-s -w -X 'main.BuildTime=${DATE_TIME}' -X 'main.GitCommit=${COMMIT_ID}'" && mv db2go ${GOPATH}/bin && db2go -v
 
 clean:
 	rm -f db2go
