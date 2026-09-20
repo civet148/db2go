@@ -161,7 +161,9 @@ func buildColumnTags(cmd *CmdFlags, table *TableSchema, col TableColumn) string 
 		strJsonValue = BigCamelCase(col.Name)
 	}
 	tagValues = append(tagValues, fmt.Sprintf(`json:"%v"`, strJsonValue))
-	tagValues = append(tagValues, fmt.Sprintf(`db:"%v"`, col.Name))
+	if !cmd.HasGorm() {
+		tagValues = append(tagValues, fmt.Sprintf(`db:"%v"`, col.Name))
+	}
 
 	for _, t := range cmd.ExtraTags {
 		tv := col.Name

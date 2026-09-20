@@ -288,6 +288,15 @@ func NewCmdFlags(opts ...Option) *CmdFlags {
 	return c
 }
 
+func (c CmdFlags) HasGorm() bool {
+	for _, tag := range c.ExtraTags {
+		if strings.Contains(tag, "gorm") {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *CmdFlags) String() string {
 	data, _ := json.Marshal(c)
 	return string(data)

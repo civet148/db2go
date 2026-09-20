@@ -21,7 +21,7 @@ CREATE TABLE `inventory_data` (
   KEY `idx_inventory_data_created_at` (`created_at`),
   KEY `idx_inventory_data_updated_at` (`updated_at`),
   KEY `i_serial_no` (`serial_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=2093631448014655489 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2101516940647337985 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_in` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -46,7 +46,7 @@ CREATE TABLE `inventory_in` (
   KEY `idx_inventory_in_updated_at` (`updated_at`),
   KEY `idx_prod_create_id` (`product_id`,`create_id`) USING BTREE,
   KEY `i_p_u` (`user_id`,`product_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2093631448006266881 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2101516940643143681 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `inventory_out` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -98,7 +98,7 @@ CREATE TABLE `user_profiles` (
   KEY `idx_user_profiles_created_at` (`created_at`),
   KEY `idx_user_profiles_updated_at` (`updated_at`),
   CONSTRAINT `fk_users_profile` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `user_roles` (
   `user_id` bigint unsigned NOT NULL DEFAULT '0',
@@ -122,9 +122,16 @@ CREATE TABLE `users` (
   `state` tinyint(1) DEFAULT '0',
   `email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `extra_data` json DEFAULT NULL,
+  `left_val` bigint DEFAULT NULL,
+  `right_val` bigint DEFAULT NULL,
+  `depth` bigint DEFAULT NULL,
+  `parent_id` bigint DEFAULT '0',
+  `root_path` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_users_user_name` (`user_name`),
   UNIQUE KEY `idx_users_email` (`email`),
   KEY `idx_users_created_at` (`created_at`),
-  KEY `idx_users_updated_at` (`updated_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `idx_users_updated_at` (`updated_at`),
+  KEY `idx_users_left_val` (`left_val`),
+  KEY `idx_users_right_val` (`right_val`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
