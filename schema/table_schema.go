@@ -123,6 +123,13 @@ func (c TableColumn) IsDeleteTime() bool {
 	return colName == "delete_time" || colName == "delete_at" || colName == "deleted_time" || colName == "deleted_at"
 }
 
+func (c TableColumn) IsJsonType() bool {
+	if c.ColumnType == "json" {
+		return true
+	}
+	return false
+}
+
 type Exporter interface {
 	ExportGo() (err error)
 	ExportProto() (err error)

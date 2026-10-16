@@ -34,7 +34,7 @@ type InventoryData struct {
 	Quantity     sqlca.Decimal `json:"quantity" gorm:"column:quantity;type:decimal(16,3);default:0.000;null;" sqlca:"nullable"`
 	Price        sqlca.Decimal `json:"price" gorm:"column:price;type:decimal(16,2);default:0.00;null;" sqlca:"nullable"`
 	Location     sqlca.Point   `json:"location" gorm:"column:location;type:point;null;" sqlca:"nullable"`
-	ProductExtra struct{}      `json:"product_extra" gorm:"column:product_extra;type:json;null;" sqlca:"nullable"`
+	ProductExtra struct{}      `json:"product_extra" gorm:"column:product_extra;type:json;serializer:json;null;" sqlca:"nullable"`
 	CreateId     uint64        `json:"create_id" gorm:"column:create_id;type:bigint unsigned;default:0;null;" sqlca:"nullable"`
 	CreateName   string        `json:"create_name" gorm:"column:create_name;type:varchar(64);null;" sqlca:"nullable"`
 	UpdateId     uint64        `json:"update_id" gorm:"column:update_id;type:bigint unsigned;default:0;null;" sqlca:"nullable"`

@@ -179,6 +179,9 @@ func buildColumnTags(cmd *CmdFlags, table *TableSchema, col TableColumn) string 
 					tv = fmt.Sprintf("column:%s;type:%s;autoUpdateTime;", tv, col.ColumnType)
 				} else {
 					tv = fmt.Sprintf("column:%s;type:%s;", tv, col.ColumnType)
+					if col.IsJsonType() {
+						tv += "serializer:json;"
+					}
 				}
 				index, ok := table.GetGormIndexes(col.Name)
 				if ok {
