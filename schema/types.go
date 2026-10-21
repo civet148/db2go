@@ -145,7 +145,7 @@ var db2goTypes = map[string]string{
 	DB_COLUMN_TYPE_LONGBLOB:   "string",
 	DB_COLUMN_TYPE_BINARY:     "string",
 	DB_COLUMN_TYPE_VARBINARY:  "string",
-	DB_COLUMN_TYPE_JSON:       "struct{}",
+	DB_COLUMN_TYPE_JSON:       "any",
 	DB_COLUMN_TYPE_JSONB:      "string",
 	DB_COLUMN_TYPE_POINT:      "sqlca.Point", //暂定
 	DB_COLUMN_TYPE_POLYGON:    "string",      //暂定
